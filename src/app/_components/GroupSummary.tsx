@@ -6,8 +6,21 @@ import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { Label } from "~/components/ui/label";
 import { Badge } from "~/components/ui/badge";
 import { Separator } from "~/components/ui/separator";
-import { Receipt, Users, TrendingUp, ArrowRight, CheckCircle2, AlertCircle } from "lucide-react";
+import { Receipt, Users, TrendingUp, ArrowRight, CheckCircle2, AlertCircle, Trash2 } from "lucide-react";
 import type { RouterOutputs } from "~/trpc/shared";
+import { Button } from "~/components/ui/button";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "~/components/ui/alert-dialog";
+import { useState } from "react";
+import { Skeleton } from "~/components/ui/skeleton";
 
 // Helper to compute minimal transactions
 function getWhoOwesWhom(balances: { person: { id: string; name: string }; balance: number }[]) {
@@ -43,7 +56,31 @@ interface GroupSummaryProps {
 }
 
 export function GroupSummary({ group }: GroupSummaryProps) {
-  const { data: balances } = api.expense.getBalances.useQuery(group.id);
+  const [expenseToDelete, setExpenseToDelete] = useState<string | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const utils = api.useUtils();
+  const { data: balances, isLoading: isLoadingBalances } = api.expense.getBalances.useQuery(group.id);
+
+  const deleteExpense = api.expense.delete.useMutation({
+    onSuccess: async () => {
+      await utils.group.getById.invalidate();
+      await utils.expense.getBalances.invalidate();
+    }
+  });
+
+  const handleDeleteExpense = async () => {
+    if (expenseToDelete) {
+      setIsDeleting(true);
+      try {
+        await deleteExpense.mutateAsync(expenseToDelete);
+        // Wait for the data to be refetched
+        await new Promise(resolve => setTimeout(resolve, 1000));
+      } finally {
+        setIsDeleting(false);
+        setExpenseToDelete(null);
+      }
+    }
+  };
 
   const whoOwesWhom = balances ? getWhoOwesWhom(
     balances
@@ -83,7 +120,9 @@ export function GroupSummary({ group }: GroupSummaryProps) {
               <span className="font-semibold text-gray-700">{group.expenses.length} Expenses</span>
             </div>
             <div className="flex items-center gap-2 px-4 py-2 bg-white/70 backdrop-blur-sm rounded-full border border-white/20 shadow-sm">
-              {isAllSettled ? (
+              {isLoadingBalances ? (
+                <Skeleton className="h-5 w-24" />
+              ) : isAllSettled ? (
                 <>
                   <CheckCircle2 className="w-5 h-5 text-green-600" />
                   <span className="font-semibold text-green-700">All Settled!</span>
@@ -154,6 +193,14 @@ export function GroupSummary({ group }: GroupSummaryProps) {
                           </div>
                         </div>
                       </div>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-50 hover:text-red-600"
+                        onClick={() => setExpenseToDelete(expense.id)}
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
                     </motion.div>
                   ))
                 )}
@@ -180,7 +227,15 @@ export function GroupSummary({ group }: GroupSummaryProps) {
               </CardHeader>
               <CardContent className="space-y-4">
                 <AnimatePresence mode="wait">
-                  {isAllSettled ? (
+                  {isLoadingBalances ? (
+                    <div className="space-y-3">
+                      {[...Array(3)].map((_, i) => (
+                        <div key={i} className="space-y-2">
+                          <Skeleton className="h-12 w-full" />
+                        </div>
+                      ))}
+                    </div>
+                  ) : isAllSettled ? (
                     <motion.div
                       initial={{ opacity: 0, scale: 0.8 }}
                       animate={{ opacity: 1, scale: 1 }}
@@ -232,6 +287,42 @@ export function GroupSummary({ group }: GroupSummaryProps) {
             </Card>
           </motion.div>
         </div>
+
+        {/* Delete Confirmation Dialog */}
+        <AlertDialog 
+          open={!!expenseToDelete} 
+          onOpenChange={(open) => {
+            if (!open && !isDeleting) {
+              setExpenseToDelete(null);
+            }
+          }}
+        >
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+              <AlertDialogDescription>
+                This action cannot be undone. This will permanently delete the expense.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel disabled={isDeleting}>Cancel</AlertDialogCancel>
+              <AlertDialogAction
+                onClick={handleDeleteExpense}
+                disabled={isDeleting}
+                className="bg-red-600 hover:bg-red-700 focus:ring-red-600"
+              >
+                {isDeleting ? (
+                  <div className="flex items-center gap-2">
+                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    Deleting...
+                  </div>
+                ) : (
+                  "Delete"
+                )}
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </div>
     </div>
   );

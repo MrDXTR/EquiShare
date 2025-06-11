@@ -73,4 +73,16 @@ export const groupRouter = createTRPCRouter({
       });
       return group;
     }),
+
+  delete: protectedProcedure
+    .input(z.string())
+    .mutation(async ({ ctx, input }) => {
+      await ctx.db.group.delete({
+        where: {
+          id: input,
+          createdById: ctx.session.user.id,
+        },
+      });
+      return { success: true };
+    }),
 }); 

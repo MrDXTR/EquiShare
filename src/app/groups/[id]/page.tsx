@@ -11,13 +11,73 @@ import { GroupSummary } from "~/app/_components/GroupSummary";
 import { Plus, Users, Receipt } from "lucide-react";
 import { ExpenseForm } from "~/app/_components/ExpenseForm";
 import { use } from "react";
+import { Skeleton } from "~/components/ui/skeleton";
 
 export default function GroupDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const resolvedParams = use(params);
   const [isAddingExpense, setIsAddingExpense] = useState(false);
+  const utils = api.useUtils();
 
-  const { data: group } = api.group.getById.useQuery(resolvedParams.id);
-  const { data: balances } = api.expense.getBalances.useQuery(resolvedParams.id);
+  const { data: group, isLoading: isLoadingGroup } = api.group.getById.useQuery(resolvedParams.id);
+  const { data: balances, isLoading: isLoadingBalances } = api.expense.getBalances.useQuery(resolvedParams.id);
+
+  const handleExpenseCreated = async () => {
+    await utils.group.getById.invalidate(resolvedParams.id);
+    await utils.expense.getBalances.invalidate(resolvedParams.id);
+  };
+
+  if (isLoadingGroup) {
+    return (
+      <div className="min-h-screen bg-gray-50/50 p-4 md:p-8">
+        <div className="container mx-auto max-w-7xl space-y-8">
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="flex flex-col sm:flex-row sm:items-center justify-between gap-4"
+          >
+            <div className="space-y-2">
+              <Skeleton className="h-10 w-64" />
+              <div className="flex items-center gap-4">
+                <Skeleton className="h-4 w-32" />
+                <Skeleton className="h-4 w-32" />
+              </div>
+            </div>
+            <Skeleton className="h-12 w-40" />
+          </motion.div>
+
+          <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
+            <Card className="h-full bg-white/80 backdrop-blur-sm border-0 shadow-xl">
+              <CardHeader className="pb-4">
+                <Skeleton className="h-8 w-48" />
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {[...Array(3)].map((_, i) => (
+                  <div key={i} className="space-y-2">
+                    <Skeleton className="h-6 w-3/4" />
+                    <Skeleton className="h-4 w-1/2" />
+                  </div>
+                ))}
+              </CardContent>
+            </Card>
+
+            <Card className="h-full bg-white/80 backdrop-blur-sm border-0 shadow-xl">
+              <CardHeader className="pb-4">
+                <Skeleton className="h-8 w-48" />
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {[...Array(3)].map((_, i) => (
+                  <div key={i} className="space-y-2">
+                    <Skeleton className="h-6 w-3/4" />
+                    <Skeleton className="h-4 w-1/2" />
+                  </div>
+                ))}
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   if (!group) return null;
 
@@ -68,6 +128,7 @@ export default function GroupDetailPage({ params }: { params: Promise<{ id: stri
               groupId={resolvedParams.id} 
               people={group.people}
               onClose={() => setIsAddingExpense(false)}
+              onSuccess={handleExpenseCreated}
             />
           </motion.div>
         )}

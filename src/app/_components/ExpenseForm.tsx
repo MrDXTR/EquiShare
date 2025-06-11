@@ -23,22 +23,26 @@ interface ExpenseFormProps {
   groupId: string;
   people: Array<{ id: string; name: string }>;
   onClose: () => void;
+  onSuccess?: () => void;
 }
 
-export function ExpenseForm({ groupId, people, onClose }: ExpenseFormProps) {
+export function ExpenseForm({ groupId, people, onClose, onSuccess }: ExpenseFormProps) {
   const router = useRouter();
   const [description, setDescription] = useState("");
   const [amount, setAmount] = useState("");
   const [paidById, setPaidById] = useState("");
   const [shareIds, setShareIds] = useState<string[]>([]);
+  const utils = api.useUtils();
 
   const createExpense = api.expense.create.useMutation({
-    onSuccess: () => {
+    onSuccess: async () => {
       setDescription("");
       setAmount("");
       setPaidById("");
       setShareIds([]);
-      router.refresh();
+      await utils.group.getById.invalidate(groupId);
+      await utils.expense.getBalances.invalidate(groupId);
+      onSuccess?.();
       onClose();
     },
   });
