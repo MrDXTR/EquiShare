@@ -63,6 +63,7 @@ model User {
     accounts      Account[]
     sessions      Session[]
     posts         Post[]
+    groups        Group[]
 }
 
 model VerificationToken {
@@ -71,4 +72,69 @@ model VerificationToken {
     expires    DateTime
 
     @@unique([identifier, token])
+}
+
+model Group {
+    id        String   @id @default(cuid())
+    name      String
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    createdBy   User     @relation(fields: [createdById], references: [id])
+    createdById String
+    people      Person[]
+    expenses    Expense[]
+
+    @@index([createdById])
+}
+
+model Person {
+    id        String   @id @default(cuid())
+    name      String
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    group   Group  @relation(fields: [groupId], references: [id], onDelete: Cascade)
+    groupId String
+
+    paidExpenses Expense[] @relation("PaidBy")
+    shares       Share[]
+
+    @@index([groupId])
+}
+
+model Expense {
+    id          String   @id @default(cuid())
+    description String
+    amount      Float
+    createdAt   DateTime @default(now())
+    updatedAt   DateTime @updatedAt
+
+    group   Group  @relation(fields: [groupId], references: [id], onDelete: Cascade)
+    groupId String
+
+    paidBy   Person @relation("PaidBy", fields: [paidById], references: [id])
+    paidById String
+
+    shares Share[]
+
+    @@index([groupId])
+    @@index([paidById])
+}
+
+model Share {
+    id        String   @id @default(cuid())
+    amount    Float
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    expense   Expense @relation(fields: [expenseId], references: [id], onDelete: Cascade)
+    expenseId String
+
+    person   Person @relation(fields: [personId], references: [id], onDelete: Cascade)
+    personId String
+
+    @@unique([expenseId, personId])
+    @@index([expenseId])
+    @@index([personId])
 }
