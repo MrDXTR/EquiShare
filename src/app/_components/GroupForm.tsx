@@ -4,20 +4,31 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { api } from "~/trpc/react";
 import { Button } from "~/components/ui/button";
-import { Input } from "~/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
-import { X } from "lucide-react";
+import { Input } from "~/components/ui/input";
+import { Label } from "~/components/ui/label";
+import { Separator } from "~/components/ui/separator";
+import { Plus, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 
-export function GroupForm() {
+interface GroupFormProps {
+  onClose: () => void;
+  onSuccess?: () => void;
+}
+
+export function GroupForm({ onClose, onSuccess }: GroupFormProps) {
   const router = useRouter();
   const [name, setName] = useState("");
   const [people, setPeople] = useState<string[]>([""]);
+  const utils = api.useUtils();
+  
   const createGroup = api.group.create.useMutation({
-    onSuccess: () => {
+    onSuccess: async () => {
       setName("");
       setPeople([""]);
-      router.refresh();
+      await utils.group.getAll.invalidate();
+      onSuccess?.();
+      onClose();
     },
   });
 
@@ -35,7 +46,7 @@ export function GroupForm() {
     setPeople(newPeople);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const validPeople = people.filter((p) => p.trim() !== "");
     if (validPeople.length === 0) return;
@@ -45,73 +56,132 @@ export function GroupForm() {
     });
   };
 
-  return (
-    <Card className="w-full max-w-md">
-      <CardHeader>
-        <CardTitle>Create New Group</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="space-y-2">
-            <label htmlFor="group-name" className="text-sm font-medium">
-              Group Name
-            </label>
-            <Input
-              id="group-name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="Enter group name"
-              required
-            />
-          </div>
+  const isFormValid = name.trim().length > 0 && people.some(p => p.trim().length > 0);
 
-          <div className="space-y-2">
-            <label className="text-sm font-medium">People</label>
-            {people.map((person, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                className="flex gap-2"
-              >
-                <Input
-                  value={person}
-                  onChange={(e) => updatePerson(index, e.target.value)}
-                  placeholder={`Person ${index + 1}`}
-                  required
-                />
-                {people.length > 1 && (
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => removePerson(index)}
-                  >
-                    <X className="h-4 w-4" />
-                  </Button>
-                )}
-              </motion.div>
-            ))}
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20, scale: 0.95 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      exit={{ opacity: 0, y: -20, scale: 0.95 }}
+      className="relative"
+    >
+      <Card className="bg-white/90 backdrop-blur-sm border-0 shadow-2xl shadow-blue-100/50">
+        <CardHeader className="pb-4">
+          <div className="flex items-center justify-between">
+            <CardTitle className="flex items-center gap-3 text-2xl">
+              <div className="p-2 bg-gradient-to-r from-green-500 to-emerald-600 rounded-lg">
+                <Plus className="w-6 h-6 text-white" />
+              </div>
+              <span className="bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">
+                Create New Group
+              </span>
+            </CardTitle>
             <Button
-              type="button"
-              variant="outline"
-              onClick={addPerson}
-              className="w-full"
+              variant="ghost"
+              size="sm"
+              onClick={onClose}
+              className="text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-full"
             >
-              Add Person
+              <X className="w-5 h-5" />
             </Button>
           </div>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div className="space-y-2">
+              <Label htmlFor="groupName" className="text-sm font-semibold text-gray-700">
+                Group Name *
+              </Label>
+              <Input
+                id="groupName"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="e.g., Trip to Goa, Roommate Expenses, Office Lunch"
+                className="h-12 border-gray-200 focus:border-blue-500 focus:ring-blue-500/20 transition-all duration-200"
+                autoFocus
+                required
+              />
+              <p className="text-sm text-gray-500">
+                Choose a descriptive name for your group
+              </p>
+            </div>
 
-          <Button
-            type="submit"
-            className="w-full"
-            disabled={createGroup.isPending}
-          >
-            {createGroup.isPending ? "Creating..." : "Create Group"}
-          </Button>
-        </form>
-      </CardContent>
-    </Card>
+            <div className="space-y-2">
+              <Label className="text-sm font-semibold text-gray-700">People *</Label>
+              {people.map((person, index) => (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -20 }}
+                  className="flex gap-2"
+                >
+                  <Input
+                    value={person}
+                    onChange={(e) => updatePerson(index, e.target.value)}
+                    placeholder={`Person ${index + 1}`}
+                    className="h-12 border-gray-200 focus:border-blue-500 focus:ring-blue-500/20 transition-all duration-200"
+                    required
+                  />
+                  {people.length > 1 && (
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => removePerson(index)}
+                      className="text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-full"
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
+                  )}
+                </motion.div>
+              ))}
+              <Button
+                type="button"
+                variant="outline"
+                onClick={addPerson}
+                className="w-full border-gray-200 hover:bg-gray-50"
+              >
+                Add Person
+              </Button>
+            </div>
+
+            <Separator />
+
+            <div className="flex flex-col sm:flex-row justify-end gap-3">
+              <Button 
+                type="button"
+                variant="outline" 
+                onClick={onClose}
+                className="order-2 sm:order-1 border-gray-300 hover:bg-gray-50"
+              >
+                Cancel
+              </Button>
+              <Button 
+                type="submit"
+                disabled={!isFormValid || createGroup.isPending}
+                className={`order-1 sm:order-2 ${
+                  isFormValid
+                    ? 'bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 shadow-lg hover:shadow-xl'
+                    : 'bg-gray-300 cursor-not-allowed'
+                } transition-all duration-300`}
+              >
+                {createGroup.isPending ? (
+                  <div className="flex items-center gap-2">
+                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    Creating...
+                  </div>
+                ) : (
+                  <>
+                    <Plus className="w-4 h-4 mr-2" />
+                    Create Group
+                  </>
+                )}
+              </Button>
+            </div>
+          </form>
+        </CardContent>
+      </Card>
+    </motion.div>
   );
 } 
