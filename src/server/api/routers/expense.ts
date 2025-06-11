@@ -51,6 +51,20 @@ export const expenseRouter = createTRPCRouter({
       return { success: true };
     }),
 
+  settleUp: protectedProcedure
+    .input(z.string())
+    .mutation(async ({ ctx, input }) => {
+      const expense = await ctx.db.expense.update({
+        where: {
+          id: input,
+        },
+        data: {
+          settled: true,
+        },
+      });
+      return expense;
+    }),
+
   getBalances: protectedProcedure
     .input(z.string())
     .query(async ({ ctx, input }) => {
@@ -62,6 +76,9 @@ export const expenseRouter = createTRPCRouter({
         include: {
           people: true,
           expenses: {
+            where: {
+              settled: false,
+            },
             include: {
               paidBy: true,
               shares: {

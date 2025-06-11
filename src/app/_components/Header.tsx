@@ -13,6 +13,7 @@ import {
   DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
 import { LogOut, User } from "lucide-react";
+import Image from "next/image";
 
 export function Header() {
   const { data: session } = useSession();
@@ -34,6 +35,7 @@ export function Header() {
           href="/"
           className="flex items-center space-x-2 transition-opacity hover:opacity-80"
         >
+          <Image src="/file.svg" alt="DxtrSplit" width={32} height={32} />
           <span className="text-xl font-bold tracking-tight">DxtrSplit</span>
         </Link>
 
@@ -90,7 +92,7 @@ export function Header() {
               </DropdownMenu>
             </div>
           ) : (
-            <Button onClick={() => void signIn()} className="font-medium">
+            <Button onClick={() => router.push("/signin")} className="font-medium">
               Sign In
             </Button>
           )}

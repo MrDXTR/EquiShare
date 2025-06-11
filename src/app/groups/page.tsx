@@ -22,6 +22,7 @@ import {
   AlertDialogTitle,
 } from "~/components/ui/alert-dialog";
 import { Skeleton } from "~/components/ui/skeleton";
+import { toast } from "sonner";
 
 export default function GroupsPage() {
   const router = useRouter();
@@ -35,8 +36,23 @@ export default function GroupsPage() {
   });
 
   const deleteGroup = api.group.delete.useMutation({
+    onMutate: () => {
+      toast.loading("Deleting group...", {
+        id: "delete-group",
+      });
+    },
     onSuccess: async () => {
       await utils.group.getAll.invalidate();
+      toast.success("Group deleted successfully", {
+        id: "delete-group",
+        style: { backgroundColor: "#fee2e2", color: "#991b1b", borderColor: "#fecaca" },
+      });
+      setGroupToDelete(null);
+    },
+    onError: () => {
+      toast.error("Failed to delete group", {
+        id: "delete-group",
+      });
     },
   });
 

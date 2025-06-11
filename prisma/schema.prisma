@@ -107,6 +107,7 @@ model Expense {
     id          String   @id @default(cuid())
     description String
     amount      Float
+    settled     Boolean  @default(false)
     createdAt   DateTime @default(now())
     updatedAt   DateTime @updatedAt
 

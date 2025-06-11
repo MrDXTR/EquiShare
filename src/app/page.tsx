@@ -119,7 +119,7 @@ export default function LandingPage() {
           >
             <Button
               size="lg"
-              onClick={() => router.push("/api/auth/signin")}
+              onClick={() => router.push("/signin")}
               className="hover:shadow-3xl transform bg-gradient-to-r from-blue-600 to-indigo-600 px-8 py-4 text-lg font-semibold text-white shadow-2xl shadow-blue-500/25 transition-all duration-300 hover:-translate-y-1 hover:scale-105 hover:from-blue-700 hover:to-indigo-700 hover:shadow-blue-500/40"
             >
               Start Splitting Smarter
@@ -225,7 +225,7 @@ export default function LandingPage() {
               </p>
               <Button
                 size="lg"
-                onClick={() => router.push("/api/auth/signin")}
+                onClick={() => router.push("/signin")}
                 className="transform bg-white px-8 py-4 text-lg font-semibold text-blue-600 shadow-xl transition-all duration-300 hover:scale-105 hover:bg-gray-50 hover:shadow-2xl"
               >
                 Get Started Now

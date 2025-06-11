@@ -17,6 +17,7 @@ import { Checkbox } from "~/components/ui/checkbox";
 import { Label } from "~/components/ui/label";
 import { X, Plus, CheckCircle2, IndianRupee } from "lucide-react";
 import { Separator } from "~/components/ui/separator";
+import { toast } from "sonner";
 
 interface ExpenseFormProps {
   groupId: string;
@@ -38,6 +39,11 @@ export function ExpenseForm({
   const utils = api.useUtils();
 
   const createExpense = api.expense.create.useMutation({
+    onMutate: () => {
+      toast.loading("Adding expense...", {
+        id: "create-expense",
+      });
+    },
     onSuccess: async () => {
       setDescription("");
       setAmount("");
@@ -45,8 +51,16 @@ export function ExpenseForm({
       setShareIds([]);
       await utils.group.getById.invalidate(groupId);
       await utils.expense.getBalances.invalidate(groupId);
+      toast.success("Expense added successfully", {
+        id: "create-expense",
+      });
       onSuccess?.();
       onClose();
+    },
+    onError: () => {
+      toast.error("Failed to add expense", {
+        id: "create-expense",
+      });
     },
   });
 

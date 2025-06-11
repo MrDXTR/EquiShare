@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { api } from "~/trpc/react";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { Badge } from "~/components/ui/badge";
+import { toast } from "sonner";
 import {
   Receipt,
   Users,
@@ -12,6 +13,9 @@ import {
   CheckCircle2,
   AlertCircle,
   Trash2,
+  MoreVertical,
+  CheckCircle,
+  Loader2,
 } from "lucide-react";
 import type { RouterOutputs } from "~/trpc/shared";
 import { Button } from "~/components/ui/button";
@@ -25,6 +29,12 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "~/components/ui/alert-dialog";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "~/components/ui/dropdown-menu";
 import { useState } from "react";
 import { Skeleton } from "~/components/ui/skeleton";
 
@@ -69,14 +79,49 @@ interface GroupSummaryProps {
 export function GroupSummary({ group }: GroupSummaryProps) {
   const [expenseToDelete, setExpenseToDelete] = useState<string | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [settlingUpExpense, setSettlingUpExpense] = useState<string | null>(null);
   const utils = api.useUtils();
   const { data: balances, isLoading: isLoadingBalances } =
     api.expense.getBalances.useQuery(group.id);
 
   const deleteExpense = api.expense.delete.useMutation({
+    onMutate: () => {
+      toast.loading("Deleting expense...", {
+        id: "delete-expense",
+      });
+    },
     onSuccess: async () => {
       await utils.group.getById.invalidate();
       await utils.expense.getBalances.invalidate();
+      toast.success("Expense deleted successfully", {
+        id: "delete-expense",
+        style: { backgroundColor: "#fee2e2", color: "#991b1b", borderColor: "#fecaca" },
+      });
+    },
+    onError: () => {
+      toast.error("Failed to delete expense", {
+        id: "delete-expense",
+      });
+    },
+  });
+
+  const settleUpExpense = api.expense.settleUp.useMutation({
+    onMutate: () => {
+      toast.loading("Settling expense...", {
+        id: "settle-expense",
+      });
+    },
+    onSuccess: async () => {
+      await utils.group.getById.invalidate();
+      await utils.expense.getBalances.invalidate();
+      toast.success("Expense settled successfully", {
+        id: "settle-expense",
+      });
+    },
+    onError: () => {
+      toast.error("Failed to settle expense", {
+        id: "settle-expense",
+      });
     },
   });
 
@@ -91,6 +136,17 @@ export function GroupSummary({ group }: GroupSummaryProps) {
         setIsDeleting(false);
         setExpenseToDelete(null);
       }
+    }
+  };
+
+  const handleSettleUp = async (expenseId: string) => {
+    setSettlingUpExpense(expenseId);
+    try {
+      await settleUpExpense.mutateAsync(expenseId);
+      // Wait for the data to be refetched
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+    } finally {
+      setSettlingUpExpense(null);
     }
   };
 
@@ -201,9 +257,17 @@ export function GroupSummary({ group }: GroupSummaryProps) {
                       <div className="absolute inset-0 bg-gradient-to-r from-blue-500/5 to-indigo-500/5 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
                       <div className="relative flex items-center justify-between">
                         <div className="space-y-2">
-                          <h3 className="text-lg font-semibold text-gray-900 transition-colors group-hover:text-blue-700">
-                            {expense.description}
-                          </h3>
+                          <div className="flex items-center gap-2">
+                            <h3 className="text-lg font-semibold text-gray-900 transition-colors group-hover:text-blue-700">
+                              {expense.description}
+                            </h3>
+                            {expense.settled && (
+                              <Badge className="bg-green-100 text-green-700 border-green-200">
+                                <CheckCircle2 className="h-3 w-3" />
+                                Settled
+                              </Badge>
+                            )}
+                          </div>
                           <div className="flex items-center gap-2">
                             <Badge
                               variant="outline"
@@ -223,14 +287,48 @@ export function GroupSummary({ group }: GroupSummaryProps) {
                           </div>
                         </div>
                       </div>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="absolute top-2 right-2 opacity-0 transition-opacity group-hover:opacity-100 hover:bg-red-50 hover:text-red-600"
-                        onClick={() => setExpenseToDelete(expense.id)}
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="absolute top-2 right-2 opacity-0 transition-opacity group-hover:opacity-100 hover:bg-gray-100"
+                          >
+                            <MoreVertical className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem
+                            className="text-green-600 focus:text-green-600"
+                            onClick={() => handleSettleUp(expense.id)}
+                            disabled={settlingUpExpense === expense.id || expense.settled}
+                          >
+                            {settlingUpExpense === expense.id ? (
+                              <div className="flex items-center gap-2">
+                                <Loader2 className="h-4 w-4 animate-spin" />
+                                Settling...
+                              </div>
+                            ) : expense.settled ? (
+                              <div className="flex items-center gap-2 text-gray-500">
+                                <CheckCircle2 className="h-4 w-4" />
+                                Already Settled
+                              </div>
+                            ) : (
+                              <>
+                                <CheckCircle className="mr-2 h-4 w-4" />
+                                Settle Up
+                              </>
+                            )}
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            className="text-red-600 focus:text-red-600"
+                            onClick={() => setExpenseToDelete(expense.id)}
+                          >
+                            <Trash2 className="mr-2 h-4 w-4" />
+                            Delete
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
                     </motion.div>
                   ))
                 )}

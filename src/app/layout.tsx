@@ -3,13 +3,17 @@ import { Header } from "./_components/Header";
 import { Footer } from "./_components/Footer";
 import { Providers } from "./providers";
 import "~/styles/globals.css";
+import { Toaster } from "sonner";
 
 import { type Metadata } from "next";
 import { Geist } from "next/font/google";
 
 import { TRPCReactProvider } from "~/trpc/react";
 
-const inter = Inter({ subsets: ["latin"] });
+const inter = Inter({
+  subsets: ["latin"],
+  variable: "--font-sans",
+});
 
 export const metadata: Metadata = {
   title: "Split Expenses",
@@ -28,7 +32,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={`${geist.variable} ${inter.className}`}>
+    <html lang="en" className={`${geist.variable} ${inter.variable}`}>
       <body>
         <TRPCReactProvider>
           <Providers>
@@ -39,6 +43,18 @@ export default function RootLayout({
             </div>
           </Providers>
         </TRPCReactProvider>
+        <Toaster 
+          richColors 
+          position="top-center" 
+          toastOptions={{
+            classNames: {
+              toast: "group toast group-[.toaster]:bg-background group-[.toaster]:text-foreground group-[.toaster]:border-border group-[.toaster]:shadow-lg",
+              description: "group-[.toast]:text-muted-foreground",
+              actionButton: "group-[.toast]:bg-primary group-[.toast]:text-primary-foreground",
+              cancelButton: "group-[.toast]:bg-muted group-[.toast]:text-muted-foreground",
+            },
+          }}
+        />
       </body>
     </html>
   );

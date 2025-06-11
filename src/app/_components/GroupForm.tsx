@@ -9,6 +9,7 @@ import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
 import { Separator } from "~/components/ui/separator";
 import { Plus, X } from "lucide-react";
+import { toast } from "sonner";
 
 interface GroupFormProps {
   onClose: () => void;
@@ -21,12 +22,26 @@ export function GroupForm({ onClose, onSuccess }: GroupFormProps) {
   const utils = api.useUtils();
 
   const createGroup = api.group.create.useMutation({
+    onMutate: () => {
+      toast.loading("Creating group...", {
+        id: "create-group",
+      });
+    },
     onSuccess: async () => {
       setName("");
       setPeople([""]);
       await utils.group.getAll.invalidate();
+      toast.success("Group created successfully", {
+        id: "create-group",
+      });
       onSuccess?.();
       onClose();
+    },
+    onError: (error) => {
+      console.error("Failed to create group:", error);
+      toast.error("Failed to create group", {
+        id: "create-group",
+      });
     },
   });
 
