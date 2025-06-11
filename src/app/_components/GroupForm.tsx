@@ -9,7 +9,6 @@ import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
 import { Separator } from "~/components/ui/separator";
 import { Plus, X } from "lucide-react";
-import { useRouter } from "next/navigation";
 
 interface GroupFormProps {
   onClose: () => void;
@@ -17,11 +16,10 @@ interface GroupFormProps {
 }
 
 export function GroupForm({ onClose, onSuccess }: GroupFormProps) {
-  const router = useRouter();
   const [name, setName] = useState("");
   const [people, setPeople] = useState<string[]>([""]);
   const utils = api.useUtils();
-  
+
   const createGroup = api.group.create.useMutation({
     onSuccess: async () => {
       setName("");
@@ -56,7 +54,8 @@ export function GroupForm({ onClose, onSuccess }: GroupFormProps) {
     });
   };
 
-  const isFormValid = name.trim().length > 0 && people.some(p => p.trim().length > 0);
+  const isFormValid =
+    name.trim().length > 0 && people.some((p) => p.trim().length > 0);
 
   return (
     <motion.div
@@ -65,12 +64,12 @@ export function GroupForm({ onClose, onSuccess }: GroupFormProps) {
       exit={{ opacity: 0, y: -20, scale: 0.95 }}
       className="relative"
     >
-      <Card className="bg-white/90 backdrop-blur-sm border-0 shadow-2xl shadow-blue-100/50">
+      <Card className="border-0 bg-white/90 shadow-2xl shadow-blue-100/50 backdrop-blur-sm">
         <CardHeader className="pb-4">
           <div className="flex items-center justify-between">
             <CardTitle className="flex items-center gap-3 text-2xl">
-              <div className="p-2 bg-gradient-to-r from-green-500 to-emerald-600 rounded-lg">
-                <Plus className="w-6 h-6 text-white" />
+              <div className="rounded-lg bg-gradient-to-r from-green-500 to-emerald-600 p-2">
+                <Plus className="h-6 w-6 text-white" />
               </div>
               <span className="bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">
                 Create New Group
@@ -80,16 +79,19 @@ export function GroupForm({ onClose, onSuccess }: GroupFormProps) {
               variant="ghost"
               size="sm"
               onClick={onClose}
-              className="text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-full"
+              className="rounded-full text-gray-500 hover:bg-gray-100 hover:text-gray-700"
             >
-              <X className="w-5 h-5" />
+              <X className="h-5 w-5" />
             </Button>
           </div>
         </CardHeader>
         <CardContent className="space-y-6">
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-2">
-              <Label htmlFor="groupName" className="text-sm font-semibold text-gray-700">
+              <Label
+                htmlFor="groupName"
+                className="text-sm font-semibold text-gray-700"
+              >
                 Group Name *
               </Label>
               <Input
@@ -97,7 +99,7 @@ export function GroupForm({ onClose, onSuccess }: GroupFormProps) {
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="e.g., Trip to Goa, Roommate Expenses, Office Lunch"
-                className="h-12 border-gray-200 focus:border-blue-500 focus:ring-blue-500/20 transition-all duration-200"
+                className="h-12 border-gray-200 transition-all duration-200 focus:border-blue-500 focus:ring-blue-500/20"
                 autoFocus
                 required
               />
@@ -107,7 +109,9 @@ export function GroupForm({ onClose, onSuccess }: GroupFormProps) {
             </div>
 
             <div className="space-y-2">
-              <Label className="text-sm font-semibold text-gray-700">People *</Label>
+              <Label className="text-sm font-semibold text-gray-700">
+                People *
+              </Label>
               {people.map((person, index) => (
                 <motion.div
                   key={index}
@@ -120,7 +124,7 @@ export function GroupForm({ onClose, onSuccess }: GroupFormProps) {
                     value={person}
                     onChange={(e) => updatePerson(index, e.target.value)}
                     placeholder={`Person ${index + 1}`}
-                    className="h-12 border-gray-200 focus:border-blue-500 focus:ring-blue-500/20 transition-all duration-200"
+                    className="h-12 border-gray-200 transition-all duration-200 focus:border-blue-500 focus:ring-blue-500/20"
                     required
                   />
                   {people.length > 1 && (
@@ -129,7 +133,7 @@ export function GroupForm({ onClose, onSuccess }: GroupFormProps) {
                       variant="ghost"
                       size="icon"
                       onClick={() => removePerson(index)}
-                      className="text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-full"
+                      className="rounded-full text-gray-500 hover:bg-gray-100 hover:text-gray-700"
                     >
                       <X className="h-4 w-4" />
                     </Button>
@@ -148,32 +152,32 @@ export function GroupForm({ onClose, onSuccess }: GroupFormProps) {
 
             <Separator />
 
-            <div className="flex flex-col sm:flex-row justify-end gap-3">
-              <Button 
+            <div className="flex flex-col justify-end gap-3 sm:flex-row">
+              <Button
                 type="button"
-                variant="outline" 
+                variant="outline"
                 onClick={onClose}
-                className="order-2 sm:order-1 border-gray-300 hover:bg-gray-50"
+                className="order-2 border-gray-300 hover:bg-gray-50 sm:order-1"
               >
                 Cancel
               </Button>
-              <Button 
+              <Button
                 type="submit"
                 disabled={!isFormValid || createGroup.isPending}
                 className={`order-1 sm:order-2 ${
                   isFormValid
-                    ? 'bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 shadow-lg hover:shadow-xl'
-                    : 'bg-gray-300 cursor-not-allowed'
+                    ? "bg-gradient-to-r from-green-600 to-emerald-600 shadow-lg hover:from-green-700 hover:to-emerald-700 hover:shadow-xl"
+                    : "cursor-not-allowed bg-gray-300"
                 } transition-all duration-300`}
               >
                 {createGroup.isPending ? (
                   <div className="flex items-center gap-2">
-                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    <div className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />
                     Creating...
                   </div>
                 ) : (
                   <>
-                    <Plus className="w-4 h-4 mr-2" />
+                    <Plus className="mr-2 h-4 w-4" />
                     Create Group
                   </>
                 )}
@@ -184,4 +188,4 @@ export function GroupForm({ onClose, onSuccess }: GroupFormProps) {
       </Card>
     </motion.div>
   );
-} 
+}

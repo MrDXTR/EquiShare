@@ -99,4 +99,4 @@ export const expenseRouter = createTRPCRouter({
         person: group.people.find((p) => p.id === personId),
       }));
     }),
-}); 
+});
