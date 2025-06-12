@@ -17,7 +17,6 @@ export default function GroupDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const resolvedParams = use(params);
-  const [isAddingExpense, setIsAddingExpense] = useState(false);
   const utils = api.useUtils();
 
   const { data: group, isLoading: isLoadingGroup } = api.group.getById.useQuery(
@@ -109,31 +108,21 @@ export default function GroupDetailPage({
             </div>
           </div>
 
-          <Button
-            onClick={() => setIsAddingExpense(true)}
-            size="lg"
-            className="transform bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg transition-all duration-300 hover:scale-105 hover:from-blue-700 hover:to-indigo-700 hover:shadow-xl"
-          >
-            <Plus className="mr-2 h-5 w-5" />
-            Add Expense
-          </Button>
+          <ExpenseForm
+            groupId={resolvedParams.id}
+            people={group.people}
+            onSuccess={handleExpenseCreated}
+            trigger={
+              <Button
+                size="lg"
+                className="transform bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg transition-all duration-300 hover:scale-105 hover:from-blue-700 hover:to-indigo-700 hover:shadow-xl"
+              >
+                <Plus className="mr-2 h-5 w-5" />
+                Add Expense
+              </Button>
+            }
+          />
         </motion.div>
-
-        {/* Add Expense Form */}
-        {isAddingExpense && (
-          <motion.div
-            initial={{ opacity: 0, y: 20, scale: 0.95 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: -20, scale: 0.95 }}
-          >
-            <ExpenseForm
-              groupId={resolvedParams.id}
-              people={group.people}
-              onClose={() => setIsAddingExpense(false)}
-              onSuccess={handleExpenseCreated}
-            />
-          </motion.div>
-        )}
 
         {/* Group Summary */}
         <motion.div

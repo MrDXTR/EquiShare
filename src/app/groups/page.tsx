@@ -4,13 +4,8 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { api } from "~/trpc/react";
 import { Button } from "~/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
-import { Badge } from "~/components/ui/badge";
-import { Separator } from "~/components/ui/separator";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
-import { Plus, Users, Receipt, Calendar, Trash2 } from "lucide-react";
-import { GroupForm } from "~/app/_components/GroupForm";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -21,13 +16,13 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "~/components/ui/alert-dialog";
-import { Skeleton } from "~/components/ui/skeleton";
 import { toast } from "sonner";
+import { GroupCard } from "~/app/_components/groups/GroupCard";
+import { CreateGroupDialog } from "~/app/_components/groups/CreateGroupDialog";
 
 export default function GroupsPage() {
   const router = useRouter();
   const { data: session } = useSession();
-  const [isCreating, setIsCreating] = useState(false);
   const [groupToDelete, setGroupToDelete] = useState<string | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
   const utils = api.useUtils();
@@ -56,11 +51,6 @@ export default function GroupsPage() {
     },
   });
 
-  const handleGroupCreated = async () => {
-    await utils.group.getAll.invalidate();
-    setIsCreating(false);
-  };
-
   const handleDeleteGroup = async () => {
     if (groupToDelete) {
       setIsDeleting(true);
@@ -75,220 +65,82 @@ export default function GroupsPage() {
     }
   };
 
-  return (
-    <div className="min-h-screen bg-gray-50/30 p-4 md:p-8">
-      <div className="container mx-auto max-w-7xl space-y-8">
-        {/* Header Section */}
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="flex flex-col justify-between gap-6 sm:flex-row sm:items-center"
-        >
-          <div className="space-y-2">
-            <h1 className="bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-4xl font-bold text-transparent">
-              Your Groups
-            </h1>
-            <p className="text-lg text-gray-600">
-              Manage your shared expenses across different groups
-            </p>
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
+        <div className="container mx-auto px-4 py-6 sm:py-8">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <h1 className="text-2xl font-bold text-gray-900 sm:text-3xl">Your Groups</h1>
+              <p className="mt-1 text-sm text-gray-600 sm:text-base">Manage your expense groups</p>
+            </div>
+            <div className="w-full sm:w-auto">
+              <CreateGroupDialog />
+            </div>
           </div>
-
-          <Button
-            onClick={() => setIsCreating(true)}
-            size="lg"
-            className="transform bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg transition-all duration-300 hover:scale-105 hover:from-blue-700 hover:to-indigo-700 hover:shadow-xl"
-          >
-            <Plus className="mr-2 h-5 w-5" />
-            Create New Group
-          </Button>
-        </motion.div>
-
-        {/* Create Group Form */}
-        {isCreating && (
-          <GroupForm
-            onClose={() => setIsCreating(false)}
-            onSuccess={handleGroupCreated}
-          />
-        )}
-
-        {/* Groups Grid */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-        >
-          {isLoading ? (
-            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-              {[...Array(4)].map((_, index) => (
-                <motion.div
-                  key={index}
-                  initial={{ opacity: 0, y: 20, scale: 0.9 }}
-                  animate={{ opacity: 1, y: 0, scale: 1 }}
-                  transition={{ delay: index * 0.1, duration: 0.5 }}
-                  className="group relative"
-                >
-                  <Card className="h-full border-0 bg-white/80 shadow-xl shadow-blue-100/50 backdrop-blur-sm">
-                    <CardHeader className="pb-4">
-                      <Skeleton className="h-6 w-3/4" />
-                    </CardHeader>
-                    <CardContent className="space-y-4">
-                      <div className="flex items-center justify-between">
-                        <Skeleton className="h-4 w-24" />
-                        <Skeleton className="h-6 w-16" />
-                      </div>
-                      <Separator />
-                      <div className="space-y-3">
-                        <div className="flex items-center justify-between">
-                          <Skeleton className="h-4 w-32" />
-                          <Skeleton className="h-6 w-24" />
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <Skeleton className="h-4 w-4" />
-                          <Skeleton className="h-4 w-32" />
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </motion.div>
+          <div className="mt-6 sm:mt-8">
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+              {[1, 2, 3, 4].map((i) => (
+                <div
+                  key={i}
+                  className="h-48 animate-pulse rounded-xl bg-gradient-to-br from-gray-100 to-gray-200 shadow-sm"
+                />
               ))}
             </div>
-          ) : groups?.length === 0 ? (
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen">
+      <div className="container mx-auto px-4 py-6 sm:py-8">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900 sm:text-3xl">Your Groups</h1>
+            <p className="mt-1 text-sm text-gray-600 sm:text-base">
+              {groups?.length === 0 ? "Start by creating your first group" : `${groups?.length} ${groups?.length === 1 ? 'group' : 'groups'} total`}
+            </p>
+          </div>
+          <div className="w-full sm:w-auto">
+            <CreateGroupDialog />
+          </div>
+        </div>
+
+        <div className="mt-6 sm:mt-8">
+          {groups?.length === 0 ? (
             <motion.div
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              className="py-20 text-center"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="flex flex-col items-center justify-center py-12 sm:py-16"
             >
-              <div className="mb-6 inline-flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-r from-blue-100 to-indigo-100">
-                <Users className="h-10 w-10 text-blue-600" />
+              <div className="rounded-full bg-blue-100 p-6 mb-4">
+                <svg className="h-12 w-12 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                </svg>
               </div>
-              <h3 className="mb-4 text-2xl font-bold text-gray-900">
-                No groups yet
-              </h3>
-              <p className="mx-auto mb-8 max-w-md text-gray-600">
-                Create your first group to start tracking shared expenses with
-                friends, family, or roommates.
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">No groups yet</h3>
+              <p className="text-gray-600 text-center mb-6 max-w-md">
+                Create your first group to start splitting expenses with friends, family, or colleagues.
               </p>
-              <Button
-                onClick={() => setIsCreating(true)}
-                size="lg"
-                className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg transition-all duration-300 hover:from-blue-700 hover:to-indigo-700 hover:shadow-xl"
-              >
-                <Plus className="mr-2 h-5 w-5" />
-                Create Your First Group
-              </Button>
+              <CreateGroupDialog />
             </motion.div>
           ) : (
-            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-              {groups?.map((group, index) => {
-                const totalExpenses =
-                  group.expenses?.reduce(
-                    (sum, expense) => sum + expense.amount,
-                    0,
-                  ) || 0;
-                const recentActivity =
-                  group.expenses?.length > 0
-                    ? new Date(
-                        group.expenses[group.expenses.length - 1]?.createdAt ||
-                          new Date(),
-                      ).toLocaleDateString()
-                    : "No activity";
-
-                return (
-                  <motion.div
-                    key={group.id}
-                    initial={{ opacity: 0, y: 20, scale: 0.9 }}
-                    animate={{ opacity: 1, y: 0, scale: 1 }}
-                    transition={{ delay: index * 0.1, duration: 0.5 }}
-                    whileHover={{ y: -8, scale: 1.02 }}
-                    className="group relative"
-                  >
-                    <Card
-                      className="h-full cursor-pointer border-0 bg-white/80 shadow-xl shadow-blue-100/50 backdrop-blur-sm transition-all duration-300 hover:shadow-2xl hover:shadow-blue-200/60"
-                      onClick={() => router.push(`/groups/${group.id}`)}
-                    >
-                      <CardHeader className="pb-4">
-                        <CardTitle className="text-xl font-bold text-gray-900 transition-colors group-hover:text-blue-700">
-                          {group.name}
-                        </CardTitle>
-                      </CardHeader>
-                      <CardContent className="relative space-y-4">
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-2">
-                            <Users className="h-4 w-4 text-blue-600" />
-                            <span className="text-sm font-medium text-gray-700">
-                              {group.people.length}{" "}
-                              {group.people.length === 1 ? "member" : "members"}
-                            </span>
-                          </div>
-                          <Badge
-                            variant="outline"
-                            className="border-blue-200 bg-blue-50 text-blue-700"
-                          >
-                            Active
-                          </Badge>
-                        </div>
-
-                        {group.expenses && group.expenses.length > 0 && (
-                          <>
-                            <Separator />
-                            <div className="space-y-3">
-                              <div className="flex items-center justify-between">
-                                <div className="flex items-center gap-2">
-                                  <Receipt className="h-4 w-4 text-green-600" />
-                                  <span className="text-sm font-medium text-gray-700">
-                                    {group.expenses.length}{" "}
-                                    {group.expenses.length === 1
-                                      ? "expense"
-                                      : "expenses"}
-                                  </span>
-                                </div>
-                                <span className="text-lg font-bold text-green-600">
-                                  ₹{totalExpenses.toFixed(2)}
-                                </span>
-                              </div>
-
-                              <div className="flex items-center gap-2">
-                                <Calendar className="h-4 w-4 text-gray-400" />
-                                <span className="text-sm text-gray-500">
-                                  Last activity: {recentActivity}
-                                </span>
-                              </div>
-                            </div>
-                          </>
-                        )}
-
-                        {(!group.expenses || group.expenses.length === 0) && (
-                          <>
-                            <Separator />
-                            <div className="py-4 text-center">
-                              <Receipt className="mx-auto mb-2 h-8 w-8 text-gray-300" />
-                              <p className="text-sm text-gray-500">
-                                No expenses yet
-                              </p>
-                            </div>
-                          </>
-                        )}
-                      </CardContent>
-                    </Card>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="absolute top-2 right-2 opacity-0 transition-opacity group-hover:opacity-100 hover:bg-red-50 hover:text-red-600"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setGroupToDelete(group.id);
-                      }}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </motion.div>
-                );
-              })}
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+              {groups?.map((group, index) => (
+                <GroupCard
+                  key={group.id}
+                  group={group}
+                  onDelete={() => setGroupToDelete(group.id)}
+                  index={index}
+                />
+              ))}
             </div>
           )}
-        </motion.div>
+        </div>
 
-        {/* Delete Confirmation Dialog */}
+        {/* Delete Group Confirmation Dialog */}
         <AlertDialog
           open={!!groupToDelete}
           onOpenChange={(open) => {
@@ -297,30 +149,33 @@ export default function GroupsPage() {
             }
           }}
         >
-          <AlertDialogContent>
+          <AlertDialogContent className="mx-4 max-w-md">
             <AlertDialogHeader>
-              <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-              <AlertDialogDescription>
-                This action cannot be undone. This will permanently delete the
-                group and all its expenses.
+              <AlertDialogTitle className="text-lg">Delete Group?</AlertDialogTitle>
+              <AlertDialogDescription className="text-sm">
+                This action cannot be undone. This will permanently delete the group
+                and all its expenses.
               </AlertDialogDescription>
             </AlertDialogHeader>
-            <AlertDialogFooter>
-              <AlertDialogCancel disabled={isDeleting}>
+            <AlertDialogFooter className="flex-col gap-2 sm:flex-row">
+              <AlertDialogCancel 
+                disabled={isDeleting}
+                className="w-full sm:w-auto"
+              >
                 Cancel
               </AlertDialogCancel>
               <AlertDialogAction
                 onClick={handleDeleteGroup}
                 disabled={isDeleting}
-                className="bg-red-600 hover:bg-red-700 focus:ring-red-600"
+                className="w-full sm:w-auto bg-red-600 hover:bg-red-700 focus:ring-red-600"
               >
                 {isDeleting ? (
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center justify-center gap-2">
                     <div className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />
                     Deleting...
                   </div>
                 ) : (
-                  "Delete"
+                  "Delete Group"
                 )}
               </AlertDialogAction>
             </AlertDialogFooter>
