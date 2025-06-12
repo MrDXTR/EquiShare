@@ -129,7 +129,7 @@ export function ExpensesList({
     >
       <Card className="h-full border-0 bg-white/80 shadow-xl shadow-indigo-100/50 backdrop-blur-sm transition-all duration-300 hover:shadow-2xl hover:shadow-indigo-200/60">
         <CardHeader className="pb-4">
-          <div className="flex items-center justify-between">
+          <div className="flex md:items-center items-start flex-col md:flex-row gap-3 md:gap-0 justify-between">
             <CardTitle className="flex items-center gap-3 text-2xl">
               <div className="rounded-lg bg-gradient-to-r from-indigo-500 to-purple-600 p-2">
                 <Receipt className="h-6 w-6 text-white" />
@@ -138,6 +138,7 @@ export function ExpensesList({
                 Expenses
               </span>
             </CardTitle>
+            <div>
             <ExpenseForm
               groupId={group.id}
               people={group.people}
@@ -152,6 +153,7 @@ export function ExpensesList({
                 </Button>
               }
             />
+            </div>
           </div>
         </CardHeader>
         <CardContent className="max-h-[calc(100vh-24rem)] space-y-4 overflow-y-auto">

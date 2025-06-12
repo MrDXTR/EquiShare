@@ -164,7 +164,7 @@ export function PeopleManagement({ group }: PeopleManagementProps) {
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="opacity-0 transition-opacity group-hover:opacity-100 hover:bg-red-50 hover:text-red-600"
+                  className="opacity-100 md:opacity-0 transition-opacity group-hover:opacity-100 hover:bg-red-50 hover:text-red-600"
                   onClick={() => setPersonToDelete(person.id)}
                 >
                   <UserMinus className="h-4 w-4" />
