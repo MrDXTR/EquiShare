@@ -17,14 +17,28 @@ import {
 } from "lucide-react";
 
 export default function LandingPage() {
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
   const router = useRouter();
 
   useEffect(() => {
-    if (session) {
+    if (status === "authenticated" && session) {
       router.push("/groups");
     }
-  }, [session, router]);
+  }, [session, status, router]);
+
+  // Don't render anything while checking authentication
+  if (status === "loading") {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="h-32 w-32 animate-spin rounded-full border-b-2 border-gray-900"></div>
+      </div>
+    );
+  }
+
+  // Don't render the landing page if authenticated
+  if (status === "authenticated") {
+    return null;
+  }
 
   const features = [
     {

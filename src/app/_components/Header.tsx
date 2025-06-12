@@ -16,7 +16,7 @@ import { LogOut, User } from "lucide-react";
 import Image from "next/image";
 
 export function Header() {
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
   const router = useRouter();
 
   const handleSignOut = async () => {
@@ -40,7 +40,9 @@ export function Header() {
         </Link>
 
         <nav className="flex items-center gap-6">
-          {session ? (
+          {status === "loading" ? (
+            <div className="h-10 w-24 animate-pulse rounded-lg bg-gray-200" />
+          ) : session ? (
             <div className="flex items-center gap-4">
               <Link href="/groups">
                 <Button variant="ghost" className="font-medium">
