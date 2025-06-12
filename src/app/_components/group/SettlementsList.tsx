@@ -72,7 +72,7 @@ export function SettlementsList({ balances, isLoading }: SettlementsListProps) {
                     className="group relative overflow-hidden rounded-xl border border-orange-200/60 bg-gradient-to-r from-orange-50 to-red-50 p-4 transition-all duration-300 hover:scale-[1.02] hover:shadow-lg hover:shadow-orange-100/50"
                   >
                     <div className="absolute inset-0 bg-gradient-to-r from-orange-500/5 to-red-500/5 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
-                    <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+                    <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
                       <div className="flex flex-wrap items-center gap-2">
                         <Badge className="border-orange-300 bg-orange-100 font-semibold text-orange-800">
                           {tx.from}
@@ -95,4 +95,4 @@ export function SettlementsList({ balances, isLoading }: SettlementsListProps) {
       </Card>
     </motion.div>
   );
-} 
+}

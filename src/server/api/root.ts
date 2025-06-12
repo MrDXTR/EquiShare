@@ -1,4 +1,3 @@
-
 import { groupRouter } from "~/server/api/routers/group";
 import { expenseRouter } from "~/server/api/routers/expense";
 import { createCallerFactory, createTRPCRouter } from "~/server/api/trpc";

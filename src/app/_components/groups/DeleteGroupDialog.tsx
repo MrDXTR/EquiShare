@@ -21,7 +21,10 @@ interface DeleteGroupDialogProps {
   groupName: string;
 }
 
-export function DeleteGroupDialog({ groupId, groupName }: DeleteGroupDialogProps) {
+export function DeleteGroupDialog({
+  groupId,
+  groupName,
+}: DeleteGroupDialogProps) {
   const [open, setOpen] = useState(false);
   const router = useRouter();
 
@@ -35,7 +38,11 @@ export function DeleteGroupDialog({ groupId, groupName }: DeleteGroupDialogProps
       setOpen(false);
       toast.success("Group deleted successfully", {
         id: "delete-group",
-        style: { backgroundColor: "#fee2e2", color: "#991b1b", borderColor: "#fecaca" },
+        style: {
+          backgroundColor: "#fee2e2",
+          color: "#991b1b",
+          borderColor: "#fecaca",
+        },
       });
       router.push("/groups");
     },
@@ -56,22 +63,24 @@ export function DeleteGroupDialog({ groupId, groupName }: DeleteGroupDialogProps
         <Button
           variant="ghost"
           size="icon"
-          className="h-8 w-8 p-0 hover:bg-red-50 hover:text-red-600 transition-colors"
+          className="h-8 w-8 p-0 transition-colors hover:bg-red-50 hover:text-red-600"
         >
           <Trash2 className="h-4 w-4" />
         </Button>
       </DialogTrigger>
       <DialogContent className="mx-4 max-w-md">
         <DialogHeader className="text-center sm:text-left">
-          <div className="flex items-center justify-center sm:justify-start gap-3 mb-2">
+          <div className="mb-2 flex items-center justify-center gap-3 sm:justify-start">
             <div className="rounded-full bg-red-100 p-2">
               <AlertTriangle className="h-5 w-5 text-red-600" />
             </div>
             <DialogTitle className="text-lg">Delete Group?</DialogTitle>
           </div>
           <DialogDescription className="text-sm leading-relaxed">
-            Are you sure you want to delete <span className="font-medium text-gray-900">{`'{groupName}'`}</span>? 
-            This will permanently delete the group and all its expenses. This action cannot be undone.
+            Are you sure you want to delete{" "}
+            <span className="font-medium text-gray-900">{`'{groupName}'`}</span>
+            ? This will permanently delete the group and all its expenses. This
+            action cannot be undone.
           </DialogDescription>
         </DialogHeader>
         <DialogFooter className="flex flex-col gap-2 pt-4 sm:flex-row">

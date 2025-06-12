@@ -19,10 +19,8 @@ interface GroupCardProps {
 
 export function GroupCard({ group, onDelete, index }: GroupCardProps) {
   const router = useRouter();
-  const totalExpenses = group.expenses?.reduce(
-    (sum, expense) => sum + expense.amount,
-    0,
-  ) || 0;
+  const totalExpenses =
+    group.expenses?.reduce((sum, expense) => sum + expense.amount, 0) || 0;
   const recentActivity =
     group.expenses?.length > 0
       ? new Date(
@@ -60,7 +58,7 @@ export function GroupCard({ group, onDelete, index }: GroupCardProps) {
             </Button>
           </div>
         </CardHeader>
-        
+
         <CardContent className="space-y-4 pb-4">
           {/* Members and Status */}
           <div className="flex items-center justify-between">
@@ -75,7 +73,7 @@ export function GroupCard({ group, onDelete, index }: GroupCardProps) {
             </div>
             <Badge
               variant="outline"
-              className="border-green-200 bg-green-50 text-green-700 text-xs"
+              className="border-green-200 bg-green-50 text-xs text-green-700"
             >
               Active
             </Badge>
@@ -98,7 +96,10 @@ export function GroupCard({ group, onDelete, index }: GroupCardProps) {
                   </div>
                   <div className="text-right">
                     <div className="text-lg font-bold text-green-600">
-                      ₹{totalExpenses.toLocaleString('en-IN', { maximumFractionDigits: 0 })}
+                      ₹
+                      {totalExpenses.toLocaleString("en-IN", {
+                        maximumFractionDigits: 0,
+                      })}
                     </div>
                   </div>
                 </div>
@@ -113,18 +114,22 @@ export function GroupCard({ group, onDelete, index }: GroupCardProps) {
             <>
               <Separator className="bg-gray-100" />
               <div className="flex flex-col items-center justify-center py-4 text-center">
-                <div className="rounded-full bg-gray-100 p-3 mb-2">
+                <div className="mb-2 rounded-full bg-gray-100 p-3">
                   <Receipt className="h-5 w-5 text-gray-400" />
                 </div>
-                <p className="text-sm text-gray-500 font-medium">No expenses yet</p>
-                <p className="text-xs text-gray-400 mt-1">Tap to add your first expense</p>
+                <p className="text-sm font-medium text-gray-500">
+                  No expenses yet
+                </p>
+                <p className="mt-1 text-xs text-gray-400">
+                  Tap to add your first expense
+                </p>
               </div>
             </>
           )}
 
           {/* View Details Arrow */}
           <div className="flex items-center justify-end pt-2">
-            <div className="flex items-center gap-1 text-xs text-blue-600 opacity-70 group-hover:opacity-100 transition-opacity">
+            <div className="flex items-center gap-1 text-xs text-blue-600 opacity-70 transition-opacity group-hover:opacity-100">
               <span>View details</span>
               <ChevronRight className="h-3 w-3" />
             </div>

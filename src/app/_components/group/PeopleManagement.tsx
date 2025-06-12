@@ -63,7 +63,11 @@ export function PeopleManagement({ group }: PeopleManagementProps) {
       await utils.expense.getBalances.invalidate(group.id);
       toast.success("Person deleted successfully", {
         id: "delete-person",
-        style: { backgroundColor: "#fee2e2", color: "#991b1b", borderColor: "#fecaca" },
+        style: {
+          backgroundColor: "#fee2e2",
+          color: "#991b1b",
+          borderColor: "#fecaca",
+        },
       });
       setPersonToDelete(null);
     },
@@ -164,7 +168,7 @@ export function PeopleManagement({ group }: PeopleManagementProps) {
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="opacity-100 md:opacity-0 transition-opacity group-hover:opacity-100 hover:bg-red-50 hover:text-red-600"
+                  className="opacity-100 transition-opacity group-hover:opacity-100 hover:bg-red-50 hover:text-red-600 md:opacity-0"
                   onClick={() => setPersonToDelete(person.id)}
                 >
                   <UserMinus className="h-4 w-4" />
@@ -188,8 +192,8 @@ export function PeopleManagement({ group }: PeopleManagementProps) {
           <AlertDialogHeader>
             <AlertDialogTitle>Are you sure?</AlertDialogTitle>
             <AlertDialogDescription>
-              This action cannot be undone. This will permanently delete the person
-              and all their associated expenses.
+              This action cannot be undone. This will permanently delete the
+              person and all their associated expenses.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -215,4 +219,4 @@ export function PeopleManagement({ group }: PeopleManagementProps) {
       </AlertDialog>
     </motion.div>
   );
-} 
+}

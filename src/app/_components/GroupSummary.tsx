@@ -56,7 +56,9 @@ interface GroupSummaryProps {
 export function GroupSummary({ group }: GroupSummaryProps) {
   const [expenseToDelete, setExpenseToDelete] = useState<string | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
-  const [settlingUpExpense, setSettlingUpExpense] = useState<string | null>(null);
+  const [settlingUpExpense, setSettlingUpExpense] = useState<string | null>(
+    null,
+  );
   const [newPersonName, setNewPersonName] = useState("");
   const [personToDelete, setPersonToDelete] = useState<string | null>(null);
   const [isDeletingPerson, setIsDeletingPerson] = useState(false);
@@ -75,7 +77,11 @@ export function GroupSummary({ group }: GroupSummaryProps) {
       await utils.expense.getBalances.invalidate();
       toast.success("Expense deleted successfully", {
         id: "delete-expense",
-        style: { backgroundColor: "#fee2e2", color: "#991b1b", borderColor: "#fecaca" },
+        style: {
+          backgroundColor: "#fee2e2",
+          color: "#991b1b",
+          borderColor: "#fecaca",
+        },
       });
     },
     onError: () => {
@@ -137,7 +143,11 @@ export function GroupSummary({ group }: GroupSummaryProps) {
       await utils.expense.getBalances.invalidate(group.id);
       toast.success("Person deleted successfully", {
         id: "delete-person",
-        style: { backgroundColor: "#fee2e2", color: "#991b1b", borderColor: "#fecaca" },
+        style: {
+          backgroundColor: "#fee2e2",
+          color: "#991b1b",
+          borderColor: "#fecaca",
+        },
       });
       setPersonToDelete(null);
     },
@@ -204,14 +214,16 @@ export function GroupSummary({ group }: GroupSummaryProps) {
     0,
   );
 
-  const mappedBalances = balances
-    ?.map((b) => ({
-      person: b.person ? { id: b.person.id, name: b.person.name } : null,
-      balance: b.balance,
-    }))
-    .filter((b): b is { person: { id: string; name: string }; balance: number } =>
-      b.person !== null,
-    ) ?? [];
+  const mappedBalances =
+    balances
+      ?.map((b) => ({
+        person: b.person ? { id: b.person.id, name: b.person.name } : null,
+        balance: b.balance,
+      }))
+      .filter(
+        (b): b is { person: { id: string; name: string }; balance: number } =>
+          b.person !== null,
+      ) ?? [];
 
   const whoOwesWhom = getWhoOwesWhom(mappedBalances);
   const isAllSettled = whoOwesWhom.length === 0;
@@ -246,7 +258,10 @@ export function GroupSummary({ group }: GroupSummaryProps) {
             }}
           />
           <div className="lg:col-span-2">
-            <SettlementsList balances={mappedBalances} isLoading={isLoadingBalances} />
+            <SettlementsList
+              balances={mappedBalances}
+              isLoading={isLoadingBalances}
+            />
           </div>
         </div>
 
@@ -263,8 +278,8 @@ export function GroupSummary({ group }: GroupSummaryProps) {
             <AlertDialogHeader>
               <AlertDialogTitle>Are you sure?</AlertDialogTitle>
               <AlertDialogDescription>
-                This action cannot be undone. This will permanently delete the person
-                and all their associated expenses.
+                This action cannot be undone. This will permanently delete the
+                person and all their associated expenses.
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>

@@ -55,9 +55,7 @@ export function GroupHeader({
           ) : isAllSettled ? (
             <>
               <CheckCircle2 className="h-5 w-5 text-green-600" />
-              <span className="font-semibold text-green-700">
-                All Settled!
-              </span>
+              <span className="font-semibold text-green-700">All Settled!</span>
             </>
           ) : (
             <>
@@ -71,4 +69,4 @@ export function GroupHeader({
       </div>
     </motion.div>
   );
-} 
+}

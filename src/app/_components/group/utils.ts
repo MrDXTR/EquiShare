@@ -9,9 +9,7 @@ export function getWhoOwesWhom(
   const creditors = balances
     .filter((b) => b.balance > 0)
     .map((b) => ({ ...b }));
-  const debtors = balances
-    .filter((b) => b.balance < 0)
-    .map((b) => ({ ...b }));
+  const debtors = balances.filter((b) => b.balance < 0).map((b) => ({ ...b }));
   const transactions: { from: string; to: string; amount: number }[] = [];
 
   let i = 0,
@@ -38,9 +36,16 @@ export function getWhoOwesWhom(
 
 // Helper to get pending settlements count
 export function getPendingSettlementsCount(
-  balances: { personId: string; balance: number; person: { id: string; name: string } | undefined }[] | null | undefined,
+  balances:
+    | {
+        personId: string;
+        balance: number;
+        person: { id: string; name: string } | undefined;
+      }[]
+    | null
+    | undefined,
 ) {
   if (!balances) return 0;
   const validBalances = balances.filter((b) => b.person && b.balance !== 0);
   return validBalances.length;
-} 
+}

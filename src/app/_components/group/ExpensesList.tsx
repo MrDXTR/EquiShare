@@ -2,7 +2,16 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Receipt, CheckCircle2, MoreVertical, CheckCircle, Loader2, Trash2, XCircle, Plus } from "lucide-react";
+import {
+  Receipt,
+  CheckCircle2,
+  MoreVertical,
+  CheckCircle,
+  Loader2,
+  Trash2,
+  XCircle,
+  Plus,
+} from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { Button } from "~/components/ui/button";
 import { Badge } from "~/components/ui/badge";
@@ -26,11 +35,7 @@ import {
   DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
 import { ExpenseForm } from "~/app/_components/ExpenseForm";
-import {
-  Dialog,
-  DialogContent,
-  DialogTrigger,
-} from "~/components/ui/dialog";
+import { Dialog, DialogContent, DialogTrigger } from "~/components/ui/dialog";
 
 type Group = RouterOutputs["group"]["getById"];
 
@@ -64,7 +69,11 @@ export function ExpensesList({
       await utils.expense.getBalances.invalidate(group.id);
       toast.success("Expense deleted successfully", {
         id: "delete-expense",
-        style: { backgroundColor: "#fee2e2", color: "#991b1b", borderColor: "#fecaca" },
+        style: {
+          backgroundColor: "#fee2e2",
+          color: "#991b1b",
+          borderColor: "#fecaca",
+        },
       });
       setExpenseToDelete(null);
       onExpenseDeleted();
@@ -89,7 +98,11 @@ export function ExpensesList({
       await utils.expense.getBalances.invalidate(group.id);
       toast.success("Expense settled successfully", {
         id: "settle-expense",
-        style: { backgroundColor: "#dcfce7", color: "#166534", borderColor: "#bbf7d0" },
+        style: {
+          backgroundColor: "#dcfce7",
+          color: "#166534",
+          borderColor: "#bbf7d0",
+        },
       });
       onExpenseSettled();
       setSettlingExpense(null);
@@ -129,7 +142,7 @@ export function ExpensesList({
     >
       <Card className="h-full border-0 bg-white/80 shadow-xl shadow-indigo-100/50 backdrop-blur-sm transition-all duration-300 hover:shadow-2xl hover:shadow-indigo-200/60">
         <CardHeader className="pb-4">
-          <div className="flex md:items-center items-start flex-col md:flex-row gap-3 md:gap-0 justify-between">
+          <div className="flex flex-col items-start justify-between gap-3 md:flex-row md:items-center md:gap-0">
             <CardTitle className="flex items-center gap-3 text-2xl">
               <div className="rounded-lg bg-gradient-to-r from-indigo-500 to-purple-600 p-2">
                 <Receipt className="h-6 w-6 text-white" />
@@ -139,20 +152,20 @@ export function ExpensesList({
               </span>
             </CardTitle>
             <div>
-            <ExpenseForm
-              groupId={group.id}
-              people={group.people}
-              onSuccess={handleExpenseCreated}
-              trigger={
-                <Button
-                  size="sm"
-                  className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700"
-                >
-                  <Plus className="mr-2 h-4 w-4" />
-                  Add Expense
-                </Button>
-              }
-            />
+              <ExpenseForm
+                groupId={group.id}
+                people={group.people}
+                onSuccess={handleExpenseCreated}
+                trigger={
+                  <Button
+                    size="sm"
+                    className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700"
+                  >
+                    <Plus className="mr-2 h-4 w-4" />
+                    Add Expense
+                  </Button>
+                }
+              />
             </div>
           </div>
         </CardHeader>
@@ -179,7 +192,7 @@ export function ExpensesList({
                         {expense.description}
                       </h3>
                       {expense.settled && (
-                        <Badge className="bg-green-100 text-green-700 border-green-200">
+                        <Badge className="border-green-200 bg-green-100 text-green-700">
                           <CheckCircle2 className="h-3 w-3" />
                           Settled
                         </Badge>
@@ -208,7 +221,7 @@ export function ExpensesList({
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="absolute top-2 right-2 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 hover:bg-gray-100"
+                      className="absolute top-2 right-2 opacity-100 hover:bg-gray-100 sm:opacity-0 sm:group-hover:opacity-100"
                     >
                       <MoreVertical className="h-4 w-4" />
                     </Button>
@@ -278,4 +291,4 @@ export function ExpensesList({
       </AlertDialog>
     </motion.div>
   );
-} 
+}

@@ -106,8 +106,8 @@ export function ExpenseForm({
   const isFormValid = description && amount && paidById && shareIds.length > 0;
 
   return (
-    <Dialog 
-      open={open} 
+    <Dialog
+      open={open}
       onOpenChange={(isOpen) => {
         setOpen(isOpen);
         if (!isOpen) {
@@ -126,11 +126,13 @@ export function ExpenseForm({
           </Button>
         )}
       </DialogTrigger>
-      <DialogContent className="w-[95vw] max-w-2xl max-h-[90vh] overflow-y-auto p-4 sm:p-6">
+      <DialogContent className="max-h-[90vh] w-[95vw] max-w-2xl overflow-y-auto p-4 sm:p-6">
         <form onSubmit={handleSubmit}>
-          <DialogHeader className="text-left pb-4">
-            <DialogTitle className="text-lg sm:text-xl">Add New Expense</DialogTitle>
-            <DialogDescription className="text-sm text-muted-foreground">
+          <DialogHeader className="pb-4 text-left">
+            <DialogTitle className="text-lg sm:text-xl">
+              Add New Expense
+            </DialogTitle>
+            <DialogDescription className="text-muted-foreground text-sm">
               Add a new expense to split with your group members.
             </DialogDescription>
           </DialogHeader>
@@ -150,7 +152,7 @@ export function ExpenseForm({
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
                   placeholder="What's this expense for?"
-                  className="h-10 sm:h-12 border-gray-200 transition-all duration-200 focus:border-blue-500 focus:ring-blue-500/20"
+                  className="h-10 border-gray-200 transition-all duration-200 focus:border-blue-500 focus:ring-blue-500/20 sm:h-12"
                   required
                   autoFocus
                 />
@@ -165,7 +167,7 @@ export function ExpenseForm({
                   Amount (₹) <span className="text-red-500">*</span>
                 </Label>
                 <div className="relative">
-                  <IndianRupee className="absolute top-1/2 left-3 h-4 w-4 sm:h-5 sm:w-5 -translate-y-1/2 transform text-gray-400" />
+                  <IndianRupee className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 transform text-gray-400 sm:h-5 sm:w-5" />
                   <Input
                     id="amount"
                     type="number"
@@ -175,7 +177,7 @@ export function ExpenseForm({
                     value={amount}
                     onChange={(e) => setAmount(e.target.value)}
                     placeholder="0.00"
-                    className="h-10 sm:h-12 border-gray-200 pl-9 sm:pl-10 transition-all duration-200 focus:border-blue-500 focus:ring-blue-500/20"
+                    className="h-10 border-gray-200 pl-9 transition-all duration-200 focus:border-blue-500 focus:ring-blue-500/20 sm:h-12 sm:pl-10"
                     required
                   />
                 </div>
@@ -191,7 +193,7 @@ export function ExpenseForm({
                 Paid by <span className="text-red-500">*</span>
               </Label>
               <Select value={paidById} onValueChange={setPaidById}>
-                <SelectTrigger className="h-10 sm:h-12 w-full">
+                <SelectTrigger className="h-10 w-full sm:h-12">
                   <SelectValue placeholder="Select who paid" />
                 </SelectTrigger>
                 <SelectContent>
@@ -211,7 +213,7 @@ export function ExpenseForm({
               <Label className="text-sm font-semibold text-gray-700">
                 Split between ({shareIds.length} selected)
               </Label>
-              <div className="grid grid-cols-1 gap-2 sm:gap-3 sm:grid-cols-2 lg:grid-cols-3">
+              <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 sm:gap-3 lg:grid-cols-3">
                 {people.map((person) => {
                   const isSelected = shareIds.includes(person.id);
                   return (
@@ -219,7 +221,7 @@ export function ExpenseForm({
                       key={person.id}
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
-                      className={`flex cursor-pointer items-center gap-2 sm:gap-3 rounded-lg sm:rounded-xl border-2 p-3 sm:p-4 transition-all duration-200 ${
+                      className={`flex cursor-pointer items-center gap-2 rounded-lg border-2 p-3 transition-all duration-200 sm:gap-3 sm:rounded-xl sm:p-4 ${
                         isSelected
                           ? "border-blue-500 bg-blue-50/50 shadow-md"
                           : "border-gray-200 hover:border-gray-300 hover:bg-gray-50"
@@ -228,18 +230,18 @@ export function ExpenseForm({
                       <Checkbox
                         checked={isSelected}
                         onCheckedChange={() => togglePersonShare(person.id)}
-                        className="h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0"
+                        className="h-4 w-4 flex-shrink-0 sm:h-5 sm:w-5"
                       />
-                      <div className="flex items-center gap-2 min-w-0 flex-1">
+                      <div className="flex min-w-0 flex-1 items-center gap-2">
                         <div
-                          className={`flex h-7 w-7 sm:h-8 sm:w-8 items-center justify-center rounded-full text-xs sm:text-sm font-semibold text-white flex-shrink-0 ${
+                          className={`flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full text-xs font-semibold text-white sm:h-8 sm:w-8 sm:text-sm ${
                             isSelected ? "bg-blue-500" : "bg-gray-400"
                           }`}
                         >
                           {person.name.charAt(0).toUpperCase()}
                         </div>
                         <span
-                          className={`font-medium text-sm sm:text-base truncate ${
+                          className={`truncate text-sm font-medium sm:text-base ${
                             isSelected ? "text-blue-700" : "text-gray-700"
                           }`}
                         >
@@ -247,7 +249,7 @@ export function ExpenseForm({
                         </span>
                       </div>
                       {isSelected && (
-                        <CheckCircle2 className="h-4 w-4 sm:h-5 sm:w-5 text-blue-500 flex-shrink-0" />
+                        <CheckCircle2 className="h-4 w-4 flex-shrink-0 text-blue-500 sm:h-5 sm:w-5" />
                       )}
                     </motion.label>
                   );
@@ -256,12 +258,12 @@ export function ExpenseForm({
             </div>
           </div>
 
-          <DialogFooter className="flex flex-col-reverse gap-2 sm:flex-row sm:gap-3 pt-4 sm:pt-6">
+          <DialogFooter className="flex flex-col-reverse gap-2 pt-4 sm:flex-row sm:gap-3 sm:pt-6">
             <Button
               type="button"
               variant="outline"
               onClick={() => setOpen(false)}
-              className="w-full sm:w-auto h-10 sm:h-11"
+              className="h-10 w-full sm:h-11 sm:w-auto"
               disabled={createExpense.isPending}
             >
               Cancel
@@ -269,7 +271,7 @@ export function ExpenseForm({
             <Button
               type="submit"
               disabled={!isFormValid || createExpense.isPending}
-              className={`w-full sm:w-auto h-10 sm:h-11 ${
+              className={`h-10 w-full sm:h-11 sm:w-auto ${
                 isFormValid
                   ? "bg-gradient-to-r from-green-600 to-emerald-600 shadow-lg hover:from-green-700 hover:to-emerald-700 hover:shadow-xl"
                   : "cursor-not-allowed bg-gray-300"

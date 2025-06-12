@@ -1,12 +1,10 @@
-'use client'
+"use client";
 
 import { useState } from "react";
 import { ArrowRight, Home } from "lucide-react";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-
-
 
 export default function SignInPage() {
   const [isHovered, setIsHovered] = useState(false);
@@ -23,15 +21,17 @@ export default function SignInPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-white flex items-center justify-center p-4">
+    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-slate-50 to-white p-4">
       <div className="w-full max-w-sm">
         {/* Logo/Brand */}
-        <div className="text-center mb-12">
-            <div className="flex items-center justify-center mb-4">
-          <Image src="/file.svg" alt="DxtrSplit" width={100} height={100} />
+        <div className="mb-12 text-center">
+          <div className="mb-4 flex items-center justify-center">
+            <Image src="/file.svg" alt="DxtrSplit" width={100} height={100} />
           </div>
-          <h1 className="text-2xl font-light text-gray-900">Welcome to DxtrSplit</h1>
-          <p className="text-gray-500 text-sm mt-1">Sign in to continue</p>
+          <h1 className="text-2xl font-light text-gray-900">
+            Welcome to DxtrSplit
+          </h1>
+          <p className="mt-1 text-sm text-gray-500">Sign in to continue</p>
         </div>
 
         {/* Sign In Form */}
@@ -42,19 +42,13 @@ export default function SignInPage() {
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
             disabled={isLoading}
-            className={`
-              w-full h-12 bg-white border border-gray-200 rounded-lg flex items-center justify-center
-              transition-all duration-200 ease-out
-              ${isHovered && !isLoading ? 'border-gray-300 shadow-md transform -translate-y-0.5' : ''}
-              ${isLoading ? 'opacity-50 cursor-not-allowed' : 'hover:shadow-sm'}
-              focus:outline-none focus:ring-2 focus:ring-black focus:ring-opacity-5
-            `}
+            className={`flex h-12 w-full items-center justify-center rounded-lg border border-gray-200 bg-white transition-all duration-200 ease-out ${isHovered && !isLoading ? "-translate-y-0.5 transform border-gray-300 shadow-md" : ""} ${isLoading ? "cursor-not-allowed opacity-50" : "hover:shadow-sm"} focus:ring-opacity-5 focus:ring-2 focus:ring-black focus:outline-none`}
           >
             {isLoading ? (
-              <div className="w-5 h-5 border-2 border-gray-300 border-t-gray-600 rounded-full animate-spin"></div>
+              <div className="h-5 w-5 animate-spin rounded-full border-2 border-gray-300 border-t-gray-600"></div>
             ) : (
               <>
-                <svg className="w-5 h-5 mr-3" viewBox="0 0 24 24">
+                <svg className="mr-3 h-5 w-5" viewBox="0 0 24 24">
                   <path
                     d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
                     fill="#4285F4"
@@ -72,43 +66,42 @@ export default function SignInPage() {
                     fill="#EA4335"
                   />
                 </svg>
-                <span className="text-gray-700 font-medium">Continue with Google</span>
-                <ArrowRight className={`w-4 h-4 ml-3 transition-transform duration-200 ${isHovered ? 'translate-x-0.5' : ''}`} />
+                <span className="font-medium text-gray-700">
+                  Continue with Google
+                </span>
+                <ArrowRight
+                  className={`ml-3 h-4 w-4 transition-transform duration-200 ${isHovered ? "translate-x-0.5" : ""}`}
+                />
               </>
             )}
           </button>
 
           {/* Divider */}
-          <div className="relative flex items-center my-6">
+          <div className="relative my-6 flex items-center">
             <div className="flex-grow border-t border-gray-200"></div>
-            <span className="px-4 text-xs text-gray-400 bg-white">or</span>
+            <span className="bg-white px-4 text-xs text-gray-400">or</span>
             <div className="flex-grow border-t border-gray-200"></div>
           </div>
 
           {/* Home Button */}
           <button
             onClick={handleHomeClick}
-            className="
-              w-full h-12 bg-gray-50 border border-gray-200 rounded-lg flex items-center justify-center
-              transition-all duration-200 ease-out
-              hover:bg-gray-100 hover:border-gray-300
-              focus:outline-none focus:ring-2 focus:ring-gray-200
-            "
+            className="flex h-12 w-full items-center justify-center rounded-lg border border-gray-200 bg-gray-50 transition-all duration-200 ease-out hover:border-gray-300 hover:bg-gray-100 focus:ring-2 focus:ring-gray-200 focus:outline-none"
           >
-            <Home className="w-4 h-4 mr-2 text-gray-600" />
-            <span className="text-gray-600 font-medium">Back to home</span>
+            <Home className="mr-2 h-4 w-4 text-gray-600" />
+            <span className="font-medium text-gray-600">Back to home</span>
           </button>
         </div>
 
         {/* Footer */}
-        <div className="text-center mt-8">
+        <div className="mt-8 text-center">
           <p className="text-xs text-gray-400">
-            By continuing, you agree to our{' '}
-            <a href="#" className="text-gray-600 hover:text-gray-800 underline">
+            By continuing, you agree to our{" "}
+            <a href="#" className="text-gray-600 underline hover:text-gray-800">
               Terms of Service
-            </a>{' '}
-            and{' '}
-            <a href="#" className="text-gray-600 hover:text-gray-800 underline">
+            </a>{" "}
+            and{" "}
+            <a href="#" className="text-gray-600 underline hover:text-gray-800">
               Privacy Policy
             </a>
           </p>

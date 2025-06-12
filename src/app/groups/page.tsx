@@ -40,7 +40,11 @@ export default function GroupsPage() {
       await utils.group.getAll.invalidate();
       toast.success("Group deleted successfully", {
         id: "delete-group",
-        style: { backgroundColor: "#fee2e2", color: "#991b1b", borderColor: "#fecaca" },
+        style: {
+          backgroundColor: "#fee2e2",
+          color: "#991b1b",
+          borderColor: "#fecaca",
+        },
       });
       setGroupToDelete(null);
     },
@@ -67,12 +71,16 @@ export default function GroupsPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen ">
+      <div className="min-h-screen">
         <div className="container mx-auto px-4 py-6 sm:py-8">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <h1 className="text-2xl font-bold text-gray-900 sm:text-3xl">Your Groups</h1>
-              <p className="mt-1 text-sm text-gray-600 sm:text-base">Manage your expense groups</p>
+              <h1 className="text-2xl font-bold text-gray-900 sm:text-3xl">
+                Your Groups
+              </h1>
+              <p className="mt-1 text-sm text-gray-600 sm:text-base">
+                Manage your expense groups
+              </p>
             </div>
             <div className="w-full sm:w-auto">
               <CreateGroupDialog />
@@ -98,9 +106,13 @@ export default function GroupsPage() {
       <div className="container mx-auto px-4 py-6 sm:py-8">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900 sm:text-3xl">Your Groups</h1>
+            <h1 className="text-2xl font-bold text-gray-900 sm:text-3xl">
+              Your Groups
+            </h1>
             <p className="mt-1 text-sm text-gray-600 sm:text-base">
-              {groups?.length === 0 ? "Start by creating your first group" : `${groups?.length} ${groups?.length === 1 ? 'group' : 'groups'} total`}
+              {groups?.length === 0
+                ? "Start by creating your first group"
+                : `${groups?.length} ${groups?.length === 1 ? "group" : "groups"} total`}
             </p>
           </div>
           <div className="w-full sm:w-auto">
@@ -115,14 +127,27 @@ export default function GroupsPage() {
               animate={{ opacity: 1, y: 0 }}
               className="flex flex-col items-center justify-center py-12 sm:py-16"
             >
-              <div className="rounded-full bg-blue-100 p-6 mb-4">
-                <svg className="h-12 w-12 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+              <div className="mb-4 rounded-full bg-blue-100 p-6">
+                <svg
+                  className="h-12 w-12 text-blue-600"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={1.5}
+                    d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
+                  />
                 </svg>
               </div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">No groups yet</h3>
-              <p className="text-gray-600 text-center mb-6 max-w-md">
-                Create your first group to start splitting expenses with friends, family, or colleagues.
+              <h3 className="mb-2 text-lg font-semibold text-gray-900">
+                No groups yet
+              </h3>
+              <p className="mb-6 max-w-md text-center text-gray-600">
+                Create your first group to start splitting expenses with
+                friends, family, or colleagues.
               </p>
               <CreateGroupDialog />
             </motion.div>
@@ -151,14 +176,16 @@ export default function GroupsPage() {
         >
           <AlertDialogContent className="mx-4 max-w-md">
             <AlertDialogHeader>
-              <AlertDialogTitle className="text-lg">Delete Group?</AlertDialogTitle>
+              <AlertDialogTitle className="text-lg">
+                Delete Group?
+              </AlertDialogTitle>
               <AlertDialogDescription className="text-sm">
-                This action cannot be undone. This will permanently delete the group
-                and all its expenses.
+                This action cannot be undone. This will permanently delete the
+                group and all its expenses.
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter className="flex-col gap-2 sm:flex-row">
-              <AlertDialogCancel 
+              <AlertDialogCancel
                 disabled={isDeleting}
                 className="w-full sm:w-auto"
               >
@@ -167,7 +194,7 @@ export default function GroupsPage() {
               <AlertDialogAction
                 onClick={handleDeleteGroup}
                 disabled={isDeleting}
-                className="w-full sm:w-auto bg-red-600 hover:bg-red-700 focus:ring-red-600"
+                className="w-full bg-red-600 hover:bg-red-700 focus:ring-red-600 sm:w-auto"
               >
                 {isDeleting ? (
                   <div className="flex items-center justify-center gap-2">

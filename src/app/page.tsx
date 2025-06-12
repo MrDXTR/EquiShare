@@ -26,16 +26,14 @@ export default function LandingPage() {
     }
   }, [session, status, router]);
 
-  // Don't render anything while checking authentication
   if (status === "loading") {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="h-32 w-32 animate-spin rounded-full border-b-2 border-gray-900"></div>
+      <div className="grid min-h-screen place-items-center">
+        <div className="h-8 w-8 animate-spin rounded-full border-2 border-gray-900/20 border-t-gray-900"></div>
       </div>
     );
   }
 
-  // Don't render the landing page if authenticated
   if (status === "authenticated") {
     return null;
   }

@@ -94,7 +94,10 @@ export function Header() {
               </DropdownMenu>
             </div>
           ) : (
-            <Button onClick={() => router.push("/signin")} className="font-medium">
+            <Button
+              onClick={() => router.push("/signin")}
+              className="font-medium"
+            >
               Sign In
             </Button>
           )}
