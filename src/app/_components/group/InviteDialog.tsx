@@ -91,7 +91,7 @@ export function InviteDialog({ children, groupId }: InviteDialogProps) {
               </p>
               <Button
                 onClick={handleGenerateInvite}
-                className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700"
+                className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 dark:text-white"
               >
                 Generate Invite Link
               </Button>
@@ -167,7 +167,7 @@ export function InviteDialog({ children, groupId }: InviteDialogProps) {
               <div className="pt-2">
                 <Button
                   onClick={handleGenerateInvite}
-                  className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700"
+                  className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 dark:text-white"
                 >
                   Generate New Link
                 </Button>

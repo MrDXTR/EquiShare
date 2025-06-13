@@ -79,20 +79,24 @@ export function GroupMembers({ group, isOwner }: GroupMembersProps) {
     <div className="space-y-4 py-4">
       {/* Group Owner */}
       <div className="space-y-3">
-        <h4 className="text-sm font-medium text-gray-500">Owner</h4>
-        <div className="flex items-center justify-between rounded-lg border border-gray-100 bg-gray-50 p-3">
+        <h4 className="text-sm font-medium text-gray-500 dark:text-gray-400">
+          Owner
+        </h4>
+        <div className="flex items-center justify-between rounded-lg border border-gray-100 bg-gray-50 p-3 dark:border-gray-700 dark:bg-gray-800">
           <div className="flex items-center gap-3">
-            <Avatar className="h-8 w-8 border border-white shadow-sm">
+            <Avatar className="h-8 w-8 border border-white shadow-sm dark:border-gray-700">
               <AvatarImage src={group.createdBy.image || undefined} />
-              <AvatarFallback className="bg-blue-100 text-blue-600">
+              <AvatarFallback className="bg-blue-100 text-blue-600 dark:bg-blue-900 dark:text-blue-400">
                 {(group.createdBy.name || "U").charAt(0)}
               </AvatarFallback>
             </Avatar>
             <div>
-              <p className="text-sm font-medium">{group.createdBy.name}</p>
+              <p className="text-sm font-medium dark:text-gray-200">
+                {group.createdBy.name}
+              </p>
               <Badge
                 variant="outline"
-                className="mt-1 border-green-200 bg-green-50 text-green-700"
+                className="mt-1 border-green-200 bg-green-50 text-green-700 dark:border-green-800 dark:bg-green-900/50 dark:text-green-400"
               >
                 Owner
               </Badge>
@@ -108,7 +112,7 @@ export function GroupMembers({ group, isOwner }: GroupMembersProps) {
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
                 <DropdownMenuItem
-                  className="text-red-600"
+                  className="text-red-600 dark:text-red-500"
                   onClick={() => setShowLeaveDialog(true)}
                 >
                   <LogOut className="mr-2 h-4 w-4" />
@@ -123,21 +127,25 @@ export function GroupMembers({ group, isOwner }: GroupMembersProps) {
       {/* Members */}
       {group.members && group.members.length > 0 && (
         <div className="space-y-3">
-          <h4 className="text-sm font-medium text-gray-500">Members</h4>
+          <h4 className="text-sm font-medium text-gray-500 dark:text-gray-400">
+            Members
+          </h4>
           <div className="max-h-60 space-y-2 overflow-y-auto">
             {group.members.map((member) => (
               <div
                 key={member.id}
-                className="flex items-center justify-between rounded-lg border border-gray-100 p-3"
+                className="flex items-center justify-between rounded-lg border border-gray-100 p-3 dark:border-gray-700"
               >
                 <div className="flex items-center gap-3">
-                  <Avatar className="h-8 w-8 border border-white shadow-sm">
+                  <Avatar className="h-8 w-8 border border-white shadow-sm dark:border-gray-700">
                     <AvatarImage src={member.image || undefined} />
-                    <AvatarFallback className="bg-blue-100 text-blue-600">
+                    <AvatarFallback className="bg-blue-100 text-blue-600 dark:bg-blue-900 dark:text-blue-400">
                       {(member.name || "U").charAt(0)}
                     </AvatarFallback>
                   </Avatar>
-                  <p className="text-sm font-medium">{member.name}</p>
+                  <p className="text-sm font-medium dark:text-gray-200">
+                    {member.name}
+                  </p>
                 </div>
                 {/* Show dropdown for owner (to remove members) or for the current user (to leave) */}
                 {(isOwner || member.id === currentUserId) && (
@@ -150,7 +158,7 @@ export function GroupMembers({ group, isOwner }: GroupMembersProps) {
                     <DropdownMenuContent align="end">
                       {isOwner && member.id !== group.createdById && (
                         <DropdownMenuItem
-                          className="text-red-600"
+                          className="text-red-600 dark:text-red-500"
                           onClick={() => setMemberToRemove(member.id)}
                         >
                           <UserMinus className="mr-2 h-4 w-4" />
@@ -159,7 +167,7 @@ export function GroupMembers({ group, isOwner }: GroupMembersProps) {
                       )}
                       {!isOwner && member.id === currentUserId && (
                         <DropdownMenuItem
-                          className="text-red-600"
+                          className="text-red-600 dark:text-red-500"
                           onClick={() => setShowLeaveDialog(true)}
                         >
                           <LogOut className="mr-2 h-4 w-4" />
@@ -177,19 +185,21 @@ export function GroupMembers({ group, isOwner }: GroupMembersProps) {
 
       {/* People in expenses */}
       <div className="space-y-3">
-        <h4 className="text-sm font-medium text-gray-500">
+        <h4 className="text-sm font-medium text-gray-500 dark:text-gray-400">
           People in Expenses
         </h4>
         <div className="max-h-60 space-y-2 overflow-y-auto">
           {group.people.map((person) => (
             <div
               key={person.id}
-              className="flex items-center gap-3 rounded-lg border border-gray-100 p-3"
+              className="flex items-center gap-3 rounded-lg border border-gray-100 p-3 dark:border-gray-700"
             >
-              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gray-100 text-gray-600">
+              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300">
                 {person.name.charAt(0)}
               </div>
-              <p className="text-sm font-medium">{person.name}</p>
+              <p className="text-sm font-medium dark:text-gray-200">
+                {person.name}
+              </p>
             </div>
           ))}
         </div>
@@ -211,7 +221,7 @@ export function GroupMembers({ group, isOwner }: GroupMembersProps) {
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction
-              className="bg-red-600 text-white hover:bg-red-700"
+              className="bg-red-600 text-white hover:bg-red-700 dark:bg-red-700 dark:hover:bg-red-800"
               onClick={() =>
                 memberToRemove && handleRemoveMember(memberToRemove)
               }
@@ -235,7 +245,7 @@ export function GroupMembers({ group, isOwner }: GroupMembersProps) {
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction
-              className="bg-red-600 text-white hover:bg-red-700"
+              className="bg-red-600 text-white hover:bg-red-700 dark:bg-red-700 dark:hover:bg-red-800"
               onClick={handleLeaveGroup}
             >
               Leave

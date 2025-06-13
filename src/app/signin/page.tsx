@@ -21,17 +21,19 @@ export default function SignInPage() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-slate-50 to-white p-4">
+    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-slate-50 to-white p-4 dark:from-gray-900 dark:to-gray-950">
       <div className="w-full max-w-sm">
         {/* Logo/Brand */}
         <div className="mb-12 text-center">
           <div className="mb-4 flex items-center justify-center">
             <Image src="/file.svg" alt="DxtrSplit" width={100} height={100} />
           </div>
-          <h1 className="text-2xl font-light text-gray-900">
+          <h1 className="text-2xl font-light text-gray-900 dark:text-gray-100">
             Welcome to DxtrSplit
           </h1>
-          <p className="mt-1 text-sm text-gray-500">Sign in to continue</p>
+          <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+            Sign in to continue
+          </p>
         </div>
 
         {/* Sign In Form */}
@@ -42,10 +44,10 @@ export default function SignInPage() {
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
             disabled={isLoading}
-            className={`flex h-12 w-full items-center justify-center rounded-lg border border-gray-200 bg-white transition-all duration-200 ease-out ${isHovered && !isLoading ? "-translate-y-0.5 transform border-gray-300 shadow-md" : ""} ${isLoading ? "cursor-not-allowed opacity-50" : "hover:shadow-sm"} focus:ring-opacity-5 focus:ring-2 focus:ring-black focus:outline-none`}
+            className={`flex h-12 w-full items-center justify-center rounded-lg border border-gray-200 bg-white transition-all duration-200 ease-out dark:border-gray-700 dark:bg-gray-800 ${isHovered && !isLoading ? "-translate-y-0.5 transform border-gray-300 shadow-md dark:border-gray-600" : ""} ${isLoading ? "cursor-not-allowed opacity-50" : "hover:shadow-sm"} focus:ring-opacity-5 focus:ring-2 focus:ring-black focus:outline-none dark:focus:ring-white`}
           >
             {isLoading ? (
-              <div className="h-5 w-5 animate-spin rounded-full border-2 border-gray-300 border-t-gray-600"></div>
+              <div className="h-5 w-5 animate-spin rounded-full border-2 border-gray-300 border-t-gray-600 dark:border-gray-600 dark:border-t-gray-300"></div>
             ) : (
               <>
                 <svg className="mr-3 h-5 w-5" viewBox="0 0 24 24">
@@ -66,7 +68,7 @@ export default function SignInPage() {
                     fill="#EA4335"
                   />
                 </svg>
-                <span className="font-medium text-gray-700">
+                <span className="font-medium text-gray-700 dark:text-gray-200">
                   Continue with Google
                 </span>
                 <ArrowRight
@@ -78,30 +80,40 @@ export default function SignInPage() {
 
           {/* Divider */}
           <div className="relative my-6 flex items-center">
-            <div className="flex-grow border-t border-gray-200"></div>
-            <span className="bg-white px-4 text-xs text-gray-400">or</span>
-            <div className="flex-grow border-t border-gray-200"></div>
+            <div className="flex-grow border-t border-gray-200 dark:border-gray-700"></div>
+            <span className="bg-white px-4 text-xs text-gray-400 dark:bg-gray-900 dark:text-gray-500">
+              or
+            </span>
+            <div className="flex-grow border-t border-gray-200 dark:border-gray-700"></div>
           </div>
 
           {/* Home Button */}
           <button
             onClick={handleHomeClick}
-            className="flex h-12 w-full items-center justify-center rounded-lg border border-gray-200 bg-gray-50 transition-all duration-200 ease-out hover:border-gray-300 hover:bg-gray-100 focus:ring-2 focus:ring-gray-200 focus:outline-none"
+            className="flex h-12 w-full items-center justify-center rounded-lg border border-gray-200 bg-gray-50 transition-all duration-200 ease-out hover:border-gray-300 hover:bg-gray-100 focus:ring-2 focus:ring-gray-200 focus:outline-none dark:border-gray-700 dark:bg-gray-800 dark:hover:border-gray-600 dark:hover:bg-gray-700 dark:focus:ring-gray-700"
           >
-            <Home className="mr-2 h-4 w-4 text-gray-600" />
-            <span className="font-medium text-gray-600">Back to home</span>
+            <Home className="mr-2 h-4 w-4 text-gray-600 dark:text-gray-300" />
+            <span className="font-medium text-gray-600 dark:text-gray-300">
+              Back to home
+            </span>
           </button>
         </div>
 
         {/* Footer */}
         <div className="mt-8 text-center">
-          <p className="text-xs text-gray-400">
+          <p className="text-xs text-gray-400 dark:text-gray-500">
             By continuing, you agree to our{" "}
-            <a href="#" className="text-gray-600 underline hover:text-gray-800">
+            <a
+              href="#"
+              className="text-gray-600 underline hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200"
+            >
               Terms of Service
             </a>{" "}
             and{" "}
-            <a href="#" className="text-gray-600 underline hover:text-gray-800">
+            <a
+              href="#"
+              className="text-gray-600 underline hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200"
+            >
               Privacy Policy
             </a>
           </p>

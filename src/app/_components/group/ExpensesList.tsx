@@ -140,14 +140,14 @@ export function ExpensesList({
       animate={{ opacity: 1, x: 0 }}
       transition={{ delay: 0.4 }}
     >
-      <Card className="h-full border-0 bg-white/80 shadow-xl shadow-indigo-100/50 backdrop-blur-sm transition-all duration-300 hover:shadow-2xl hover:shadow-indigo-200/60">
+      <Card className="h-full border-0 bg-white/80 shadow-xl shadow-indigo-100/50 backdrop-blur-sm transition-all duration-300 hover:shadow-2xl hover:shadow-indigo-200/60 dark:bg-gray-800/80 dark:shadow-none dark:hover:shadow-none">
         <CardHeader className="pb-4">
           <div className="flex flex-col items-start justify-between gap-3 md:flex-row md:items-center md:gap-0">
             <CardTitle className="flex items-center gap-3 text-2xl">
               <div className="rounded-lg bg-gradient-to-r from-indigo-500 to-purple-600 p-2">
                 <Receipt className="h-6 w-6 text-white" />
               </div>
-              <span className="bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent dark:from-indigo-400 dark:to-purple-400">
                 Expenses
               </span>
             </CardTitle>
@@ -159,7 +159,7 @@ export function ExpensesList({
                 trigger={
                   <Button
                     size="sm"
-                    className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700"
+                    className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 dark:from-indigo-500 dark:to-purple-500 dark:text-white dark:hover:from-indigo-600 dark:hover:to-purple-600"
                   >
                     <Plus className="mr-2 h-4 w-4" />
                     Add Expense
@@ -172,8 +172,8 @@ export function ExpensesList({
         <CardContent className="max-h-[calc(100vh-24rem)] overflow-y-auto">
           <div className="space-y-4">
             {group.expenses.length === 0 ? (
-              <div className="py-12 text-center text-gray-500">
-                <Receipt className="mx-auto mb-4 h-12 w-12 text-gray-300" />
+              <div className="py-12 text-center text-gray-500 dark:text-gray-400">
+                <Receipt className="mx-auto mb-4 h-12 w-12 text-gray-300 dark:text-gray-600" />
                 <p className="text-lg">No expenses yet</p>
               </div>
             ) : (
@@ -183,17 +183,17 @@ export function ExpensesList({
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: index * 0.1 }}
-                  className="group relative overflow-hidden rounded-xl border border-gray-200/60 bg-gradient-to-r from-white to-gray-50/50 p-5 transition-all duration-300 hover:shadow-lg hover:shadow-blue-100/50"
+                  className="group relative overflow-hidden rounded-xl border border-gray-200/60 bg-gradient-to-r from-white to-gray-50/50 p-5 transition-all duration-300 hover:shadow-lg hover:shadow-blue-100/50 dark:border-gray-700/60 dark:from-gray-800 dark:to-gray-900/50 dark:hover:shadow-blue-900/20"
                 >
-                  <div className="absolute inset-0 bg-gradient-to-r from-blue-500/5 to-indigo-500/5 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+                  <div className="absolute inset-0 bg-gradient-to-r from-blue-500/5 to-indigo-500/5 opacity-0 transition-opacity duration-300 group-hover:opacity-100 dark:from-blue-500/10 dark:to-indigo-500/10" />
                   <div className="relative flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                     <div className="space-y-2">
                       <div className="flex flex-wrap items-center gap-2">
-                        <h3 className="text-lg font-semibold text-gray-900 transition-colors group-hover:text-blue-700">
+                        <h3 className="text-lg font-semibold text-gray-900 transition-colors group-hover:text-blue-700 dark:text-gray-100 dark:group-hover:text-blue-400">
                           {expense.description}
                         </h3>
                         {expense.settled && (
-                          <Badge className="border-green-200 bg-green-100 text-green-700">
+                          <Badge className="border-green-200 bg-green-100 text-green-700 dark:border-green-800 dark:bg-green-900/50 dark:text-green-400">
                             <CheckCircle2 className="mr-1 h-3 w-3" />
                             Settled
                           </Badge>
@@ -202,17 +202,17 @@ export function ExpensesList({
                       <div className="flex flex-wrap items-center gap-2">
                         <Badge
                           variant="outline"
-                          className="border-blue-200 bg-blue-50 text-blue-700"
+                          className="border-blue-200 bg-blue-50 text-blue-700 dark:border-blue-800 dark:bg-blue-900/50 dark:text-blue-400"
                         >
                           Paid by {expense.paidBy.name}
                         </Badge>
                       </div>
                     </div>
                     <div className="space-y-1 text-right">
-                      <p className="text-2xl font-bold text-gray-900 transition-colors group-hover:text-green-600">
+                      <p className="text-2xl font-bold text-gray-900 transition-colors group-hover:text-green-600 dark:text-gray-100 dark:group-hover:text-green-400">
                         ₹{expense.amount.toFixed(2)}
                       </p>
-                      <div className="flex items-center gap-1 text-sm text-gray-600">
+                      <div className="flex items-center gap-1 text-sm text-gray-600 dark:text-gray-400">
                         <span>Split {expense.shares.length} ways</span>
                       </div>
                     </div>
@@ -222,7 +222,7 @@ export function ExpensesList({
                       <Button
                         variant="ghost"
                         size="icon"
-                        className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 hover:bg-gray-100"
+                        className="absolute top-2 right-2 opacity-0 group-focus-within:opacity-100 group-hover:opacity-100 hover:bg-gray-100 dark:hover:bg-gray-700"
                       >
                         <MoreVertical className="h-4 w-4" />
                       </Button>
@@ -230,7 +230,7 @@ export function ExpensesList({
                     <DropdownMenuContent align="end">
                       {!expense.settled && (
                         <DropdownMenuItem
-                          className="text-green-600 focus:text-green-600"
+                          className="text-green-600 focus:text-green-600 dark:text-green-500 dark:focus:text-green-500"
                           onClick={() => handleSettleUp(expense.id)}
                           disabled={settlingExpense === expense.id}
                         >
@@ -248,7 +248,7 @@ export function ExpensesList({
                         </DropdownMenuItem>
                       )}
                       <DropdownMenuItem
-                        className="text-red-600 focus:text-red-600"
+                        className="text-red-600 focus:text-red-600 dark:text-red-500 dark:focus:text-red-500"
                         onClick={() => setExpenseToDelete(expense.id)}
                       >
                         <Trash2 className="mr-2 h-4 w-4" />
@@ -284,7 +284,7 @@ export function ExpensesList({
             <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction
               onClick={handleDelete}
-              className="bg-red-600 hover:bg-red-700 focus:ring-red-600"
+              className="bg-red-600 hover:bg-red-700 focus:ring-red-600 dark:bg-red-700 dark:hover:bg-red-800 dark:focus:ring-red-700"
             >
               Delete
             </AlertDialogAction>
