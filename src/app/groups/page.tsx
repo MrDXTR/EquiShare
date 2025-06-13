@@ -194,7 +194,7 @@ export default function GroupsPage() {
               <AlertDialogAction
                 onClick={handleDeleteGroup}
                 disabled={isDeleting}
-                className="w-full bg-red-600 dark:text-white text-black hover:bg-red-700 focus:ring-red-600 sm:w-auto dark:bg-red-700 dark:hover:bg-red-800 dark:focus:ring-red-700"
+                className="w-full bg-red-600 dark:text-white  hover:bg-red-700 focus:ring-red-600 sm:w-auto dark:bg-red-700 dark:hover:bg-red-800 dark:focus:ring-red-700"
               >
                 {isDeleting ? (
                   <div className="flex items-center justify-center gap-2">
