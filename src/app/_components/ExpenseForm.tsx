@@ -126,7 +126,7 @@ export function ExpenseForm({
           </Button>
         )}
       </DialogTrigger>
-      <DialogContent className="max-h-[90vh] w-[95vw] max-w-3xl overflow-y-auto p-4 sm:p-6">
+      <DialogContent className="max-h-[90vh] w-[95vw] max-w-3xl md:max-w-5xl overflow-y-auto p-4 sm:p-6">
         <form onSubmit={handleSubmit}>
           <DialogHeader className="pb-4 text-left">
             <DialogTitle className="text-lg sm:text-xl">
@@ -209,7 +209,7 @@ export function ExpenseForm({
             <Separator />
 
             {/* Split Between */}
-            <div className="space-y-3 sm:space-y-4">
+            <div className="space-y-3 sm:space-y-4 w-full">
               <Label className="text-sm font-semibold text-gray-700">
                 Split between ({shareIds.length} selected)
               </Label>
