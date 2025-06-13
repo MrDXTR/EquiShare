@@ -75,10 +75,10 @@ export default function GroupsPage() {
         <div className="container mx-auto px-4 py-6 sm:py-8">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100 sm:text-3xl">
+              <h1 className="text-2xl font-bold text-gray-900 sm:text-3xl dark:text-gray-100">
                 Your Groups
               </h1>
-              <p className="mt-1 text-sm text-gray-600 dark:text-gray-300 sm:text-base">
+              <p className="mt-1 text-sm text-gray-600 sm:text-base dark:text-gray-300">
                 Manage your expense groups
               </p>
             </div>
@@ -106,10 +106,10 @@ export default function GroupsPage() {
       <div className="container mx-auto px-4 py-6 sm:py-8">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100 sm:text-3xl">
+            <h1 className="text-2xl font-bold text-gray-900 sm:text-3xl dark:text-gray-100">
               Your Groups
             </h1>
-            <p className="mt-1 text-sm text-gray-600 dark:text-gray-300 sm:text-base">
+            <p className="mt-1 text-sm text-gray-600 sm:text-base dark:text-gray-300">
               {groups?.length === 0
                 ? "Start by creating your first group"
                 : `${groups?.length} ${groups?.length === 1 ? "group" : "groups"} total`}
@@ -194,7 +194,7 @@ export default function GroupsPage() {
               <AlertDialogAction
                 onClick={handleDeleteGroup}
                 disabled={isDeleting}
-                className="w-full bg-red-600 dark:text-white  hover:bg-red-700 focus:ring-red-600 sm:w-auto dark:bg-red-700 dark:hover:bg-red-800 dark:focus:ring-red-700"
+                className="w-full bg-red-600 hover:bg-red-700 focus:ring-red-600 sm:w-auto dark:bg-red-700 dark:text-white dark:hover:bg-red-800 dark:focus:ring-red-700"
               >
                 {isDeleting ? (
                   <div className="flex items-center justify-center gap-2">

@@ -126,8 +126,13 @@ export function InvitePageClient({ token }: InvitePageClientProps) {
               <h2 className="mt-4 text-xl font-semibold text-gray-800 dark:text-gray-100">
                 Invitation Error
               </h2>
-              <p className="mt-2 text-gray-600 dark:text-gray-300">{error.message}</p>
-              <Button className="mt-6 dark:text-white" onClick={() => router.push("/groups")}>
+              <p className="mt-2 text-gray-600 dark:text-gray-300">
+                {error.message}
+              </p>
+              <Button
+                className="mt-6 dark:text-white"
+                onClick={() => router.push("/groups")}
+              >
                 Go to Groups
               </Button>
             </CardContent>

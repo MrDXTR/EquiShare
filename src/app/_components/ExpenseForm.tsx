@@ -119,7 +119,7 @@ export function ExpenseForm({
         {trigger || (
           <Button
             size="sm"
-            className="bg-gradient-to-r dark:text-white  from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 dark:from-indigo-500 dark:to-purple-500 dark:hover:from-indigo-600 dark:hover:to-purple-600"
+            className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 dark:from-indigo-500 dark:to-purple-500 dark:text-white dark:hover:from-indigo-600 dark:hover:to-purple-600"
           >
             <Plus className="mr-2 h-4 w-4" />
             Add Expense
@@ -152,7 +152,7 @@ export function ExpenseForm({
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
                   placeholder="What's this expense for?"
-                  className="h-10 border-gray-200 transition-all duration-200 focus:border-blue-500 focus:ring-blue-500/20 dark:border-gray-700 dark:bg-gray-800 dark:focus:border-blue-400 dark:focus:ring-blue-400/20 sm:h-12"
+                  className="h-10 border-gray-200 transition-all duration-200 focus:border-blue-500 focus:ring-blue-500/20 sm:h-12 dark:border-gray-700 dark:bg-gray-800 dark:focus:border-blue-400 dark:focus:ring-blue-400/20"
                   required
                   autoFocus
                 />
@@ -167,7 +167,7 @@ export function ExpenseForm({
                   Amount (₹) <span className="text-red-500">*</span>
                 </Label>
                 <div className="relative">
-                  <IndianRupee className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 transform text-gray-400 dark:text-gray-500 sm:h-5 sm:w-5" />
+                  <IndianRupee className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 transform text-gray-400 sm:h-5 sm:w-5 dark:text-gray-500" />
                   <Input
                     id="amount"
                     type="number"
@@ -177,7 +177,7 @@ export function ExpenseForm({
                     value={amount}
                     onChange={(e) => setAmount(e.target.value)}
                     placeholder="0.00"
-                    className="h-10 border-gray-200 pl-9 transition-all duration-200 focus:border-blue-500 focus:ring-blue-500/20 dark:border-gray-700 dark:bg-gray-800 dark:focus:border-blue-400 dark:focus:ring-blue-400/20 sm:h-12 sm:pl-10"
+                    className="h-10 border-gray-200 pl-9 transition-all duration-200 focus:border-blue-500 focus:ring-blue-500/20 sm:h-12 sm:pl-10 dark:border-gray-700 dark:bg-gray-800 dark:focus:border-blue-400 dark:focus:ring-blue-400/20"
                     required
                   />
                 </div>
@@ -193,7 +193,7 @@ export function ExpenseForm({
                 Paid by <span className="text-red-500">*</span>
               </Label>
               <Select value={paidById} onValueChange={setPaidById}>
-                <SelectTrigger className="h-10 w-full dark:border-gray-700 dark:bg-gray-800 sm:h-12">
+                <SelectTrigger className="h-10 w-full sm:h-12 dark:border-gray-700 dark:bg-gray-800">
                   <SelectValue placeholder="Select who paid" />
                 </SelectTrigger>
                 <SelectContent>
@@ -237,14 +237,18 @@ export function ExpenseForm({
                       <div className="flex min-w-0 flex-1 items-center gap-3">
                         <div
                           className={`flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full text-sm font-semibold text-white ${
-                            isSelected ? "bg-blue-500 dark:bg-blue-600" : "bg-gray-400 dark:bg-gray-600"
+                            isSelected
+                              ? "bg-blue-500 dark:bg-blue-600"
+                              : "bg-gray-400 dark:bg-gray-600"
                           }`}
                         >
                           {person.name.charAt(0).toUpperCase()}
                         </div>
                         <span
                           className={`overflow-hidden text-base font-medium ${
-                            isSelected ? "text-blue-700 dark:text-blue-400" : "text-gray-700 dark:text-gray-300"
+                            isSelected
+                              ? "text-blue-700 dark:text-blue-400"
+                              : "text-gray-700 dark:text-gray-300"
                           }`}
                           title={person.name}
                         >
@@ -266,7 +270,7 @@ export function ExpenseForm({
               type="button"
               variant="outline"
               onClick={() => setOpen(false)}
-              className="h-10 w-full dark:border-gray-700 dark:bg-gray-800 dark:hover:bg-gray-700 sm:h-11 sm:w-auto"
+              className="h-10 w-full sm:h-11 sm:w-auto dark:border-gray-700 dark:bg-gray-800 dark:hover:bg-gray-700"
               disabled={createExpense.isPending}
             >
               Cancel
@@ -274,7 +278,7 @@ export function ExpenseForm({
             <Button
               type="submit"
               disabled={!isFormValid || createExpense.isPending}
-              className={`h-10 w-full sm:h-11 dark:text-white  sm:w-auto ${
+              className={`h-10 w-full sm:h-11 sm:w-auto dark:text-white ${
                 isFormValid
                   ? "bg-gradient-to-r from-green-600 to-emerald-600 shadow-lg hover:from-green-700 hover:to-emerald-700 hover:shadow-xl dark:from-green-700 dark:to-emerald-700 dark:hover:from-green-600 dark:hover:to-emerald-600"
                   : "cursor-not-allowed bg-gray-300 dark:bg-gray-700"

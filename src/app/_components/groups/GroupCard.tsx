@@ -49,7 +49,7 @@ export function GroupCard({ group, onDelete, index }: GroupCardProps) {
       className="group relative"
     >
       <Card
-        className={`h-full cursor-pointer border-0 backdrop-blur-sm transition-all duration-300 hover:shadow-xl hover:shadow-blue-200/30 dark:hover:shadow-blue-900/20 active:scale-[0.98] ${
+        className={`h-full cursor-pointer border-0 backdrop-blur-sm transition-all duration-300 hover:shadow-xl hover:shadow-blue-200/30 active:scale-[0.98] dark:hover:shadow-blue-900/20 ${
           isSharedGroup
             ? "bg-blue-50/90 hover:bg-blue-50 dark:bg-blue-950/60 dark:hover:bg-blue-950/80"
             : "bg-white/90 hover:bg-white dark:bg-gray-800/90 dark:hover:bg-gray-800"
@@ -59,7 +59,7 @@ export function GroupCard({ group, onDelete, index }: GroupCardProps) {
         <CardHeader className="pb-3">
           <div className="flex items-start justify-between">
             <div>
-              <CardTitle className="line-clamp-2 text-lg font-bold text-gray-900 transition-colors group-hover:text-blue-700 dark:text-gray-100 dark:group-hover:text-blue-400 sm:text-xl">
+              <CardTitle className="line-clamp-2 text-lg font-bold text-gray-900 transition-colors group-hover:text-blue-700 sm:text-xl dark:text-gray-100 dark:group-hover:text-blue-400">
                 {group.name}
               </CardTitle>
 
@@ -80,7 +80,7 @@ export function GroupCard({ group, onDelete, index }: GroupCardProps) {
               <Button
                 variant="ghost"
                 size="icon"
-                className="h-8 w-8 shrink-0 opacity-100 hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-950 dark:hover:text-red-400 sm:opacity-0 sm:group-hover:opacity-100"
+                className="h-8 w-8 shrink-0 opacity-100 hover:bg-red-50 hover:text-red-600 sm:opacity-0 sm:group-hover:opacity-100 dark:hover:bg-red-950 dark:hover:text-red-400"
                 onClick={(e) => {
                   e.stopPropagation();
                   onDelete(group.id);
@@ -162,7 +162,7 @@ export function GroupCard({ group, onDelete, index }: GroupCardProps) {
 
           {/* View Details Arrow */}
           <div className="flex items-center justify-end pt-2">
-            <div className="flex items-center gap-1 text-xs text-blue-600 dark:text-blue-400 opacity-70 transition-opacity group-hover:opacity-100">
+            <div className="flex items-center gap-1 text-xs text-blue-600 opacity-70 transition-opacity group-hover:opacity-100 dark:text-blue-400">
               <span>View details</span>
               <ChevronRight className="h-3 w-3" />
             </div>

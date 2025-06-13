@@ -57,9 +57,9 @@ export function GroupHeader({
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div className="flex items-center gap-2">
-        <h1 className="bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-3xl font-bold text-transparent dark:from-blue-400 dark:to-indigo-400 sm:text-4xl">
-          {group.name || "Group Expenses"}
-        </h1>
+          <h1 className="bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-3xl font-bold text-transparent sm:text-4xl dark:from-blue-400 dark:to-indigo-400">
+            {group.name || "Group Expenses"}
+          </h1>
 
           {!isOwner && (
             <Badge
@@ -126,8 +126,14 @@ export function GroupHeader({
                 ))}
 
               <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={() => setShowMembersDialog && setShowMembersDialog(true)}>
-                <span className="text-blue-600 dark:text-blue-400">View all members</span>
+              <DropdownMenuItem
+                onClick={() =>
+                  setShowMembersDialog && setShowMembersDialog(true)
+                }
+              >
+                <span className="text-blue-600 dark:text-blue-400">
+                  View all members
+                </span>
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -169,7 +175,9 @@ export function GroupHeader({
           ) : showAllSettled ? (
             <>
               <CheckCircle2 className="h-5 w-5 text-green-600 dark:text-green-400" />
-              <span className="font-semibold text-green-700 dark:text-green-400">All Settled!</span>
+              <span className="font-semibold text-green-700 dark:text-green-400">
+                All Settled!
+              </span>
             </>
           ) : (
             <>

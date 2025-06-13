@@ -68,7 +68,7 @@ export default function LandingPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="bg-background min-h-screen">
       {/* Hero Section */}
       <div className="flex min-h-[calc(100vh-8rem)] flex-col items-center justify-center px-4">
         <motion.div
@@ -113,7 +113,7 @@ export default function LandingPage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.5, duration: 0.8 }}
-            className="max-w-[48rem] text-xl leading-relaxed text-gray-600 dark:text-gray-300 sm:text-2xl sm:leading-9"
+            className="max-w-[48rem] text-xl leading-relaxed text-gray-600 sm:text-2xl sm:leading-9 dark:text-gray-300"
           >
             Split bills, track expenses, and settle up with friends and family.
             <span className="font-semibold text-gray-800 dark:text-gray-200">

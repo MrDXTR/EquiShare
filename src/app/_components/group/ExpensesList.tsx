@@ -159,7 +159,7 @@ export function ExpensesList({
                 trigger={
                   <Button
                     size="sm"
-                    className="bg-gradient-to-r dark:text-white  from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 dark:from-indigo-500 dark:to-purple-500 dark:hover:from-indigo-600 dark:hover:to-purple-600"
+                    className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 dark:from-indigo-500 dark:to-purple-500 dark:text-white dark:hover:from-indigo-600 dark:hover:to-purple-600"
                   >
                     <Plus className="mr-2 h-4 w-4" />
                     Add Expense
@@ -222,7 +222,7 @@ export function ExpensesList({
                       <Button
                         variant="ghost"
                         size="icon"
-                        className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 hover:bg-gray-100 dark:hover:bg-gray-700"
+                        className="absolute top-2 right-2 opacity-0 group-focus-within:opacity-100 group-hover:opacity-100 hover:bg-gray-100 dark:hover:bg-gray-700"
                       >
                         <MoreVertical className="h-4 w-4" />
                       </Button>

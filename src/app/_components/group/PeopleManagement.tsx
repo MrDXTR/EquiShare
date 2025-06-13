@@ -124,7 +124,9 @@ export function PeopleManagement({ group }: PeopleManagementProps) {
           {/* Add Person Form */}
           <form onSubmit={handleAddPerson} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="newPerson" className="dark:text-gray-300">Add New Person</Label>
+              <Label htmlFor="newPerson" className="dark:text-gray-300">
+                Add New Person
+              </Label>
               <div className="flex gap-2">
                 <Input
                   id="newPerson"
@@ -175,7 +177,7 @@ export function PeopleManagement({ group }: PeopleManagementProps) {
                   <Button
                     variant="ghost"
                     size="icon"
-                    className="opacity-100 transition-opacity group-hover:opacity-100 hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-900/30 dark:hover:text-red-400 md:opacity-0"
+                    className="opacity-100 transition-opacity group-hover:opacity-100 hover:bg-red-50 hover:text-red-600 md:opacity-0 dark:hover:bg-red-900/30 dark:hover:text-red-400"
                     onClick={() => setPersonToDelete(person.id)}
                   >
                     <UserMinus className="h-4 w-4" />

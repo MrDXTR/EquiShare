@@ -31,7 +31,9 @@ export default function SignInPage() {
           <h1 className="text-2xl font-light text-gray-900 dark:text-gray-100">
             Welcome to DxtrSplit
           </h1>
-          <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">Sign in to continue</p>
+          <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+            Sign in to continue
+          </p>
         </div>
 
         {/* Sign In Form */}
@@ -79,7 +81,9 @@ export default function SignInPage() {
           {/* Divider */}
           <div className="relative my-6 flex items-center">
             <div className="flex-grow border-t border-gray-200 dark:border-gray-700"></div>
-            <span className="bg-white px-4 text-xs text-gray-400 dark:bg-gray-900 dark:text-gray-500">or</span>
+            <span className="bg-white px-4 text-xs text-gray-400 dark:bg-gray-900 dark:text-gray-500">
+              or
+            </span>
             <div className="flex-grow border-t border-gray-200 dark:border-gray-700"></div>
           </div>
 
@@ -89,7 +93,9 @@ export default function SignInPage() {
             className="flex h-12 w-full items-center justify-center rounded-lg border border-gray-200 bg-gray-50 transition-all duration-200 ease-out hover:border-gray-300 hover:bg-gray-100 focus:ring-2 focus:ring-gray-200 focus:outline-none dark:border-gray-700 dark:bg-gray-800 dark:hover:border-gray-600 dark:hover:bg-gray-700 dark:focus:ring-gray-700"
           >
             <Home className="mr-2 h-4 w-4 text-gray-600 dark:text-gray-300" />
-            <span className="font-medium text-gray-600 dark:text-gray-300">Back to home</span>
+            <span className="font-medium text-gray-600 dark:text-gray-300">
+              Back to home
+            </span>
           </button>
         </div>
 
@@ -97,11 +103,17 @@ export default function SignInPage() {
         <div className="mt-8 text-center">
           <p className="text-xs text-gray-400 dark:text-gray-500">
             By continuing, you agree to our{" "}
-            <a href="#" className="text-gray-600 underline hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200">
+            <a
+              href="#"
+              className="text-gray-600 underline hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200"
+            >
               Terms of Service
             </a>{" "}
             and{" "}
-            <a href="#" className="text-gray-600 underline hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200">
+            <a
+              href="#"
+              className="text-gray-600 underline hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200"
+            >
               Privacy Policy
             </a>
           </p>

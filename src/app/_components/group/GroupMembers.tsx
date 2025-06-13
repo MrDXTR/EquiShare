@@ -79,7 +79,9 @@ export function GroupMembers({ group, isOwner }: GroupMembersProps) {
     <div className="space-y-4 py-4">
       {/* Group Owner */}
       <div className="space-y-3">
-        <h4 className="text-sm font-medium text-gray-500 dark:text-gray-400">Owner</h4>
+        <h4 className="text-sm font-medium text-gray-500 dark:text-gray-400">
+          Owner
+        </h4>
         <div className="flex items-center justify-between rounded-lg border border-gray-100 bg-gray-50 p-3 dark:border-gray-700 dark:bg-gray-800">
           <div className="flex items-center gap-3">
             <Avatar className="h-8 w-8 border border-white shadow-sm dark:border-gray-700">
@@ -89,7 +91,9 @@ export function GroupMembers({ group, isOwner }: GroupMembersProps) {
               </AvatarFallback>
             </Avatar>
             <div>
-              <p className="text-sm font-medium dark:text-gray-200">{group.createdBy.name}</p>
+              <p className="text-sm font-medium dark:text-gray-200">
+                {group.createdBy.name}
+              </p>
               <Badge
                 variant="outline"
                 className="mt-1 border-green-200 bg-green-50 text-green-700 dark:border-green-800 dark:bg-green-900/50 dark:text-green-400"
@@ -123,7 +127,9 @@ export function GroupMembers({ group, isOwner }: GroupMembersProps) {
       {/* Members */}
       {group.members && group.members.length > 0 && (
         <div className="space-y-3">
-          <h4 className="text-sm font-medium text-gray-500 dark:text-gray-400">Members</h4>
+          <h4 className="text-sm font-medium text-gray-500 dark:text-gray-400">
+            Members
+          </h4>
           <div className="max-h-60 space-y-2 overflow-y-auto">
             {group.members.map((member) => (
               <div
@@ -137,7 +143,9 @@ export function GroupMembers({ group, isOwner }: GroupMembersProps) {
                       {(member.name || "U").charAt(0)}
                     </AvatarFallback>
                   </Avatar>
-                  <p className="text-sm font-medium dark:text-gray-200">{member.name}</p>
+                  <p className="text-sm font-medium dark:text-gray-200">
+                    {member.name}
+                  </p>
                 </div>
                 {/* Show dropdown for owner (to remove members) or for the current user (to leave) */}
                 {(isOwner || member.id === currentUserId) && (
@@ -189,7 +197,9 @@ export function GroupMembers({ group, isOwner }: GroupMembersProps) {
               <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300">
                 {person.name.charAt(0)}
               </div>
-              <p className="text-sm font-medium dark:text-gray-200">{person.name}</p>
+              <p className="text-sm font-medium dark:text-gray-200">
+                {person.name}
+              </p>
             </div>
           ))}
         </div>
