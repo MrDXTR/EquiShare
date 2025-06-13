@@ -126,7 +126,7 @@ export function ExpenseForm({
           </Button>
         )}
       </DialogTrigger>
-      <DialogContent className="max-h-[90vh] w-[95vw] max-w-3xl md:max-w-5xl overflow-y-auto p-4 sm:p-6">
+      <DialogContent className="max-h-[90vh] w-[95vw] max-w-3xl overflow-y-auto p-4 sm:p-6 md:max-w-5xl">
         <form onSubmit={handleSubmit}>
           <DialogHeader className="pb-4 text-left">
             <DialogTitle className="text-lg sm:text-xl">
@@ -209,7 +209,7 @@ export function ExpenseForm({
             <Separator />
 
             {/* Split Between */}
-            <div className="space-y-3 sm:space-y-4 w-full">
+            <div className="w-full space-y-3 sm:space-y-4">
               <Label className="text-sm font-semibold text-gray-700">
                 Split between ({shareIds.length} selected)
               </Label>
@@ -234,7 +234,7 @@ export function ExpenseForm({
                         onCheckedChange={() => togglePersonShare(person.id)}
                         className="h-5 w-5 flex-shrink-0"
                       />
-                      <div className="flex items-center gap-3 flex-1 min-w-0">
+                      <div className="flex min-w-0 flex-1 items-center gap-3">
                         <div
                           className={`flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full text-sm font-semibold text-white ${
                             isSelected ? "bg-blue-500" : "bg-gray-400"
@@ -243,7 +243,7 @@ export function ExpenseForm({
                           {person.name.charAt(0).toUpperCase()}
                         </div>
                         <span
-                          className={`text-base font-medium overflow-hidden ${
+                          className={`overflow-hidden text-base font-medium ${
                             isSelected ? "text-blue-700" : "text-gray-700"
                           }`}
                           title={person.name}

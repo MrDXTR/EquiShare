@@ -1,7 +1,13 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Receipt, TrendingUp, CheckCircle2, AlertCircle, UserPlus } from "lucide-react";
+import {
+  Receipt,
+  TrendingUp,
+  CheckCircle2,
+  AlertCircle,
+  UserPlus,
+} from "lucide-react";
 import { Skeleton } from "~/components/ui/skeleton";
 import { Button } from "~/components/ui/button";
 import { InviteDialog } from "~/app/_components/group/InviteDialog";
@@ -75,10 +81,10 @@ export function GroupHeader({
             </>
           )}
         </div>
-        
+
         {isOwner && (
           <InviteDialog groupId={group.id}>
-            <div className="flex items-center gap-2 rounded-full border border-white/20 bg-white/70 px-4 py-2 shadow-sm backdrop-blur-sm hover:bg-white/90 transition-colors cursor-pointer">
+            <div className="flex cursor-pointer items-center gap-2 rounded-full border border-white/20 bg-white/70 px-4 py-2 shadow-sm backdrop-blur-sm transition-colors hover:bg-white/90">
               <UserPlus className="h-5 w-5 text-indigo-600" />
               <span className="font-semibold text-indigo-700">
                 Invite Members

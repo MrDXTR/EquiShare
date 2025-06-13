@@ -13,14 +13,14 @@ interface SettlementsListProps {
   hasUnsettledExpenses?: boolean;
 }
 
-export function SettlementsList({ 
-  balances, 
+export function SettlementsList({
+  balances,
   isLoading,
-  hasUnsettledExpenses = true
+  hasUnsettledExpenses = true,
 }: SettlementsListProps) {
   const whoOwesWhom = getWhoOwesWhom(balances);
   const isAllSettled = whoOwesWhom.length === 0;
-  
+
   // If there are no unsettled expenses, show the all settled message
   const showAllSettled = isAllSettled || !hasUnsettledExpenses;
 

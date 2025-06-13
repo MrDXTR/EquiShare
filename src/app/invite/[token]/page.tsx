@@ -7,4 +7,4 @@ export default async function InvitePage({
 }) {
   const { token } = await params;
   return <InvitePageClient token={token} />;
-} 
+}

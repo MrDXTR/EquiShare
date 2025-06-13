@@ -1,6 +1,10 @@
 import { z } from "zod";
 import { TRPCError } from "@trpc/server";
-import { createTRPCRouter, protectedProcedure, publicProcedure } from "~/server/api/trpc";
+import {
+  createTRPCRouter,
+  protectedProcedure,
+  publicProcedure,
+} from "~/server/api/trpc";
 import crypto from "crypto";
 
 export const inviteRouter = createTRPCRouter({
@@ -26,11 +30,11 @@ export const inviteRouter = createTRPCRouter({
           message: "You don't have permission to invite users to this group",
         });
       }
-      
+
       // Check rate limiting (max 10 invites per group per day)
       const oneDayAgo = new Date();
       oneDayAgo.setDate(oneDayAgo.getDate() - 1);
-      
+
       const recentInvitesCount = await ctx.db.groupInvite.count({
         where: {
           groupId: input.groupId,
@@ -39,11 +43,12 @@ export const inviteRouter = createTRPCRouter({
           },
         },
       });
-      
+
       if (recentInvitesCount >= 10) {
         throw new TRPCError({
           code: "TOO_MANY_REQUESTS",
-          message: "You've reached the limit of 10 invites per day for this group",
+          message:
+            "You've reached the limit of 10 invites per day for this group",
         });
       }
 
@@ -81,7 +86,7 @@ export const inviteRouter = createTRPCRouter({
       });
 
       // Format the inviteLink based on the deployment URL
-      const baseUrl = process.env.NEXTAUTH_URL || 'http://localhost:3000';
+      const baseUrl = process.env.NEXTAUTH_URL || "http://localhost:3000";
       const inviteLink = `${baseUrl}/invite/${inviteToken}`;
 
       return {
@@ -199,14 +204,14 @@ export const inviteRouter = createTRPCRouter({
 
       // Check if the user is already a member of this group
       const isOwner = invite.group.createdById === ctx.session.user.id;
-      
+
       if (isOwner) {
         throw new TRPCError({
           code: "BAD_REQUEST",
           message: "You already own this group",
         });
       }
-      
+
       const isMember = await ctx.db.group.findFirst({
         where: {
           id: invite.groupId,
@@ -217,7 +222,7 @@ export const inviteRouter = createTRPCRouter({
           },
         },
       });
-      
+
       if (isMember) {
         throw new TRPCError({
           code: "BAD_REQUEST",
@@ -246,9 +251,9 @@ export const inviteRouter = createTRPCRouter({
         },
       });
 
-      return { 
-        success: true, 
-        groupId: invite.groupId 
+      return {
+        success: true,
+        groupId: invite.groupId,
       };
     }),
 
@@ -276,6 +281,17 @@ export const inviteRouter = createTRPCRouter({
         });
       }
 
+      // Check if the invite has an assigned user and that it matches the current user
+      if (
+        invite.invitedUserId !== null &&
+        invite.invitedUserId !== ctx.session.user.id
+      ) {
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "You don't have permission to reject this invitation",
+        });
+      }
+
       await ctx.db.groupInvite.update({
         where: { id: invite.id },
         data: {
@@ -288,14 +304,14 @@ export const inviteRouter = createTRPCRouter({
 
       return { success: true };
     }),
-    
+
   // Get a list of invites the current user has received
   getMyInvites: protectedProcedure.query(async ({ ctx }) => {
     const invites = await ctx.db.groupInvite.findMany({
       where: {
         OR: [
           // Explicit invites to this user
-          { 
+          {
             invitedUserId: ctx.session.user.id,
             status: "PENDING",
           },
@@ -305,7 +321,7 @@ export const inviteRouter = createTRPCRouter({
             status: "PENDING",
             // We'll validate these when they're accessed
           },
-        ]
+        ],
       },
       include: {
         group: {
@@ -323,7 +339,7 @@ export const inviteRouter = createTRPCRouter({
         },
       },
     });
-    
+
     return invites;
   }),
-}); 
+});

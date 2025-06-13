@@ -19,15 +19,16 @@ export function InvitePageClient({ token }: InvitePageClientProps) {
   const router = useRouter();
   const { data: session, status: sessionStatus } = useSession();
   const [acceptingInvite, setAcceptingInvite] = useState(false);
-  
-  const { data: invite, isLoading, error } = api.invite.getInviteByToken.useQuery(
-    token,
-    {
-      retry: false,
-      refetchOnWindowFocus: false,
-    }
-  );
-  
+
+  const {
+    data: invite,
+    isLoading,
+    error,
+  } = api.invite.getInviteByToken.useQuery(token, {
+    retry: false,
+    refetchOnWindowFocus: false,
+  });
+
   const acceptInvite = api.invite.acceptInvite.useMutation({
     onMutate: () => {
       setAcceptingInvite(true);
@@ -44,7 +45,7 @@ export function InvitePageClient({ token }: InvitePageClientProps) {
       setAcceptingInvite(false);
     },
   });
-  
+
   const rejectInvite = api.invite.rejectInvite.useMutation({
     onSuccess: () => {
       toast.success("Invitation rejected");
@@ -57,7 +58,7 @@ export function InvitePageClient({ token }: InvitePageClientProps) {
       toast.error(`Error: ${error.message}`);
     },
   });
-  
+
   const handleAcceptInvite = () => {
     if (sessionStatus === "authenticated") {
       acceptInvite.mutate(token);
@@ -67,7 +68,7 @@ export function InvitePageClient({ token }: InvitePageClientProps) {
       router.push(`/api/auth/signin?callbackUrl=/invite/${token}`);
     }
   };
-  
+
   const handleRejectInvite = () => {
     if (sessionStatus === "authenticated") {
       rejectInvite.mutate(token);
@@ -75,7 +76,7 @@ export function InvitePageClient({ token }: InvitePageClientProps) {
       router.push("/groups");
     }
   };
-  
+
   // Check for pending invite after login
   useEffect(() => {
     const pendingInvite = sessionStorage.getItem("pendingInvite");
@@ -88,8 +89,14 @@ export function InvitePageClient({ token }: InvitePageClientProps) {
       acceptInvite.mutate(token);
       sessionStorage.removeItem("pendingInvite");
     }
-  }, [sessionStatus, token, acceptingInvite, acceptInvite.isSuccess, acceptInvite]);
-  
+  }, [
+    sessionStatus,
+    token,
+    acceptingInvite,
+    acceptInvite.isSuccess,
+    acceptInvite,
+  ]);
+
   if (isLoading) {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center bg-gray-50">
@@ -106,7 +113,7 @@ export function InvitePageClient({ token }: InvitePageClientProps) {
       </div>
     );
   }
-  
+
   if (error) {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center bg-gray-50">
@@ -120,10 +127,7 @@ export function InvitePageClient({ token }: InvitePageClientProps) {
                 Invitation Error
               </h2>
               <p className="mt-2 text-gray-600">{error.message}</p>
-              <Button
-                className="mt-6"
-                onClick={() => router.push("/groups")}
-              >
+              <Button className="mt-6" onClick={() => router.push("/groups")}>
                 Go to Groups
               </Button>
             </CardContent>
@@ -132,7 +136,7 @@ export function InvitePageClient({ token }: InvitePageClientProps) {
       </div>
     );
   }
-  
+
   if (acceptInvite.isSuccess) {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center bg-gray-50">
@@ -160,9 +164,9 @@ export function InvitePageClient({ token }: InvitePageClientProps) {
       </div>
     );
   }
-  
+
   if (!invite) return null;
-  
+
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-gray-50">
       <div className="w-full max-w-md p-4">
@@ -177,19 +181,19 @@ export function InvitePageClient({ token }: InvitePageClientProps) {
                 <div className="rounded-full bg-blue-100 p-3">
                   <UserPlus className="h-8 w-8 text-blue-500" />
                 </div>
-                
+
                 <h1 className="mt-4 text-2xl font-bold text-gray-800">
                   Group Invitation
                 </h1>
-                
+
                 <p className="mt-2 text-gray-600">
                   You&apos;ve been invited to join
                 </p>
-                
+
                 <h2 className="mt-1 text-xl font-semibold text-blue-600">
                   {invite.group.name}
                 </h2>
-                
+
                 <div className="mt-4 flex items-center">
                   {invite.invitedBy.image ? (
                     <Image
@@ -208,7 +212,7 @@ export function InvitePageClient({ token }: InvitePageClientProps) {
                     Invited by {invite.invitedBy.name}
                   </span>
                 </div>
-                
+
                 <div className="mt-6 flex w-full flex-col space-y-3">
                   <Button
                     onClick={handleAcceptInvite}
@@ -225,7 +229,7 @@ export function InvitePageClient({ token }: InvitePageClientProps) {
                       "Join Group"
                     )}
                   </Button>
-                  
+
                   <Button
                     onClick={handleRejectInvite}
                     variant="outline"
@@ -235,7 +239,7 @@ export function InvitePageClient({ token }: InvitePageClientProps) {
                     Decline
                   </Button>
                 </div>
-                
+
                 {sessionStatus === "unauthenticated" && (
                   <p className="mt-4 text-xs text-gray-500">
                     You&apos;ll need to sign in to join this group
@@ -248,4 +252,4 @@ export function InvitePageClient({ token }: InvitePageClientProps) {
       </div>
     </div>
   );
-} 
+}

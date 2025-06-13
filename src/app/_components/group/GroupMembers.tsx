@@ -41,7 +41,7 @@ export function GroupMembers({ group, isOwner }: GroupMembersProps) {
   const [showLeaveDialog, setShowLeaveDialog] = useState(false);
 
   const utils = api.useUtils();
-  
+
   const leaveGroup = api.group.leaveGroup.useMutation({
     onSuccess: () => {
       toast.success("You've left the group");
@@ -90,7 +90,10 @@ export function GroupMembers({ group, isOwner }: GroupMembersProps) {
             </Avatar>
             <div>
               <p className="text-sm font-medium">{group.createdBy.name}</p>
-              <Badge variant="outline" className="mt-1 border-green-200 bg-green-50 text-green-700">
+              <Badge
+                variant="outline"
+                className="mt-1 border-green-200 bg-green-50 text-green-700"
+              >
                 Owner
               </Badge>
             </div>
@@ -116,14 +119,17 @@ export function GroupMembers({ group, isOwner }: GroupMembersProps) {
           )}
         </div>
       </div>
-      
+
       {/* Members */}
       {group.members && group.members.length > 0 && (
         <div className="space-y-3">
           <h4 className="text-sm font-medium text-gray-500">Members</h4>
           <div className="max-h-60 space-y-2 overflow-y-auto">
             {group.members.map((member) => (
-              <div key={member.id} className="flex items-center justify-between rounded-lg border border-gray-100 p-3">
+              <div
+                key={member.id}
+                className="flex items-center justify-between rounded-lg border border-gray-100 p-3"
+              >
                 <div className="flex items-center gap-3">
                   <Avatar className="h-8 w-8 border border-white shadow-sm">
                     <AvatarImage src={member.image || undefined} />
@@ -168,13 +174,18 @@ export function GroupMembers({ group, isOwner }: GroupMembersProps) {
           </div>
         </div>
       )}
-      
+
       {/* People in expenses */}
       <div className="space-y-3">
-        <h4 className="text-sm font-medium text-gray-500">People in Expenses</h4>
+        <h4 className="text-sm font-medium text-gray-500">
+          People in Expenses
+        </h4>
         <div className="max-h-60 space-y-2 overflow-y-auto">
           {group.people.map((person) => (
-            <div key={person.id} className="flex items-center gap-3 rounded-lg border border-gray-100 p-3">
+            <div
+              key={person.id}
+              className="flex items-center gap-3 rounded-lg border border-gray-100 p-3"
+            >
               <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gray-100 text-gray-600">
                 {person.name.charAt(0)}
               </div>
@@ -185,19 +196,25 @@ export function GroupMembers({ group, isOwner }: GroupMembersProps) {
       </div>
 
       {/* Remove Member Confirmation Dialog */}
-      <AlertDialog open={!!memberToRemove} onOpenChange={() => setMemberToRemove(null)}>
+      <AlertDialog
+        open={!!memberToRemove}
+        onOpenChange={() => setMemberToRemove(null)}
+      >
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Remove Member</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to remove this member from the group? This action cannot be undone.
+              Are you sure you want to remove this member from the group? This
+              action cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction
               className="bg-red-600 text-white hover:bg-red-700"
-              onClick={() => memberToRemove && handleRemoveMember(memberToRemove)}
+              onClick={() =>
+                memberToRemove && handleRemoveMember(memberToRemove)
+              }
             >
               Remove
             </AlertDialogAction>
@@ -211,7 +228,8 @@ export function GroupMembers({ group, isOwner }: GroupMembersProps) {
           <AlertDialogHeader>
             <AlertDialogTitle>Leave Group</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to leave this group? You will need to be invited again to rejoin.
+              Are you sure you want to leave this group? You will need to be
+              invited again to rejoin.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -227,4 +245,4 @@ export function GroupMembers({ group, isOwner }: GroupMembersProps) {
       </AlertDialog>
     </div>
   );
-} 
+}

@@ -194,7 +194,7 @@ export function ExpensesList({
                         </h3>
                         {expense.settled && (
                           <Badge className="border-green-200 bg-green-100 text-green-700">
-                            <CheckCircle2 className="h-3 w-3 mr-1" />
+                            <CheckCircle2 className="mr-1 h-3 w-3" />
                             Settled
                           </Badge>
                         )}
@@ -222,7 +222,7 @@ export function ExpensesList({
                       <Button
                         variant="ghost"
                         size="icon"
-                        className="absolute top-2 right-2 opacity-0 hover:bg-gray-100 group-hover:opacity-100"
+                        className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 hover:bg-gray-100"
                       >
                         <MoreVertical className="h-4 w-4" />
                       </Button>

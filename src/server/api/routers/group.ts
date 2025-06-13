@@ -110,25 +110,27 @@ export const groupRouter = createTRPCRouter({
           },
         },
       });
-      
+
       if (!group) {
         throw new TRPCError({
-          code: 'NOT_FOUND',
-          message: 'Group not found',
+          code: "NOT_FOUND",
+          message: "Group not found",
         });
       }
-      
+
       // Check if user has access to this group (owner or member)
       const isOwner = group.createdById === ctx.session.user.id;
-      const isMember = group.members.some(member => member.id === ctx.session.user.id);
-      
+      const isMember = group.members.some(
+        (member) => member.id === ctx.session.user.id,
+      );
+
       if (!isOwner && !isMember) {
         throw new TRPCError({
-          code: 'FORBIDDEN',
-          message: 'You do not have access to this group',
+          code: "FORBIDDEN",
+          message: "You do not have access to this group",
         });
       }
-      
+
       return {
         ...group,
         isOwner,
@@ -166,14 +168,14 @@ export const groupRouter = createTRPCRouter({
           ],
         },
       });
-      
+
       if (!group) {
         throw new TRPCError({
-          code: 'FORBIDDEN',
-          message: 'You do not have access to this group',
+          code: "FORBIDDEN",
+          message: "You do not have access to this group",
         });
       }
-      
+
       const person = await ctx.db.person.create({
         data: {
           name: input.name,
@@ -204,8 +206,8 @@ export const groupRouter = createTRPCRouter({
 
       if (!group) {
         throw new TRPCError({
-          code: 'FORBIDDEN',
-          message: 'You do not have access to this group',
+          code: "FORBIDDEN",
+          message: "You do not have access to this group",
         });
       }
 
@@ -217,7 +219,7 @@ export const groupRouter = createTRPCRouter({
       });
       return { success: true };
     }),
-    
+
   checkGroupAccess: protectedProcedure
     .input(z.string())
     .query(async ({ ctx, input: groupId }) => {
@@ -232,19 +234,19 @@ export const groupRouter = createTRPCRouter({
         select: {
           id: true,
           createdById: true,
-        }
+        },
       });
-      
+
       if (!group) {
         return { hasAccess: false, isOwner: false };
       }
-      
-      return { 
-        hasAccess: true, 
-        isOwner: group.createdById === ctx.session.user.id 
+
+      return {
+        hasAccess: true,
+        isOwner: group.createdById === ctx.session.user.id,
       };
     }),
-    
+
   leaveGroup: protectedProcedure
     .input(z.string())
     .mutation(async ({ ctx, input: groupId }) => {
@@ -256,14 +258,14 @@ export const groupRouter = createTRPCRouter({
           NOT: { createdById: ctx.session.user.id }, // Can't leave groups you own
         },
       });
-      
+
       if (!group) {
         throw new TRPCError({
-          code: 'FORBIDDEN',
-          message: 'You cannot leave this group',
+          code: "FORBIDDEN",
+          message: "You cannot leave this group",
         });
       }
-      
+
       await ctx.db.group.update({
         where: { id: groupId },
         data: {
@@ -272,7 +274,7 @@ export const groupRouter = createTRPCRouter({
           },
         },
       });
-      
+
       return { success: true };
     }),
 
@@ -281,7 +283,7 @@ export const groupRouter = createTRPCRouter({
       z.object({
         groupId: z.string(),
         memberId: z.string(),
-      })
+      }),
     )
     .mutation(async ({ ctx, input }) => {
       // Check if the current user is the owner of the group
@@ -294,16 +296,16 @@ export const groupRouter = createTRPCRouter({
 
       if (!group) {
         throw new TRPCError({
-          code: 'FORBIDDEN',
-          message: 'Only the group owner can remove members',
+          code: "FORBIDDEN",
+          message: "Only the group owner can remove members",
         });
       }
 
       // Check if trying to remove the owner
       if (input.memberId === ctx.session.user.id) {
         throw new TRPCError({
-          code: 'BAD_REQUEST',
-          message: 'You cannot remove yourself as the owner',
+          code: "BAD_REQUEST",
+          message: "You cannot remove yourself as the owner",
         });
       }
 

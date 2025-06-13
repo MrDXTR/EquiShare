@@ -6,7 +6,14 @@ import { api } from "~/trpc/react";
 import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { GroupSummary } from "~/app/_components/GroupSummary";
-import { Plus, Users, Receipt, UserPlus, Share2, MoreVertical } from "lucide-react";
+import {
+  Plus,
+  Users,
+  Receipt,
+  UserPlus,
+  Share2,
+  MoreVertical,
+} from "lucide-react";
 import { ExpenseForm } from "~/app/_components/ExpenseForm";
 import { use } from "react";
 import { Skeleton } from "~/components/ui/skeleton";
@@ -41,13 +48,11 @@ export default function GroupDetailPage({
   const { data: group, isLoading: isLoadingGroup } = api.group.getById.useQuery(
     resolvedParams.id,
   );
-  
-  const { data: balances, isLoading: isLoadingBalances } = api.expense.getBalances.useQuery(
-    resolvedParams.id,
-    {
+
+  const { data: balances, isLoading: isLoadingBalances } =
+    api.expense.getBalances.useQuery(resolvedParams.id, {
       enabled: !!group,
-    }
-  );
+    });
 
   const handleExpenseCreated = async () => {
     await utils.group.getById.invalidate(resolvedParams.id);
@@ -108,14 +113,16 @@ export default function GroupDetailPage({
   }
 
   if (!group) return null;
-  
+
   const totalExpenses = group.expenses.reduce(
     (sum, expense) => sum + expense.amount,
-    0
+    0,
   );
-  
+
   const isAllSettled = group.expenses.every((expense) => expense.settled);
-  const pendingSettlements = group.expenses.filter((expense) => !expense.settled).length;
+  const pendingSettlements = group.expenses.filter(
+    (expense) => !expense.settled,
+  ).length;
 
   return (
     <div className="min-h-screen bg-gray-50/50 p-4 md:p-8">
@@ -127,19 +134,26 @@ export default function GroupDetailPage({
               <h1 className="bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-4xl font-bold text-transparent">
                 {group.name}
               </h1>
-              
+
               {!group.isOwner && (
-                <Badge variant="outline" className="ml-2 border-blue-200 bg-blue-50 text-blue-700">
+                <Badge
+                  variant="outline"
+                  className="ml-2 border-blue-200 bg-blue-50 text-blue-700"
+                >
                   <Share2 className="mr-1 h-3 w-3" />
                   Shared
                 </Badge>
               )}
             </div>
-            
+
             <div className="flex items-center gap-3">
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="outline" size="sm" className="flex items-center gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="flex items-center gap-2"
+                  >
                     <Users className="h-4 w-4" />
                     <span>Members</span>
                   </Button>
@@ -147,43 +161,51 @@ export default function GroupDetailPage({
                 <DropdownMenuContent align="end" className="w-56">
                   <DropdownMenuLabel>Group Members</DropdownMenuLabel>
                   <DropdownMenuSeparator />
-                  
+
                   {/* Owner */}
                   <DropdownMenuItem className="flex items-center gap-2 py-2">
                     <Avatar className="h-6 w-6">
                       <AvatarImage src={group.createdBy.image || undefined} />
-                      <AvatarFallback className="bg-blue-100 text-blue-600 text-xs">
+                      <AvatarFallback className="bg-blue-100 text-xs text-blue-600">
                         {(group.createdBy.name || "U").charAt(0)}
                       </AvatarFallback>
                     </Avatar>
                     <div className="flex flex-1 items-center justify-between">
                       <span className="text-sm">{group.createdBy.name}</span>
-                      <Badge variant="outline" className="ml-2 h-5 border-green-200 bg-green-50 text-green-700 text-xs">
+                      <Badge
+                        variant="outline"
+                        className="ml-2 h-5 border-green-200 bg-green-50 text-xs text-green-700"
+                      >
                         Owner
                       </Badge>
                     </div>
                   </DropdownMenuItem>
-                  
+
                   {/* Members */}
-                  {group.members && group.members.length > 0 && group.members.map((member) => (
-                    <DropdownMenuItem key={member.id} className="flex items-center gap-2 py-2">
-                      <Avatar className="h-6 w-6">
-                        <AvatarImage src={member.image || undefined} />
-                        <AvatarFallback className="bg-blue-100 text-blue-600 text-xs">
-                          {(member.name || "U").charAt(0)}
-                        </AvatarFallback>
-                      </Avatar>
-                      <span className="text-sm">{member.name}</span>
-                    </DropdownMenuItem>
-                  ))}
-                  
+                  {group.members &&
+                    group.members.length > 0 &&
+                    group.members.map((member) => (
+                      <DropdownMenuItem
+                        key={member.id}
+                        className="flex items-center gap-2 py-2"
+                      >
+                        <Avatar className="h-6 w-6">
+                          <AvatarImage src={member.image || undefined} />
+                          <AvatarFallback className="bg-blue-100 text-xs text-blue-600">
+                            {(member.name || "U").charAt(0)}
+                          </AvatarFallback>
+                        </Avatar>
+                        <span className="text-sm">{member.name}</span>
+                      </DropdownMenuItem>
+                    ))}
+
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={() => setShowMembersDialog(true)}>
                     <span className="text-blue-600">View all members</span>
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
-              
+
               <ExpenseForm
                 groupId={resolvedParams.id}
                 people={group.people}
@@ -200,7 +222,7 @@ export default function GroupDetailPage({
               />
             </div>
           </div>
-          
+
           {/* <GroupHeader 
             group={group} 
             totalExpenses={totalExpenses} 
@@ -220,14 +242,14 @@ export default function GroupDetailPage({
           <GroupSummary group={group} />
         </motion.div>
       </div>
-      
+
       {/* Members Dialog */}
       <Dialog open={showMembersDialog} onOpenChange={setShowMembersDialog}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle>Group Members</DialogTitle>
           </DialogHeader>
-          
+
           <GroupMembers group={group} isOwner={group.isOwner} />
         </DialogContent>
       </Dialog>

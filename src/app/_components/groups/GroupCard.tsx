@@ -1,7 +1,14 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Users, Receipt, Calendar, Trash2, ChevronRight, Share2 } from "lucide-react";
+import {
+  Users,
+  Receipt,
+  Calendar,
+  Trash2,
+  ChevronRight,
+  Share2,
+} from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
@@ -29,7 +36,7 @@ export function GroupCard({ group, onDelete, index }: GroupCardProps) {
           group.expenses[group.expenses.length - 1]?.createdAt || new Date(),
         ).toLocaleDateString()
       : "No activity";
-      
+
   // Check if this is a shared group (user is not the creator)
   const isSharedGroup = group.createdById !== session?.user?.id;
 
@@ -43,8 +50,8 @@ export function GroupCard({ group, onDelete, index }: GroupCardProps) {
     >
       <Card
         className={`h-full cursor-pointer border-0 backdrop-blur-sm transition-all duration-300 hover:shadow-xl hover:shadow-blue-200/30 active:scale-[0.98] ${
-          isSharedGroup 
-            ? "bg-blue-50/90 hover:bg-blue-50" 
+          isSharedGroup
+            ? "bg-blue-50/90 hover:bg-blue-50"
             : "bg-white/90 hover:bg-white"
         }`}
         onClick={() => router.push(`/groups/${group.id}`)}
@@ -55,17 +62,20 @@ export function GroupCard({ group, onDelete, index }: GroupCardProps) {
               <CardTitle className="line-clamp-2 text-lg font-bold text-gray-900 transition-colors group-hover:text-blue-700 sm:text-xl">
                 {group.name}
               </CardTitle>
-              
+
               {isSharedGroup && (
                 <div className="mt-1">
-                  <Badge variant="outline" className="border-blue-200 bg-blue-100/50 text-xs text-blue-700">
+                  <Badge
+                    variant="outline"
+                    className="border-blue-200 bg-blue-100/50 text-xs text-blue-700"
+                  >
                     <Share2 className="mr-1 h-3 w-3" />
                     Shared with you
                   </Badge>
                 </div>
               )}
             </div>
-            
+
             {!isSharedGroup && (
               <Button
                 variant="ghost"

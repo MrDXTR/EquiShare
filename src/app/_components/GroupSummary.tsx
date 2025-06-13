@@ -226,11 +226,15 @@ export function GroupSummary({ group }: GroupSummaryProps) {
       ) ?? [];
 
   const whoOwesWhom = getWhoOwesWhom(mappedBalances);
-  
-  const hasUnsettledExpenses = group.expenses.some(expense => !expense.settled);
+
+  const hasUnsettledExpenses = group.expenses.some(
+    (expense) => !expense.settled,
+  );
   const isAllSettled = !hasUnsettledExpenses || whoOwesWhom.length === 0;
-  
-  const pendingSettlements = group.expenses.filter(expense => !expense.settled).length;
+
+  const pendingSettlements = group.expenses.filter(
+    (expense) => !expense.settled,
+  ).length;
 
   return (
     <div className="min-h-screen p-4 md:p-8">

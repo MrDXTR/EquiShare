@@ -150,31 +150,39 @@ export function PeopleManagement({ group }: PeopleManagementProps) {
 
           {/* People List */}
           <div className="space-y-3">
-            {group.people.map((person) => (
-              <motion.div
-                key={person.id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="group flex items-center justify-between rounded-lg border border-gray-200 bg-white p-3 transition-all duration-200 hover:border-blue-200 hover:shadow-sm"
-              >
-                <div className="flex items-center gap-3">
-                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-100 text-blue-600">
-                    {person.name?.[0]?.toUpperCase() ?? "?"}
-                  </div>
-                  <span className="font-medium text-gray-700">
-                    {person.name}
-                  </span>
-                </div>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="opacity-100 transition-opacity group-hover:opacity-100 hover:bg-red-50 hover:text-red-600 md:opacity-0"
-                  onClick={() => setPersonToDelete(person.id)}
+            <div
+              className={`space-y-3 ${
+                group.people.length > 5
+                  ? "max-h-[320px] overflow-y-auto pr-1"
+                  : ""
+              }`}
+            >
+              {group.people.map((person) => (
+                <motion.div
+                  key={person.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="group flex items-center justify-between rounded-lg border border-gray-200 bg-white p-3 transition-all duration-200 hover:border-blue-200 hover:shadow-sm"
                 >
-                  <UserMinus className="h-4 w-4" />
-                </Button>
-              </motion.div>
-            ))}
+                  <div className="flex items-center gap-3">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-100 text-blue-600">
+                      {person.name?.[0]?.toUpperCase() ?? "?"}
+                    </div>
+                    <span className="font-medium text-gray-700">
+                      {person.name}
+                    </span>
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="opacity-100 transition-opacity group-hover:opacity-100 hover:bg-red-50 hover:text-red-600 md:opacity-0"
+                    onClick={() => setPersonToDelete(person.id)}
+                  >
+                    <UserMinus className="h-4 w-4" />
+                  </Button>
+                </motion.div>
+              ))}
+            </div>
           </div>
         </CardContent>
       </Card>
