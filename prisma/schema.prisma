@@ -52,6 +52,11 @@ model User {
     accounts      Account[]
     sessions      Session[]
     groups        Group[]
+    
+    // New relations for group invitation system
+    sentInvites     GroupInvite[] @relation("SentInvites")
+    receivedInvites GroupInvite[] @relation("ReceivedInvites")
+    sharedGroups    Group[]       @relation("GroupMembers")
 }
 
 model VerificationToken {
@@ -72,8 +77,43 @@ model Group {
     createdById String
     people      Person[]
     expenses    Expense[]
+    
+    // New relations for group invitation system
+    members User[]       @relation("GroupMembers")
+    invites GroupInvite[]
 
     @@index([createdById])
+}
+
+// New model for group invitations
+model GroupInvite {
+    id              String   @id @default(cuid())
+    groupId         String
+    invitedByUserId String
+    invitedUserId   String?
+    inviteToken     String   @unique
+    status          InviteStatus @default(PENDING)
+    expiresAt       DateTime
+    createdAt       DateTime @default(now())
+    updatedAt       DateTime @updatedAt
+
+    // Relations
+    group           Group    @relation(fields: [groupId], references: [id], onDelete: Cascade)
+    invitedBy       User     @relation("SentInvites", fields: [invitedByUserId], references: [id], onDelete: Cascade)
+    invitedUser     User?    @relation("ReceivedInvites", fields: [invitedUserId], references: [id], onDelete: SetNull)
+
+    @@index([groupId])
+    @@index([inviteToken])
+    @@index([invitedByUserId])
+    @@index([invitedUserId])
+}
+
+// Enum for invite status
+enum InviteStatus {
+    PENDING
+    ACCEPTED
+    REJECTED
+    EXPIRED
 }
 
 model Person {

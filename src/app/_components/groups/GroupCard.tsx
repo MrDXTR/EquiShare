@@ -1,13 +1,14 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Users, Receipt, Calendar, Trash2, ChevronRight } from "lucide-react";
+import { Users, Receipt, Calendar, Trash2, ChevronRight, Share2 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
 import { Separator } from "~/components/ui/separator";
 import { useRouter } from "next/navigation";
 import type { RouterOutputs } from "~/trpc/shared";
+import { useSession } from "next-auth/react";
 
 type Group = RouterOutputs["group"]["getAll"][number];
 
@@ -19,6 +20,7 @@ interface GroupCardProps {
 
 export function GroupCard({ group, onDelete, index }: GroupCardProps) {
   const router = useRouter();
+  const { data: session } = useSession();
   const totalExpenses =
     group.expenses?.reduce((sum, expense) => sum + expense.amount, 0) || 0;
   const recentActivity =
@@ -27,6 +29,9 @@ export function GroupCard({ group, onDelete, index }: GroupCardProps) {
           group.expenses[group.expenses.length - 1]?.createdAt || new Date(),
         ).toLocaleDateString()
       : "No activity";
+      
+  // Check if this is a shared group (user is not the creator)
+  const isSharedGroup = group.createdById !== session?.user?.id;
 
   return (
     <motion.div
@@ -37,25 +42,43 @@ export function GroupCard({ group, onDelete, index }: GroupCardProps) {
       className="group relative"
     >
       <Card
-        className="h-full cursor-pointer border-0 bg-white/90 backdrop-blur-sm transition-all duration-300 hover:bg-white hover:shadow-xl hover:shadow-blue-200/30 active:scale-[0.98]"
+        className={`h-full cursor-pointer border-0 backdrop-blur-sm transition-all duration-300 hover:shadow-xl hover:shadow-blue-200/30 active:scale-[0.98] ${
+          isSharedGroup 
+            ? "bg-blue-50/90 hover:bg-blue-50" 
+            : "bg-white/90 hover:bg-white"
+        }`}
         onClick={() => router.push(`/groups/${group.id}`)}
       >
         <CardHeader className="pb-3">
           <div className="flex items-start justify-between">
-            <CardTitle className="line-clamp-2 text-lg font-bold text-gray-900 transition-colors group-hover:text-blue-700 sm:text-xl">
-              {group.name}
-            </CardTitle>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-8 w-8 shrink-0 opacity-100 hover:bg-red-50 hover:text-red-600 sm:opacity-0 sm:group-hover:opacity-100"
-              onClick={(e) => {
-                e.stopPropagation();
-                onDelete(group.id);
-              }}
-            >
-              <Trash2 className="h-4 w-4" />
-            </Button>
+            <div>
+              <CardTitle className="line-clamp-2 text-lg font-bold text-gray-900 transition-colors group-hover:text-blue-700 sm:text-xl">
+                {group.name}
+              </CardTitle>
+              
+              {isSharedGroup && (
+                <div className="mt-1">
+                  <Badge variant="outline" className="border-blue-200 bg-blue-100/50 text-xs text-blue-700">
+                    <Share2 className="mr-1 h-3 w-3" />
+                    Shared with you
+                  </Badge>
+                </div>
+              )}
+            </div>
+            
+            {!isSharedGroup && (
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8 shrink-0 opacity-100 hover:bg-red-50 hover:text-red-600 sm:opacity-0 sm:group-hover:opacity-100"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onDelete(group.id);
+                }}
+              >
+                <Trash2 className="h-4 w-4" />
+              </Button>
+            )}
           </div>
         </CardHeader>
 

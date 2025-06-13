@@ -226,8 +226,11 @@ export function GroupSummary({ group }: GroupSummaryProps) {
       ) ?? [];
 
   const whoOwesWhom = getWhoOwesWhom(mappedBalances);
-  const isAllSettled = whoOwesWhom.length === 0;
-  const pendingSettlements = getPendingSettlementsCount(balances);
+  
+  const hasUnsettledExpenses = group.expenses.some(expense => !expense.settled);
+  const isAllSettled = !hasUnsettledExpenses || whoOwesWhom.length === 0;
+  
+  const pendingSettlements = group.expenses.filter(expense => !expense.settled).length;
 
   return (
     <div className="min-h-screen p-4 md:p-8">
@@ -238,6 +241,8 @@ export function GroupSummary({ group }: GroupSummaryProps) {
           isLoadingBalances={isLoadingBalances}
           isAllSettled={isAllSettled}
           pendingSettlements={pendingSettlements}
+          isOwner={group.isOwner}
+          hasUnsettledExpenses={hasUnsettledExpenses}
         />
 
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
@@ -261,6 +266,7 @@ export function GroupSummary({ group }: GroupSummaryProps) {
             <SettlementsList
               balances={mappedBalances}
               isLoading={isLoadingBalances}
+              hasUnsettledExpenses={hasUnsettledExpenses}
             />
           </div>
         </div>
