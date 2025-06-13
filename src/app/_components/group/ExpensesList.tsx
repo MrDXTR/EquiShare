@@ -169,95 +169,97 @@ export function ExpensesList({
             </div>
           </div>
         </CardHeader>
-        <CardContent className="max-h-[calc(100vh-24rem)] space-y-4 overflow-y-auto">
-          {group.expenses.length === 0 ? (
-            <div className="py-12 text-center text-gray-500">
-              <Receipt className="mx-auto mb-4 h-12 w-12 text-gray-300" />
-              <p className="text-lg">No expenses yet</p>
-            </div>
-          ) : (
-            group.expenses.map((expense: any, index: number) => (
-              <motion.div
-                key={expense.id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1 }}
-                className="group relative overflow-hidden rounded-xl border border-gray-200/60 bg-gradient-to-r from-white to-gray-50/50 p-5 transition-all duration-300 hover:scale-[1.02] hover:shadow-lg hover:shadow-blue-100/50"
-              >
-                <div className="absolute inset-0 bg-gradient-to-r from-blue-500/5 to-indigo-500/5 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
-                <div className="relative flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                  <div className="space-y-2">
-                    <div className="flex flex-wrap items-center gap-2">
-                      <h3 className="text-lg font-semibold text-gray-900 transition-colors group-hover:text-blue-700">
-                        {expense.description}
-                      </h3>
-                      {expense.settled && (
-                        <Badge className="border-green-200 bg-green-100 text-green-700">
-                          <CheckCircle2 className="h-3 w-3" />
-                          Settled
-                        </Badge>
-                      )}
-                    </div>
-                    <div className="flex flex-wrap items-center gap-2">
-                      <Badge
-                        variant="outline"
-                        className="border-blue-200 bg-blue-50 text-blue-700"
-                      >
-                        Paid by {expense.paidBy.name}
-                      </Badge>
-                    </div>
-                  </div>
-                  <div className="space-y-1 text-right">
-                    <p className="text-2xl font-bold text-gray-900 transition-colors group-hover:text-green-600">
-                      ₹{expense.amount.toFixed(2)}
-                    </p>
-                    <div className="flex items-center gap-1 text-sm text-gray-600">
-                      <span>Split {expense.shares.length} ways</span>
-                    </div>
-                  </div>
-                </div>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="absolute top-2 right-2 opacity-100 hover:bg-gray-100 sm:opacity-0 sm:group-hover:opacity-100"
-                    >
-                      <MoreVertical className="h-4 w-4" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
-                    {!expense.settled && (
-                      <DropdownMenuItem
-                        className="text-green-600 focus:text-green-600"
-                        onClick={() => handleSettleUp(expense.id)}
-                        disabled={settlingExpense === expense.id}
-                      >
-                        {settlingExpense === expense.id ? (
-                          <div className="flex items-center gap-2">
-                            <Loader2 className="h-4 w-4 animate-spin" />
-                            Settling...
-                          </div>
-                        ) : (
-                          <>
-                            <CheckCircle className="mr-2 h-4 w-4" />
-                            Settle Up
-                          </>
+        <CardContent className="max-h-[calc(100vh-24rem)] overflow-y-auto">
+          <div className="space-y-4">
+            {group.expenses.length === 0 ? (
+              <div className="py-12 text-center text-gray-500">
+                <Receipt className="mx-auto mb-4 h-12 w-12 text-gray-300" />
+                <p className="text-lg">No expenses yet</p>
+              </div>
+            ) : (
+              group.expenses.map((expense: any, index: number) => (
+                <motion.div
+                  key={expense.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.1 }}
+                  className="group relative overflow-hidden rounded-xl border border-gray-200/60 bg-gradient-to-r from-white to-gray-50/50 p-5 transition-all duration-300 hover:shadow-lg hover:shadow-blue-100/50"
+                >
+                  <div className="absolute inset-0 bg-gradient-to-r from-blue-500/5 to-indigo-500/5 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+                  <div className="relative flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                    <div className="space-y-2">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <h3 className="text-lg font-semibold text-gray-900 transition-colors group-hover:text-blue-700">
+                          {expense.description}
+                        </h3>
+                        {expense.settled && (
+                          <Badge className="border-green-200 bg-green-100 text-green-700">
+                            <CheckCircle2 className="mr-1 h-3 w-3" />
+                            Settled
+                          </Badge>
                         )}
+                      </div>
+                      <div className="flex flex-wrap items-center gap-2">
+                        <Badge
+                          variant="outline"
+                          className="border-blue-200 bg-blue-50 text-blue-700"
+                        >
+                          Paid by {expense.paidBy.name}
+                        </Badge>
+                      </div>
+                    </div>
+                    <div className="space-y-1 text-right">
+                      <p className="text-2xl font-bold text-gray-900 transition-colors group-hover:text-green-600">
+                        ₹{expense.amount.toFixed(2)}
+                      </p>
+                      <div className="flex items-center gap-1 text-sm text-gray-600">
+                        <span>Split {expense.shares.length} ways</span>
+                      </div>
+                    </div>
+                  </div>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 hover:bg-gray-100"
+                      >
+                        <MoreVertical className="h-4 w-4" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      {!expense.settled && (
+                        <DropdownMenuItem
+                          className="text-green-600 focus:text-green-600"
+                          onClick={() => handleSettleUp(expense.id)}
+                          disabled={settlingExpense === expense.id}
+                        >
+                          {settlingExpense === expense.id ? (
+                            <div className="flex items-center gap-2">
+                              <Loader2 className="h-4 w-4 animate-spin" />
+                              Settling...
+                            </div>
+                          ) : (
+                            <>
+                              <CheckCircle className="mr-2 h-4 w-4" />
+                              Settle Up
+                            </>
+                          )}
+                        </DropdownMenuItem>
+                      )}
+                      <DropdownMenuItem
+                        className="text-red-600 focus:text-red-600"
+                        onClick={() => setExpenseToDelete(expense.id)}
+                      >
+                        <Trash2 className="mr-2 h-4 w-4" />
+                        Delete
                       </DropdownMenuItem>
-                    )}
-                    <DropdownMenuItem
-                      className="text-red-600 focus:text-red-600"
-                      onClick={() => setExpenseToDelete(expense.id)}
-                    >
-                      <Trash2 className="mr-2 h-4 w-4" />
-                      Delete
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </motion.div>
-            ))
-          )}
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </motion.div>
+              ))
+            )}
+          </div>
         </CardContent>
       </Card>
 

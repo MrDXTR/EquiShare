@@ -1,8 +1,16 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Receipt, TrendingUp, CheckCircle2, AlertCircle } from "lucide-react";
+import {
+  Receipt,
+  TrendingUp,
+  CheckCircle2,
+  AlertCircle,
+  UserPlus,
+} from "lucide-react";
 import { Skeleton } from "~/components/ui/skeleton";
+import { Button } from "~/components/ui/button";
+import { InviteDialog } from "~/app/_components/group/InviteDialog";
 import type { Group } from "./utils";
 
 interface GroupHeaderProps {
@@ -11,6 +19,8 @@ interface GroupHeaderProps {
   isLoadingBalances: boolean;
   isAllSettled: boolean;
   pendingSettlements: number;
+  isOwner: boolean;
+  hasUnsettledExpenses?: boolean;
 }
 
 export function GroupHeader({
@@ -19,7 +29,12 @@ export function GroupHeader({
   isLoadingBalances,
   isAllSettled,
   pendingSettlements,
+  isOwner,
+  hasUnsettledExpenses = true,
 }: GroupHeaderProps) {
+  // If there are no unsettled expenses, show the all settled message
+  const showAllSettled = isAllSettled || !hasUnsettledExpenses;
+
   return (
     <motion.div
       initial={{ opacity: 0, y: -20 }}
@@ -52,7 +67,7 @@ export function GroupHeader({
         <div className="flex items-center gap-2 rounded-full border border-white/20 bg-white/70 px-4 py-2 shadow-sm backdrop-blur-sm">
           {isLoadingBalances ? (
             <Skeleton className="h-5 w-24" />
-          ) : isAllSettled ? (
+          ) : showAllSettled ? (
             <>
               <CheckCircle2 className="h-5 w-5 text-green-600" />
               <span className="font-semibold text-green-700">All Settled!</span>
@@ -66,6 +81,17 @@ export function GroupHeader({
             </>
           )}
         </div>
+
+        {isOwner && (
+          <InviteDialog groupId={group.id}>
+            <div className="flex cursor-pointer items-center gap-2 rounded-full border border-white/20 bg-white/70 px-4 py-2 shadow-sm backdrop-blur-sm transition-colors hover:bg-white/90">
+              <UserPlus className="h-5 w-5 text-indigo-600" />
+              <span className="font-semibold text-indigo-700">
+                Invite Members
+              </span>
+            </div>
+          </InviteDialog>
+        )}
       </div>
     </motion.div>
   );

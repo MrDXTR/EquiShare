@@ -10,11 +10,19 @@ import { getWhoOwesWhom } from "./utils";
 interface SettlementsListProps {
   balances: { person: { id: string; name: string }; balance: number }[];
   isLoading: boolean;
+  hasUnsettledExpenses?: boolean;
 }
 
-export function SettlementsList({ balances, isLoading }: SettlementsListProps) {
+export function SettlementsList({
+  balances,
+  isLoading,
+  hasUnsettledExpenses = true,
+}: SettlementsListProps) {
   const whoOwesWhom = getWhoOwesWhom(balances);
   const isAllSettled = whoOwesWhom.length === 0;
+
+  // If there are no unsettled expenses, show the all settled message
+  const showAllSettled = isAllSettled || !hasUnsettledExpenses;
 
   return (
     <motion.div
@@ -43,7 +51,7 @@ export function SettlementsList({ balances, isLoading }: SettlementsListProps) {
                   </div>
                 ))}
               </div>
-            ) : isAllSettled ? (
+            ) : showAllSettled ? (
               <motion.div
                 initial={{ opacity: 0, scale: 0.8 }}
                 animate={{ opacity: 1, scale: 1 }}

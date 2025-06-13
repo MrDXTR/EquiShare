@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
+import { TRPCError } from "@trpc/server";
 
 export const expenseRouter = createTRPCRouter({
   create: protectedProcedure
@@ -68,16 +69,20 @@ export const expenseRouter = createTRPCRouter({
   getBalances: protectedProcedure
     .input(z.string())
     .query(async ({ ctx, input }) => {
-      const group = await ctx.db.group.findUnique({
+      // First check if user has access to this group (owner or member)
+      const group = await ctx.db.group.findFirst({
         where: {
           id: input,
-          createdById: ctx.session.user.id,
+          OR: [
+            { createdById: ctx.session.user.id },
+            { members: { some: { id: ctx.session.user.id } } },
+          ],
         },
         include: {
           people: true,
           expenses: {
             where: {
-              settled: false,
+              settled: false, // Only consider unsettled expenses for balances
             },
             include: {
               paidBy: true,
@@ -91,7 +96,17 @@ export const expenseRouter = createTRPCRouter({
         },
       });
 
-      if (!group) return null;
+      if (!group) {
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "You don't have access to this group",
+        });
+      }
+
+      // If there are no unsettled expenses, return empty balances
+      if (group.expenses.length === 0) {
+        return [];
+      }
 
       const balances = new Map<string, number>();
       group.people.forEach((person) => {
@@ -110,10 +125,13 @@ export const expenseRouter = createTRPCRouter({
         });
       });
 
-      return Array.from(balances.entries()).map(([personId, balance]) => ({
-        personId,
-        balance,
-        person: group.people.find((p) => p.id === personId),
-      }));
+      // Filter out zero balances to avoid showing settled people
+      return Array.from(balances.entries())
+        .filter(([_, balance]) => Math.abs(balance) > 0.01) // Filter out zero or very small balances
+        .map(([personId, balance]) => ({
+          personId,
+          balance,
+          person: group.people.find((p) => p.id === personId),
+        }));
     }),
 });

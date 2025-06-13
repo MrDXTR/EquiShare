@@ -1,6 +1,6 @@
 import type { RouterOutputs } from "~/trpc/shared";
 
-export type Group = RouterOutputs["group"]["getAll"][number];
+export type Group = RouterOutputs["group"]["getById"];
 
 // Helper to compute minimal transactions
 export function getWhoOwesWhom(
