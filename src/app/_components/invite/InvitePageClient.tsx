@@ -99,12 +99,12 @@ export function InvitePageClient({ token }: InvitePageClientProps) {
 
   if (isLoading) {
     return (
-      <div className="flex min-h-screen flex-col items-center justify-center bg-gray-50">
+      <div className="flex min-h-screen flex-col items-center justify-center bg-gray-50 dark:bg-gray-950">
         <div className="w-full max-w-md p-4">
-          <Card className="overflow-hidden border-0 shadow-lg">
+          <Card className="overflow-hidden border-0 shadow-lg dark:border-gray-800 dark:bg-gray-900">
             <CardContent className="flex flex-col items-center justify-center p-6 text-center">
-              <Loader2 className="h-12 w-12 animate-spin text-blue-500" />
-              <h2 className="mt-4 text-xl font-semibold text-gray-800">
+              <Loader2 className="h-12 w-12 animate-spin text-blue-500 dark:text-gray-300" />
+              <h2 className="mt-4 text-xl font-semibold text-gray-800 dark:text-gray-100">
                 Loading invitation...
               </h2>
             </CardContent>
@@ -116,18 +116,18 @@ export function InvitePageClient({ token }: InvitePageClientProps) {
 
   if (error) {
     return (
-      <div className="flex min-h-screen flex-col items-center justify-center bg-gray-50">
+      <div className="flex min-h-screen flex-col items-center justify-center bg-gray-50 dark:bg-gray-950">
         <div className="w-full max-w-md p-4">
-          <Card className="overflow-hidden border-0 shadow-lg">
+          <Card className="overflow-hidden border-0 shadow-lg dark:border-gray-800 dark:bg-gray-900">
             <CardContent className="flex flex-col items-center justify-center p-6 text-center">
-              <div className="rounded-full bg-red-100 p-3">
-                <AlertCircle className="h-8 w-8 text-red-500" />
+              <div className="rounded-full bg-red-100 p-3 dark:bg-red-900/20">
+                <AlertCircle className="h-8 w-8 text-red-500 dark:text-red-400" />
               </div>
-              <h2 className="mt-4 text-xl font-semibold text-gray-800">
+              <h2 className="mt-4 text-xl font-semibold text-gray-800 dark:text-gray-100">
                 Invitation Error
               </h2>
-              <p className="mt-2 text-gray-600">{error.message}</p>
-              <Button className="mt-6" onClick={() => router.push("/groups")}>
+              <p className="mt-2 text-gray-600 dark:text-gray-300">{error.message}</p>
+              <Button className="mt-6 dark:text-white" onClick={() => router.push("/groups")}>
                 Go to Groups
               </Button>
             </CardContent>
@@ -139,22 +139,22 @@ export function InvitePageClient({ token }: InvitePageClientProps) {
 
   if (acceptInvite.isSuccess) {
     return (
-      <div className="flex min-h-screen flex-col items-center justify-center bg-gray-50">
+      <div className="flex min-h-screen flex-col items-center justify-center bg-gray-50 dark:bg-gray-950">
         <div className="w-full max-w-md p-4">
           <motion.div
             initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ duration: 0.3 }}
           >
-            <Card className="overflow-hidden border-0 shadow-lg">
+            <Card className="overflow-hidden border-0 shadow-lg dark:border-gray-800 dark:bg-gray-900">
               <CardContent className="flex flex-col items-center justify-center p-6 text-center">
-                <div className="rounded-full bg-green-100 p-3">
-                  <CheckCircle className="h-8 w-8 text-green-500" />
+                <div className="rounded-full bg-green-100 p-3 dark:bg-green-900/20">
+                  <CheckCircle className="h-8 w-8 text-green-500 dark:text-green-400" />
                 </div>
-                <h2 className="mt-4 text-xl font-semibold text-gray-800">
+                <h2 className="mt-4 text-xl font-semibold text-gray-800 dark:text-gray-100">
                   Successfully Joined!
                 </h2>
-                <p className="mt-2 text-gray-600">
+                <p className="mt-2 text-gray-600 dark:text-gray-300">
                   You have successfully joined the group. Redirecting...
                 </p>
               </CardContent>
@@ -168,29 +168,29 @@ export function InvitePageClient({ token }: InvitePageClientProps) {
   if (!invite) return null;
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-gray-50">
+    <div className="flex min-h-screen flex-col items-center justify-center bg-gray-50 dark:bg-gray-950">
       <div className="w-full max-w-md p-4">
         <motion.div
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ duration: 0.3 }}
         >
-          <Card className="overflow-hidden border-0 shadow-lg">
+          <Card className="overflow-hidden border-0 shadow-lg dark:border-gray-800 dark:bg-gray-900">
             <CardContent className="p-6">
               <div className="flex flex-col items-center text-center">
-                <div className="rounded-full bg-blue-100 p-3">
-                  <UserPlus className="h-8 w-8 text-blue-500" />
+                <div className="rounded-full bg-blue-100 p-3 dark:bg-gray-800">
+                  <UserPlus className="h-8 w-8 text-blue-500 dark:text-gray-300" />
                 </div>
 
-                <h1 className="mt-4 text-2xl font-bold text-gray-800">
+                <h1 className="mt-4 text-2xl font-bold text-gray-800 dark:text-gray-100">
                   Group Invitation
                 </h1>
 
-                <p className="mt-2 text-gray-600">
+                <p className="mt-2 text-gray-600 dark:text-gray-300">
                   You&apos;ve been invited to join
                 </p>
 
-                <h2 className="mt-1 text-xl font-semibold text-blue-600">
+                <h2 className="mt-1 text-xl font-semibold text-blue-600 dark:text-gray-200">
                   {invite.group.name}
                 </h2>
 
@@ -204,11 +204,11 @@ export function InvitePageClient({ token }: InvitePageClientProps) {
                       className="rounded-full"
                     />
                   ) : (
-                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-100 text-blue-500">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-100 text-blue-500 dark:bg-gray-800 dark:text-gray-300">
                       {(invite.invitedBy.name || "U").charAt(0)}
                     </div>
                   )}
-                  <span className="ml-2 text-sm text-gray-600">
+                  <span className="ml-2 text-sm text-gray-600 dark:text-gray-300">
                     Invited by {invite.invitedBy.name}
                   </span>
                 </div>
@@ -217,7 +217,7 @@ export function InvitePageClient({ token }: InvitePageClientProps) {
                   <Button
                     onClick={handleAcceptInvite}
                     disabled={acceptingInvite}
-                    className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white hover:from-blue-700 hover:to-indigo-700"
+                    className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white hover:from-blue-700 hover:to-indigo-700 dark:from-gray-700 dark:to-gray-800 dark:hover:from-gray-600 dark:hover:to-gray-700"
                     size="lg"
                   >
                     {acceptingInvite ? (
@@ -233,7 +233,7 @@ export function InvitePageClient({ token }: InvitePageClientProps) {
                   <Button
                     onClick={handleRejectInvite}
                     variant="outline"
-                    className="w-full"
+                    className="w-full dark:border-gray-700 dark:bg-gray-800 dark:hover:bg-gray-700"
                     disabled={acceptingInvite}
                   >
                     Decline
@@ -241,7 +241,7 @@ export function InvitePageClient({ token }: InvitePageClientProps) {
                 </div>
 
                 {sessionStatus === "unauthenticated" && (
-                  <p className="mt-4 text-xs text-gray-500">
+                  <p className="mt-4 text-xs text-gray-500 dark:text-gray-400">
                     You&apos;ll need to sign in to join this group
                   </p>
                 )}

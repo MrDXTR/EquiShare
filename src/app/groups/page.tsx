@@ -75,10 +75,10 @@ export default function GroupsPage() {
         <div className="container mx-auto px-4 py-6 sm:py-8">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <h1 className="text-2xl font-bold text-gray-900 sm:text-3xl">
+              <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100 sm:text-3xl">
                 Your Groups
               </h1>
-              <p className="mt-1 text-sm text-gray-600 sm:text-base">
+              <p className="mt-1 text-sm text-gray-600 dark:text-gray-300 sm:text-base">
                 Manage your expense groups
               </p>
             </div>
@@ -91,7 +91,7 @@ export default function GroupsPage() {
               {[1, 2, 3, 4].map((i) => (
                 <div
                   key={i}
-                  className="h-48 animate-pulse rounded-xl bg-gradient-to-br from-gray-100 to-gray-200 shadow-sm"
+                  className="h-48 animate-pulse rounded-xl bg-gradient-to-br from-gray-100 to-gray-200 shadow-sm dark:from-gray-800 dark:to-gray-700"
                 />
               ))}
             </div>
@@ -106,10 +106,10 @@ export default function GroupsPage() {
       <div className="container mx-auto px-4 py-6 sm:py-8">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900 sm:text-3xl">
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100 sm:text-3xl">
               Your Groups
             </h1>
-            <p className="mt-1 text-sm text-gray-600 sm:text-base">
+            <p className="mt-1 text-sm text-gray-600 dark:text-gray-300 sm:text-base">
               {groups?.length === 0
                 ? "Start by creating your first group"
                 : `${groups?.length} ${groups?.length === 1 ? "group" : "groups"} total`}
@@ -127,9 +127,9 @@ export default function GroupsPage() {
               animate={{ opacity: 1, y: 0 }}
               className="flex flex-col items-center justify-center py-12 sm:py-16"
             >
-              <div className="mb-4 rounded-full bg-blue-100 p-6">
+              <div className="mb-4 rounded-full bg-blue-100 p-6 dark:bg-blue-900">
                 <svg
-                  className="h-12 w-12 text-blue-600"
+                  className="h-12 w-12 text-blue-600 dark:text-blue-400"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -142,10 +142,10 @@ export default function GroupsPage() {
                   />
                 </svg>
               </div>
-              <h3 className="mb-2 text-lg font-semibold text-gray-900">
+              <h3 className="mb-2 text-lg font-semibold text-gray-900 dark:text-gray-100">
                 No groups yet
               </h3>
-              <p className="mb-6 max-w-md text-center text-gray-600">
+              <p className="mb-6 max-w-md text-center text-gray-600 dark:text-gray-300">
                 Create your first group to start splitting expenses with
                 friends, family, or colleagues.
               </p>
@@ -194,7 +194,7 @@ export default function GroupsPage() {
               <AlertDialogAction
                 onClick={handleDeleteGroup}
                 disabled={isDeleting}
-                className="w-full bg-red-600 hover:bg-red-700 focus:ring-red-600 sm:w-auto"
+                className="w-full bg-red-600 dark:text-white text-black hover:bg-red-700 focus:ring-red-600 sm:w-auto dark:bg-red-700 dark:hover:bg-red-800 dark:focus:ring-red-700"
               >
                 {isDeleting ? (
                   <div className="flex items-center justify-center gap-2">

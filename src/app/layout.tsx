@@ -32,8 +32,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={`${geist.variable} ${inter.variable}`}>
-      <body>
+    <html lang="en" suppressHydrationWarning className={`${geist.variable} ${inter.variable}`}>
+      <head />
+      <body className="min-h-screen bg-background font-sans antialiased">
         <TRPCReactProvider>
           <Providers>
             <div className="flex min-h-screen flex-col">

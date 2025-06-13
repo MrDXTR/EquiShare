@@ -109,13 +109,13 @@ export function PeopleManagement({ group }: PeopleManagementProps) {
       animate={{ opacity: 1, x: 0 }}
       transition={{ delay: 0.2 }}
     >
-      <Card className="h-full border-0 bg-white/80 shadow-xl shadow-blue-100/50 backdrop-blur-sm transition-all duration-300 hover:shadow-2xl hover:shadow-blue-200/60">
+      <Card className="h-full border-0 bg-white/80 shadow-xl shadow-blue-100/50 backdrop-blur-sm transition-all duration-300 hover:shadow-2xl hover:shadow-blue-200/60 dark:bg-gray-800/80 dark:shadow-none dark:hover:shadow-none">
         <CardHeader className="pb-4">
           <CardTitle className="flex items-center gap-3 text-2xl">
             <div className="rounded-lg bg-gradient-to-r from-blue-500 to-blue-600 p-2">
               <Users className="h-6 w-6 text-white" />
             </div>
-            <span className="bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent dark:from-blue-400 dark:to-indigo-400">
               People
             </span>
           </CardTitle>
@@ -124,19 +124,19 @@ export function PeopleManagement({ group }: PeopleManagementProps) {
           {/* Add Person Form */}
           <form onSubmit={handleAddPerson} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="newPerson">Add New Person</Label>
+              <Label htmlFor="newPerson" className="dark:text-gray-300">Add New Person</Label>
               <div className="flex gap-2">
                 <Input
                   id="newPerson"
                   value={newPersonName}
                   onChange={(e) => setNewPersonName(e.target.value)}
                   placeholder="Enter name"
-                  className="flex-1"
+                  className="flex-1 dark:border-gray-700 dark:bg-gray-800"
                 />
                 <Button
                   type="submit"
                   disabled={!newPersonName.trim() || addPerson.isPending}
-                  className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white hover:from-blue-700 hover:to-indigo-700"
+                  className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white hover:from-blue-700 hover:to-indigo-700 dark:from-blue-500 dark:to-indigo-500 dark:hover:from-blue-600 dark:hover:to-indigo-600"
                 >
                   {addPerson.isPending ? (
                     <Loader2 className="h-4 w-4 animate-spin" />
@@ -162,20 +162,20 @@ export function PeopleManagement({ group }: PeopleManagementProps) {
                   key={person.id}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="group flex items-center justify-between rounded-lg border border-gray-200 bg-white p-3 transition-all duration-200 hover:border-blue-200 hover:shadow-sm"
+                  className="group flex items-center justify-between rounded-lg border border-gray-200 bg-white p-3 transition-all duration-200 hover:border-blue-200 hover:shadow-sm dark:border-gray-700 dark:bg-gray-800 dark:hover:border-blue-700"
                 >
                   <div className="flex items-center gap-3">
-                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-100 text-blue-600">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-100 text-blue-600 dark:bg-blue-900 dark:text-blue-400">
                       {person.name?.[0]?.toUpperCase() ?? "?"}
                     </div>
-                    <span className="font-medium text-gray-700">
+                    <span className="font-medium text-gray-700 dark:text-gray-200">
                       {person.name}
                     </span>
                   </div>
                   <Button
                     variant="ghost"
                     size="icon"
-                    className="opacity-100 transition-opacity group-hover:opacity-100 hover:bg-red-50 hover:text-red-600 md:opacity-0"
+                    className="opacity-100 transition-opacity group-hover:opacity-100 hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-900/30 dark:hover:text-red-400 md:opacity-0"
                     onClick={() => setPersonToDelete(person.id)}
                   >
                     <UserMinus className="h-4 w-4" />
@@ -211,7 +211,7 @@ export function PeopleManagement({ group }: PeopleManagementProps) {
             <AlertDialogAction
               onClick={handleDeletePerson}
               disabled={isDeletingPerson}
-              className="bg-red-600 hover:bg-red-700 focus:ring-red-600"
+              className="bg-red-600 hover:bg-red-700 focus:ring-red-600 dark:bg-red-700 dark:hover:bg-red-800 dark:focus:ring-red-700"
             >
               {isDeletingPerson ? (
                 <div className="flex items-center gap-2">

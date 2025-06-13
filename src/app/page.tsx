@@ -29,7 +29,7 @@ export default function LandingPage() {
   if (status === "loading") {
     return (
       <div className="grid min-h-screen place-items-center">
-        <div className="h-8 w-8 animate-spin rounded-full border-2 border-gray-900/20 border-t-gray-900"></div>
+        <div className="h-8 w-8 animate-spin rounded-full border-2 border-gray-900/20 border-t-gray-900 dark:border-gray-100/20 dark:border-t-gray-100"></div>
       </div>
     );
   }
@@ -68,7 +68,7 @@ export default function LandingPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-background">
       {/* Hero Section */}
       <div className="flex min-h-[calc(100vh-8rem)] flex-col items-center justify-center px-4">
         <motion.div
@@ -83,7 +83,7 @@ export default function LandingPage() {
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.2, duration: 0.5 }}
           >
-            <Badge className="border-blue-200 bg-gradient-to-r from-blue-500/10 to-indigo-500/10 px-4 py-2 text-sm font-medium text-blue-700">
+            <Badge className="border-blue-200 bg-gradient-to-r from-blue-500/10 to-indigo-500/10 px-4 py-2 text-sm font-medium text-blue-700 dark:border-blue-800 dark:from-blue-500/20 dark:to-indigo-500/20 dark:text-blue-400">
               <Sparkles className="mr-2 h-4 w-4" />
               The Smart Way to Split Bills
             </Badge>
@@ -98,7 +98,7 @@ export default function LandingPage() {
           >
             <h1 className="text-5xl font-bold tracking-tight sm:text-6xl md:text-7xl lg:text-8xl">
               Split Expenses
-              <span className="block bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 bg-clip-text text-transparent">
+              <span className="block bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 bg-clip-text text-transparent dark:from-blue-400 dark:via-purple-400 dark:to-indigo-400">
                 Smarter
               </span>
             </h1>
@@ -113,10 +113,10 @@ export default function LandingPage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.5, duration: 0.8 }}
-            className="max-w-[48rem] text-xl leading-relaxed text-gray-600 sm:text-2xl sm:leading-9"
+            className="max-w-[48rem] text-xl leading-relaxed text-gray-600 dark:text-gray-300 sm:text-2xl sm:leading-9"
           >
             Split bills, track expenses, and settle up with friends and family.
-            <span className="font-semibold text-gray-800">
+            <span className="font-semibold text-gray-800 dark:text-gray-200">
               {" "}
               The easiest way to manage shared expenses.
             </span>
@@ -132,7 +132,7 @@ export default function LandingPage() {
             <Button
               size="lg"
               onClick={() => router.push("/signin")}
-              className="hover:shadow-3xl transform bg-gradient-to-r from-blue-600 to-indigo-600 px-8 py-4 text-lg font-semibold text-white shadow-2xl shadow-blue-500/25 transition-all duration-300 hover:-translate-y-1 hover:scale-105 hover:from-blue-700 hover:to-indigo-700 hover:shadow-blue-500/40"
+              className="hover:shadow-3xl transform bg-gradient-to-r from-blue-600 to-indigo-600 px-8 py-4 text-lg font-semibold text-white shadow-2xl shadow-blue-500/25 transition-all duration-300 hover:-translate-y-1 hover:scale-105 hover:from-blue-700 hover:to-indigo-700 hover:shadow-blue-500/40 dark:from-blue-500 dark:to-indigo-500 dark:shadow-blue-900/25 dark:hover:from-blue-600 dark:hover:to-indigo-600 dark:hover:shadow-blue-900/40"
             >
               Start Splitting Smarter
               <ArrowRight className="ml-2 h-5 w-5" />
@@ -144,7 +144,7 @@ export default function LandingPage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.9, duration: 0.8 }}
-            className="mt-16 flex flex-wrap justify-center gap-8 text-sm text-gray-600"
+            className="mt-16 flex flex-wrap justify-center gap-8 text-sm text-gray-600 dark:text-gray-400"
           >
             <div className="flex items-center gap-2">
               <div className="h-2 w-2 rounded-full bg-green-500"></div>
@@ -163,7 +163,7 @@ export default function LandingPage() {
       </div>
 
       {/* Features Section */}
-      <section className="bg-gray-50/30 px-4 py-20">
+      <section className="bg-gray-50/30 px-4 py-20 dark:bg-gray-900/30">
         <div className="container mx-auto max-w-6xl">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -172,14 +172,14 @@ export default function LandingPage() {
             viewport={{ once: true }}
             className="mb-16 text-center"
           >
-            <h2 className="mb-4 text-4xl font-bold text-gray-900">
+            <h2 className="mb-4 text-4xl font-bold text-gray-900 dark:text-gray-100">
               Everything you need to
-              <span className="bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent dark:from-blue-400 dark:to-indigo-400">
                 {" "}
                 manage expenses
               </span>
             </h2>
-            <p className="mx-auto max-w-2xl text-xl text-gray-600">
+            <p className="mx-auto max-w-2xl text-xl text-gray-600 dark:text-gray-300">
               Powerful features designed to make splitting expenses as simple as
               possible
             </p>
@@ -196,17 +196,17 @@ export default function LandingPage() {
                 whileHover={{ y: -8, scale: 1.02 }}
                 className="group"
               >
-                <Card className="h-full border-0 bg-white/80 shadow-lg backdrop-blur-sm transition-all duration-300 hover:shadow-2xl">
+                <Card className="h-full border-0 bg-white/80 shadow-lg backdrop-blur-sm transition-all duration-300 hover:shadow-2xl dark:bg-gray-800/80 dark:shadow-gray-900/30">
                   <CardContent className="space-y-4 p-8 text-center">
                     <div
                       className={`inline-flex rounded-2xl bg-gradient-to-r p-4 ${feature.color} shadow-lg transition-all duration-300 group-hover:shadow-xl`}
                     >
                       <feature.icon className="h-8 w-8 text-white" />
                     </div>
-                    <h3 className="text-xl font-bold text-gray-900 transition-colors group-hover:text-blue-700">
+                    <h3 className="text-xl font-bold text-gray-900 transition-colors group-hover:text-blue-700 dark:text-gray-100 dark:group-hover:text-blue-400">
                       {feature.title}
                     </h3>
-                    <p className="leading-relaxed text-gray-600">
+                    <p className="leading-relaxed text-gray-600 dark:text-gray-300">
                       {feature.description}
                     </p>
                   </CardContent>
@@ -226,7 +226,7 @@ export default function LandingPage() {
           viewport={{ once: true }}
           className="container mx-auto max-w-4xl text-center"
         >
-          <Card className="border-0 bg-gradient-to-r from-blue-600 to-indigo-600 shadow-2xl shadow-blue-500/25">
+          <Card className="border-0 bg-gradient-to-r from-blue-600 to-indigo-600 shadow-2xl shadow-blue-500/25 dark:from-blue-700 dark:to-indigo-700 dark:shadow-blue-900/25">
             <CardContent className="space-y-6 p-12">
               <h2 className="mb-4 text-4xl font-bold text-white">
                 Ready to get started?
@@ -238,7 +238,7 @@ export default function LandingPage() {
               <Button
                 size="lg"
                 onClick={() => router.push("/signin")}
-                className="transform bg-white px-8 py-4 text-lg font-semibold text-blue-600 shadow-xl transition-all duration-300 hover:scale-105 hover:bg-gray-50 hover:shadow-2xl"
+                className="transform bg-white px-8 py-4 text-lg font-semibold text-blue-600 shadow-xl transition-all duration-300 hover:scale-105 hover:bg-gray-50 hover:shadow-2xl dark:bg-gray-100 dark:text-blue-700 dark:hover:bg-gray-200"
               >
                 Get Started Now
                 <ArrowRight className="ml-2 h-5 w-5" />

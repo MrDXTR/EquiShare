@@ -192,7 +192,7 @@ export function CreateGroupDialog() {
             <Button
               type="submit"
               disabled={createGroup.isPending || !name.trim()}
-              className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 sm:w-auto"
+              className="w-full bg-gradient-to-r from-blue-600 dark:text-white text-black to-purple-600 hover:from-blue-700 hover:to-purple-700 sm:w-auto"
             >
               {createGroup.isPending ? (
                 <div className="flex items-center gap-2">

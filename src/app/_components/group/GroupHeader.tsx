@@ -45,37 +45,37 @@ export function GroupHeader({
         <div className="rounded-full bg-gradient-to-r from-blue-500 to-indigo-600 p-3">
           <Receipt className="h-8 w-8 text-white" />
         </div>
-        <h1 className="bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-3xl font-bold text-transparent sm:text-4xl">
+        <h1 className="bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-3xl font-bold text-transparent dark:from-blue-400 dark:to-indigo-400 sm:text-4xl">
           {group.name || "Group Expenses"}
         </h1>
       </div>
 
       {/* Stats Overview */}
       <div className="mt-6 flex flex-wrap justify-center gap-4 sm:gap-6">
-        <div className="flex items-center gap-2 rounded-full border border-white/20 bg-white/70 px-4 py-2 shadow-sm backdrop-blur-sm">
-          <TrendingUp className="h-5 w-5 text-green-600" />
-          <span className="font-semibold text-gray-700">
+        <div className="flex items-center gap-2 rounded-full border border-white/20 bg-white/70 px-4 py-2 shadow-sm backdrop-blur-sm dark:border-gray-700/20 dark:bg-gray-800/70">
+          <TrendingUp className="h-5 w-5 text-green-600 dark:text-green-400" />
+          <span className="font-semibold text-gray-700 dark:text-gray-200">
             Total: ₹{totalExpenses.toFixed(2)}
           </span>
         </div>
-        <div className="flex items-center gap-2 rounded-full border border-white/20 bg-white/70 px-4 py-2 shadow-sm backdrop-blur-sm">
-          <Receipt className="h-5 w-5 text-blue-600" />
-          <span className="font-semibold text-gray-700">
+        <div className="flex items-center gap-2 rounded-full border border-white/20 bg-white/70 px-4 py-2 shadow-sm backdrop-blur-sm dark:border-gray-700/20 dark:bg-gray-800/70">
+          <Receipt className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+          <span className="font-semibold text-gray-700 dark:text-gray-200">
             {group.expenses.length} Expenses
           </span>
         </div>
-        <div className="flex items-center gap-2 rounded-full border border-white/20 bg-white/70 px-4 py-2 shadow-sm backdrop-blur-sm">
+        <div className="flex items-center gap-2 rounded-full border border-white/20 bg-white/70 px-4 py-2 shadow-sm backdrop-blur-sm dark:border-gray-700/20 dark:bg-gray-800/70">
           {isLoadingBalances ? (
-            <Skeleton className="h-5 w-24" />
+            <Skeleton className="h-5 w-24 dark:bg-gray-700" />
           ) : showAllSettled ? (
             <>
-              <CheckCircle2 className="h-5 w-5 text-green-600" />
-              <span className="font-semibold text-green-700">All Settled!</span>
+              <CheckCircle2 className="h-5 w-5 text-green-600 dark:text-green-400" />
+              <span className="font-semibold text-green-700 dark:text-green-400">All Settled!</span>
             </>
           ) : (
             <>
-              <AlertCircle className="h-5 w-5 text-orange-600" />
-              <span className="font-semibold text-orange-700">
+              <AlertCircle className="h-5 w-5 text-orange-600 dark:text-orange-400" />
+              <span className="font-semibold text-orange-700 dark:text-orange-400">
                 {pendingSettlements} Pending
               </span>
             </>
@@ -84,9 +84,9 @@ export function GroupHeader({
 
         {isOwner && (
           <InviteDialog groupId={group.id}>
-            <div className="flex cursor-pointer items-center gap-2 rounded-full border border-white/20 bg-white/70 px-4 py-2 shadow-sm backdrop-blur-sm transition-colors hover:bg-white/90">
-              <UserPlus className="h-5 w-5 text-indigo-600" />
-              <span className="font-semibold text-indigo-700">
+            <div className="flex cursor-pointer items-center gap-2 rounded-full border border-white/20 bg-white/70 px-4 py-2 shadow-sm backdrop-blur-sm transition-colors hover:bg-white/90 dark:border-gray-700/20 dark:bg-gray-800/70 dark:hover:bg-gray-800/90">
+              <UserPlus className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
+              <span className="font-semibold text-indigo-700 dark:text-indigo-400">
                 Invite Members
               </span>
             </div>

@@ -14,6 +14,7 @@ import {
 } from "~/components/ui/dropdown-menu";
 import { LogOut, User } from "lucide-react";
 import Image from "next/image";
+import { ThemeToggle } from "./ThemeToggle";
 
 export function Header() {
   const { data: session, status } = useSession();
@@ -50,13 +51,15 @@ export function Header() {
                 </Button>
               </Link>
 
+              <ThemeToggle />
+
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button
                     variant="ghost"
-                    className="relative h-10 w-10 rounded-full p-0 hover:bg-gray-100"
+                    className="relative h-10 w-10 rounded-full p-0 hover:bg-gray-100 dark:hover:bg-gray-800"
                   >
-                    <Avatar className="h-10 w-10 border-2 border-gray-200 transition-colors hover:border-gray-300">
+                    <Avatar className="h-10 w-10 border-2 border-gray-200 transition-colors hover:border-gray-300 dark:border-gray-700 dark:hover:border-gray-600">
                       <AvatarImage
                         src={session.user?.image || ""}
                         alt={session.user?.name || "User"}
@@ -85,7 +88,7 @@ export function Header() {
                   <div className="my-1 border-t"></div>
                   <DropdownMenuItem
                     onClick={handleSignOut}
-                    className="cursor-pointer text-red-600 focus:bg-red-50 focus:text-red-600"
+                    className="cursor-pointer text-red-600 focus:bg-red-50 focus:text-red-600 dark:focus:bg-red-950 dark:focus:text-red-400"
                   >
                     <LogOut className="mr-2 h-4 w-4" />
                     <span>Sign out</span>
@@ -94,12 +97,15 @@ export function Header() {
               </DropdownMenu>
             </div>
           ) : (
-            <Button
-              onClick={() => router.push("/signin")}
-              className="font-medium"
-            >
-              Sign In
-            </Button>
+            <div className="flex items-center gap-4">
+              <ThemeToggle />
+              <Button
+                onClick={() => router.push("/signin")}
+                className="font-medium"
+              >
+                Sign In
+              </Button>
+            </div>
           )}
         </nav>
       </div>
