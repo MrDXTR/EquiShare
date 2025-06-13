@@ -138,7 +138,7 @@ export function GroupHeader({
             </DropdownMenuContent>
           </DropdownMenu>
 
-          <ExpenseForm
+          {/* <ExpenseForm
             groupId={group.id}
             people={group.people}
             onSuccess={onExpenseCreated}
@@ -151,7 +151,7 @@ export function GroupHeader({
                 Add Expense
               </Button>
             }
-          />
+          /> */}
         </div>
       </div>
 

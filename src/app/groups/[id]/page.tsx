@@ -3,31 +3,10 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { api } from "~/trpc/react";
-import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { GroupSummary } from "~/app/_components/GroupSummary";
-import {
-  Plus,
-  Users,
-  Receipt,
-  UserPlus,
-  Share2,
-  MoreVertical,
-} from "lucide-react";
-import { ExpenseForm } from "~/app/_components/ExpenseForm";
 import { use } from "react";
 import { Skeleton } from "~/components/ui/skeleton";
-import { Badge } from "~/components/ui/badge";
-import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
-import { GroupHeader } from "~/app/_components/group/GroupHeader";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "~/components/ui/dropdown-menu";
 import {
   Dialog,
   DialogContent,
@@ -61,7 +40,7 @@ export default function GroupDetailPage({
 
   if (isLoadingGroup) {
     return (
-      <div className="min-h-screen bg-gray-50/50 p-4 md:p-8 dark:bg-gray-900/50">
+      <div className="min-h-screen bg-gray-50/50 p-4 dark:bg-gray-900/50 md:p-8">
         <div className="container mx-auto max-w-7xl space-y-8">
           <motion.div
             initial={{ opacity: 0, y: -20 }}
@@ -114,18 +93,8 @@ export default function GroupDetailPage({
 
   if (!group) return null;
 
-  const totalExpenses = group.expenses.reduce(
-    (sum, expense) => sum + expense.amount,
-    0,
-  );
-
-  const isAllSettled = group.expenses.every((expense) => expense.settled);
-  const pendingSettlements = group.expenses.filter(
-    (expense) => !expense.settled,
-  ).length;
-
   return (
-    <div className="min-h-screen bg-gray-50/50 p-4 md:p-8 dark:bg-gray-900/50">
+    <div className="min-h-screen bg-gray-50/50 p-4 dark:bg-gray-900/50 md:p-8">
       <div className="container mx-auto max-w-7xl space-y-8">
         {/* Main Content */}
         <motion.div
@@ -133,7 +102,11 @@ export default function GroupDetailPage({
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
         >
-          <GroupSummary group={group} />
+          <GroupSummary 
+            group={group} 
+            onExpenseCreated={handleExpenseCreated}
+            setShowMembersDialog={setShowMembersDialog}
+          />
         </motion.div>
       </div>
 

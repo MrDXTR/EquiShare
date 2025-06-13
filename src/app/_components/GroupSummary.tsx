@@ -51,9 +51,15 @@ import { getWhoOwesWhom, getPendingSettlementsCount } from "./group/utils";
 
 interface GroupSummaryProps {
   group: Group;
+  onExpenseCreated?: () => Promise<void>;
+  setShowMembersDialog?: (show: boolean) => void;
 }
 
-export function GroupSummary({ group }: GroupSummaryProps) {
+export function GroupSummary({ 
+  group, 
+  onExpenseCreated,
+  setShowMembersDialog 
+}: GroupSummaryProps) {
   const [expenseToDelete, setExpenseToDelete] = useState<string | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
   const [settlingUpExpense, setSettlingUpExpense] = useState<string | null>(
@@ -247,6 +253,8 @@ export function GroupSummary({ group }: GroupSummaryProps) {
           pendingSettlements={pendingSettlements}
           isOwner={group.isOwner}
           hasUnsettledExpenses={hasUnsettledExpenses}
+          onExpenseCreated={onExpenseCreated}
+          setShowMembersDialog={setShowMembersDialog}
         />
 
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
