@@ -9,6 +9,13 @@ export interface Transaction {
   isSettled?: boolean;
 }
 
+export interface SettlementExpense {
+  id: string;
+  paidBy: { id: string; name: string };
+  shares: Array<{ person: { id: string; name: string } | null }>;
+  amount: number;
+}
+
 // Helper to compute minimal transactions
 export function getWhoOwesWhom(
   balances: { person: { id: string; name: string }; balance: number }[],
@@ -78,4 +85,39 @@ export function trackSettledTransactions(
       isSettled: isSettled
     };
   });
+}
+
+// Convert settled expenses to a format for tracking
+export function convertSettledExpensesToTransactions(
+  settledExpenses: SettlementExpense[] | undefined
+): { from: string; to: string; amount: number }[] {
+  if (!settledExpenses) return [];
+  
+  return settledExpenses
+    .map(exp => ({
+      from: exp.paidBy.name,
+      to: exp.shares[0]?.person?.name ?? "",
+      amount: exp.amount,
+    }))
+    .filter(tx => tx.to !== ""); // Filter out any with missing person
+}
+
+// Check if there are any unsettled transactions
+export function hasUnsettledTransactions(transactions: Transaction[]): boolean {
+  return transactions.some(tx => !tx.isSettled);
+}
+
+// Filter transactions based on showSettled flag
+export function filterTransactions(
+  transactions: Transaction[],
+  showSettled: boolean
+): Transaction[] {
+  return showSettled
+    ? transactions
+    : transactions.filter(tx => !tx.isSettled);
+}
+
+// Determine if all transactions are settled
+export function areAllTransactionsSettled(transactions: Transaction[]): boolean {
+  return transactions.every(tx => tx.isSettled) || transactions.length === 0;
 }

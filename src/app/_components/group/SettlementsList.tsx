@@ -5,7 +5,14 @@ import { ArrowRight, CheckCircle2, Check, Loader2 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { Badge } from "~/components/ui/badge";
 import { Skeleton } from "~/components/ui/skeleton";
-import { getWhoOwesWhom, type Transaction } from "./utils";
+import { 
+  getWhoOwesWhom, 
+  type Transaction, 
+  convertSettledExpensesToTransactions, 
+  hasUnsettledTransactions as checkUnsettledTransactions,
+  filterTransactions,
+  areAllTransactionsSettled
+} from "./utils";
 import { useState, useEffect, useRef } from "react";
 import { api } from "~/trpc/react";
 import { toast } from "sonner";
@@ -40,19 +47,31 @@ export function SettlementsList({
   const [showConfirmSettleAll, setShowConfirmSettleAll] = useState(false);
   const [showSettled, setShowSettled] = useState(true);
   
-  // Use refs to track state changes and prevent infinite loops
+  // Track if balances have changed to prevent unnecessary recalculations
   const balancesRef = useRef(balances);
-  const settledExpensesApplied = useRef(false);
   
-  const isAllSettled = transactions.every(tx => tx.isSettled) || transactions.length === 0;
-
-  // If there are no unsettled expenses, show the all settled message
-  const showAllSettled = isAllSettled || !hasUnsettledExpenses;
-  
+  // Utils for API calls
   const utils = api.useUtils();
 
-  const { data: settledExpenses } = api.expense.getSettlements.useQuery(groupId);
+  // Fetch settlement data
+  const { data: settledExpenses } = api.expense.getSettlements.useQuery(
+    groupId,
+    {
+      // Ensure we refetch after mutations
+      refetchOnWindowFocus: true,
+      refetchOnMount: true,
+      refetchOnReconnect: true
+    }
+  );
   
+  // Compute derived state
+  const hasUnsettledTx = checkUnsettledTransactions(transactions);
+  const isAllSettled = areAllTransactionsSettled(transactions);
+  const filteredTx = filterTransactions(transactions, showSettled);
+  
+  // Show "All Settled" message only when there are no unsettled transactions and we're not showing settled ones
+  const showAllSettled = !hasUnsettledTx && !showSettled;
+
   // Update transactions when balances change
   useEffect(() => {
     // Skip if balances haven't changed
@@ -60,43 +79,51 @@ export function SettlementsList({
       return;
     }
     
+    // Update reference and calculate new transactions
     balancesRef.current = balances;
-    const whoOwesWhom = getWhoOwesWhom(balances);
-    setTransactions(whoOwesWhom);
-    settledExpensesApplied.current = false;
-  }, [balances]);
-  
-  // Update settled status when settled expenses data is available
-  useEffect(() => {
-    if (!settledExpenses || settledExpensesApplied.current) return;
+    const newTransactions = getWhoOwesWhom(balances);
     
-    const settledTransactions = settledExpenses.map(exp => ({
-      from: exp.paidBy.name,
-      to: exp.shares[0]?.person?.name ?? "",
-      amount: exp.amount
-    })).filter(tx => tx.to !== ""); // Filter out any with missing person
-    
-    if (transactions.length > 0) {
-      setTransactions(prev => 
-        prev.map(tx => {
-          // Check if this transaction is settled
-          const isSettled = settledTransactions.some(
-            settledTx => 
-              tx.from === settledTx.from && 
-              tx.to === settledTx.to && 
-              Math.abs(tx.amount - settledTx.amount) < 0.01
-          );
-          
-          return {
-            ...tx,
-            isSettled
-          };
-        })
-      );
-      settledExpensesApplied.current = true;
+    // Apply settled status if we have settlement data
+    if (settledExpenses) {
+      const settledTx = convertSettledExpensesToTransactions(settledExpenses);
+      
+      // Apply settled status to new transactions
+      setTransactions(newTransactions.map(tx => {
+        const isSettled = settledTx.some(
+          settled => 
+            tx.from === settled.from && 
+            tx.to === settled.to && 
+            Math.abs(tx.amount - settled.amount) < 0.01
+        );
+        
+        return { ...tx, isSettled };
+      }));
+    } else {
+      setTransactions(newTransactions);
     }
-  }, [settledExpenses, transactions.length]);
+  }, [balances, settledExpenses]);
+  
+  // Update settled status when settled expenses data changes
+  useEffect(() => {
+    if (!settledExpenses || transactions.length === 0) return;
+    
+    const settledTx = convertSettledExpensesToTransactions(settledExpenses);
+    
+    setTransactions(prev => 
+      prev.map(tx => {
+        const isSettled = settledTx.some(
+          settled => 
+            tx.from === settled.from && 
+            tx.to === settled.to && 
+            Math.abs(tx.amount - settled.amount) < 0.01
+        );
+        
+        return { ...tx, isSettled };
+      })
+    );
+  }, [settledExpenses]);
 
+  // API mutation for settling a single transaction
   const settleTransaction = api.expense.settleTransaction.useMutation({
     onMutate: () => {
       toast.loading("Settling transaction...", {
@@ -104,9 +131,11 @@ export function SettlementsList({
       });
     },
     onSuccess: async () => {
+      // Invalidate all related queries to trigger refetching
       await utils.expense.getBalances.invalidate(groupId);
       await utils.expense.getSettlements.invalidate(groupId);
       await utils.group.getById.invalidate(groupId);
+      
       toast.success("Transaction settled successfully", {
         id: "settle-transaction",
         style: {
@@ -115,8 +144,6 @@ export function SettlementsList({
           borderColor: "#bbf7d0",
         },
       });
-      // Reset the flag so we apply settled status again after refetch
-      settledExpensesApplied.current = false;
     },
     onError: () => {
       toast.error("Failed to settle transaction", {
@@ -125,9 +152,10 @@ export function SettlementsList({
     },
     onSettled: () => {
       setSettlingTransaction(null);
-    }
+    },
   });
 
+  // API mutation for settling all transactions
   const settleAllTransactions = api.expense.settleAllTransactions.useMutation({
     onMutate: () => {
       toast.loading("Settling all transactions...", {
@@ -135,9 +163,11 @@ export function SettlementsList({
       });
     },
     onSuccess: async () => {
+      // Invalidate all related queries to trigger refetching
       await utils.expense.getBalances.invalidate(groupId);
       await utils.expense.getSettlements.invalidate(groupId);
       await utils.group.getById.invalidate(groupId);
+      
       toast.success("All transactions settled successfully", {
         id: "settle-all-transactions",
         style: {
@@ -146,8 +176,6 @@ export function SettlementsList({
           borderColor: "#bbf7d0",
         },
       });
-      // Reset the flag so we apply settled status again after refetch
-      settledExpensesApplied.current = false;
     },
     onError: () => {
       toast.error("Failed to settle all transactions", {
@@ -157,34 +185,35 @@ export function SettlementsList({
     onSettled: () => {
       setIsSettlingAll(false);
       setShowConfirmSettleAll(false);
-    }
+    },
   });
 
-  const handleSettleTransaction = (index: number, from: string, to: string, amount: number) => {
+  // Handler for settling a single transaction
+  const handleSettleTransaction = (
+    index: number,
+    from: string,
+    to: string,
+    amount: number,
+  ) => {
     setSettlingTransaction(index);
     settleTransaction.mutate({
       groupId,
       fromName: from,
-      toName: to, 
-      amount
+      toName: to,
+      amount,
     });
   };
 
+  // Handler for settling all transactions
   const handleSettleAllTransactions = () => {
     setIsSettlingAll(true);
     settleAllTransactions.mutate(groupId);
   };
   
+  // Toggle showing/hiding settled transactions
   const toggleShowSettled = () => {
-    setShowSettled(prev => !prev);
+    setShowSettled((prev) => !prev);
   };
-  
-  // Filter transactions based on the showSettled toggle
-  const filteredTransactions = showSettled 
-    ? transactions 
-    : transactions.filter(tx => !tx.isSettled);
-
-  const hasUnsettledTransactions = transactions.some(tx => !tx.isSettled);
 
   return (
     <motion.div
@@ -194,7 +223,7 @@ export function SettlementsList({
     >
       <Card className="h-full border-0 bg-white/80 shadow-xl shadow-indigo-100/50 backdrop-blur-sm transition-all duration-300 hover:shadow-2xl hover:shadow-indigo-200/60 dark:bg-gray-800/80 dark:shadow-none dark:hover:shadow-none">
         <CardHeader className="pb-4">
-          <div className="flex flex-row items-center justify-between">
+        <div className="flex flex-col items-start justify-between gap-3 md:flex-row md:items-center md:gap-0">
             <CardTitle className="flex items-center gap-3 text-2xl">
               <div className="rounded-lg bg-gradient-to-r from-indigo-500 to-purple-600 p-2">
                 <ArrowRight className="h-6 w-6 text-white" />
@@ -214,7 +243,7 @@ export function SettlementsList({
                   {showSettled ? "Hide Settled" : "Show All"}
                 </Button>
               )}
-              {hasUnsettledTransactions && (
+              {hasUnsettledTx && (
                 <Button
                   size="sm"
                   className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 dark:from-green-500 dark:to-emerald-500 dark:text-white dark:hover:from-green-600 dark:hover:to-emerald-600"
@@ -264,13 +293,13 @@ export function SettlementsList({
                   Everyone&apos;s debts are cleared
                 </p>
               </motion.div>
-            ) : filteredTransactions.length === 0 ? (
+            ) : filteredTx.length === 0 ? (
               <div className="py-8 text-center">
                 <p className="text-gray-500">No transactions to show</p>
               </div>
             ) : (
               <div className="space-y-3">
-                {filteredTransactions.map((tx, idx) => {
+                {filteredTx.map((tx, idx) => {
                   const isSettling = settlingTransaction === idx;
                   const isSettled = tx.isSettled;
                   
@@ -296,16 +325,18 @@ export function SettlementsList({
                         delay: idx * 0.05, 
                         duration: 0.3,
                         type: "spring",
-                        stiffness: 100 
+                        stiffness: 100,
                       }}
                       className={`group relative overflow-hidden rounded-xl border ${boxColorClass} p-4 hover:shadow-lg hover:shadow-orange-100/50`}
                       style={{ 
-                        willChange: 'transform, opacity',
-                        transform: 'translate3d(0, 0, 0)'
+                        willChange: "transform, opacity",
+                        transform: "translate3d(0, 0, 0)",
                       }}
                     >
-                      <div className={`absolute inset-0 bg-gradient-to-r ${glowColorClass} opacity-0 transition-opacity duration-300 pointer-events-none`} />
-                      <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between relative z-10">
+                      <div
+                        className={`absolute inset-0 bg-gradient-to-r ${glowColorClass} pointer-events-none opacity-0 transition-opacity duration-300`}
+                      />
+                      <div className="relative z-10 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
                         <div className="flex flex-wrap items-center gap-2">
                           <Badge className="border-orange-300 bg-orange-100 font-semibold text-orange-800 dark:border-orange-700 dark:bg-orange-900/50 dark:text-orange-300">
                             {tx.from}
@@ -322,16 +353,23 @@ export function SettlementsList({
                           )}
                         </div>
                         <div className="flex items-center gap-3">
-                          <span className={`text-2xl font-bold ${amountColorClass}`}>
+                          <span
+                            className={`text-2xl font-bold ${amountColorClass}`}
+                          >
                             ₹{tx.amount.toFixed(2)}
                           </span>
                           {!isSettled && (
                             <Button
                               size="sm"
-                              className="bg-green-600 hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-800 relative z-20"
+                              className="relative z-20 bg-green-600 hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-800"
                               onClick={(e) => {
                                 e.stopPropagation();
-                                handleSettleTransaction(idx, tx.from, tx.to, tx.amount);
+                                handleSettleTransaction(
+                                  idx,
+                                  tx.from,
+                                  tx.to,
+                                  tx.amount,
+                                );
                               }}
                               disabled={isSettling}
                             >
@@ -372,11 +410,14 @@ export function SettlementsList({
           <AlertDialogHeader>
             <AlertDialogTitle>Settle all transactions?</AlertDialogTitle>
             <AlertDialogDescription>
-              This will mark all transactions as settled. Ensure everyone has actually paid what they owe.
+              This will mark all transactions as settled. Ensure everyone has
+              actually paid what they owe.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel disabled={isSettlingAll}>Cancel</AlertDialogCancel>
+            <AlertDialogCancel disabled={isSettlingAll}>
+              Cancel
+            </AlertDialogCancel>
             <AlertDialogAction
               onClick={handleSettleAllTransactions}
               disabled={isSettlingAll}
@@ -387,7 +428,9 @@ export function SettlementsList({
                   <div className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />
                   Settling All...
                 </div>
-              ) : "Settle All"}
+              ) : (
+                "Settle All"
+              )}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

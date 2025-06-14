@@ -2,13 +2,7 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
-import {
-  Receipt,
-  MoreVertical,
-  Loader2,
-  Trash2,
-  Plus,
-} from "lucide-react";
+import { Receipt, MoreVertical, Loader2, Trash2, Plus } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { Button } from "~/components/ui/button";
 import { Badge } from "~/components/ui/badge";
@@ -162,12 +156,12 @@ export function ExpensesList({
                         </Badge>
                       </div>
                     </div>
-                    <div className="space-y-1 text-right">
-                      <p className="text-2xl font-bold text-gray-900 transition-colors group-hover:text-green-600 dark:text-gray-100 dark:group-hover:text-green-400">
+                    <div className="space-y-1 ">
+                      <p className="text-2xl text-right font-bold text-gray-900 transition-colors group-hover:text-green-600 dark:text-gray-100 dark:group-hover:text-green-400">
                         ₹{expense.amount.toFixed(2)}
                       </p>
-                      <div className="flex items-center gap-1 text-sm text-gray-600 dark:text-gray-400">
-                        <span>Split {expense.shares.length} ways</span>
+                      <div className="flex items-center text-end gap-1 text-sm text-gray-600 dark:text-gray-400">
+                        <span >Split {expense.shares.length} ways</span>
                       </div>
                     </div>
                   </div>

@@ -55,10 +55,10 @@ interface GroupSummaryProps {
   setShowMembersDialog?: (show: boolean) => void;
 }
 
-export function GroupSummary({ 
-  group, 
+export function GroupSummary({
+  group,
   onExpenseCreated,
-  setShowMembersDialog 
+  setShowMembersDialog,
 }: GroupSummaryProps) {
   const [expenseToDelete, setExpenseToDelete] = useState<string | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
