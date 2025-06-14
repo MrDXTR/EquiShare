@@ -279,6 +279,7 @@ export function GroupSummary({
               balances={mappedBalances}
               isLoading={isLoadingBalances}
               hasUnsettledExpenses={hasUnsettledExpenses}
+              groupId={group.id}
             />
           </div>
         </div>

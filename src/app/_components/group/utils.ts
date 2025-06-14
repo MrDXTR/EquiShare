@@ -2,15 +2,22 @@ import type { RouterOutputs } from "~/trpc/shared";
 
 export type Group = RouterOutputs["group"]["getById"];
 
+export interface Transaction {
+  from: string;
+  to: string;
+  amount: number;
+  isSettled?: boolean;
+}
+
 // Helper to compute minimal transactions
 export function getWhoOwesWhom(
   balances: { person: { id: string; name: string }; balance: number }[],
-) {
+): Transaction[] {
   const creditors = balances
     .filter((b) => b.balance > 0)
     .map((b) => ({ ...b }));
   const debtors = balances.filter((b) => b.balance < 0).map((b) => ({ ...b }));
-  const transactions: { from: string; to: string; amount: number }[] = [];
+  const transactions: Transaction[] = [];
 
   let i = 0,
     j = 0;
@@ -24,6 +31,7 @@ export function getWhoOwesWhom(
         from: debtor.person.name,
         to: creditor.person.name,
         amount,
+        isSettled: false,
       });
       debtor.balance += amount;
       creditor.balance -= amount;
@@ -48,4 +56,26 @@ export function getPendingSettlementsCount(
   if (!balances) return 0;
   const validBalances = balances.filter((b) => b.person && b.balance !== 0);
   return validBalances.length;
+}
+
+// Function to track settled transactions
+export function trackSettledTransactions(
+  transactions: Transaction[],
+  settledTransactions: { from: string; to: string; amount: number }[],
+): Transaction[] {
+  return transactions.map(tx => {
+    // Check if this transaction is in the settled list
+    const isSettled = settledTransactions.some(
+      settledTx => 
+        tx.from === settledTx.from && 
+        tx.to === settledTx.to && 
+        Math.abs(tx.amount - settledTx.amount) < 0.01
+    );
+    
+    // Return a new transaction object with the isSettled flag updated
+    return {
+      ...tx,
+      isSettled: isSettled
+    };
+  });
 }
