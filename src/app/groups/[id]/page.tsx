@@ -40,7 +40,7 @@ export default function GroupDetailPage({
 
   if (isLoadingGroup) {
     return (
-      <div className="min-h-screen bg-gray-50/50 p-4 dark:bg-gray-900/50 md:p-8">
+      <div className="min-h-screen bg-gray-50/50 p-4 dark:bg-black md:p-8">
         <div className="container mx-auto max-w-7xl space-y-8">
           <motion.div
             initial={{ opacity: 0, y: -20 }}
@@ -94,7 +94,7 @@ export default function GroupDetailPage({
   if (!group) return null;
 
   return (
-    <div className="min-h-screen bg-gray-50/50 p-4 dark:bg-gray-900/50 md:p-8">
+    <div className="min-h-screen bg-gray-50/50 p-4 dark:bg-black md:p-8">
       <div className="container mx-auto max-w-7xl space-y-8">
         {/* Main Content */}
         <motion.div

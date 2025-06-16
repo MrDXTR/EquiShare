@@ -1,52 +1,56 @@
 import { TRPCError } from "@trpc/server";
-import type { PrismaClient, Person, Expense, Share } from "@prisma/client";
+import type {
+  PrismaClient,
+  Person,
+  Expense,
+  Share,
+  Settlement,
+} from "@prisma/client";
 
-type Context = {
+type Ctx = {
   db: PrismaClient;
-  session: {
-    user: {
-      id: string;
-    };
-  };
+  session: { user: { id: string } };
 };
 
-// Similar to the client-side util function but adapted for server
-function getWhoOwesWhom(
-  balances: { personId: string; balance: number; person: { id: string; name: string } | undefined }[]
-) {
-  const creditors = balances
-    .filter((b) => b.balance > 0 && b.person)
-    .map((b) => ({ ...b }));
-  const debtors = balances
-    .filter((b) => b.balance < 0 && b.person)
-    .map((b) => ({ ...b }));
-  const transactions: { fromId: string; toId: string; amount: number }[] = [];
+/* ------------------------------------------------------------------ */
+/* 1. helper – minimal transaction algo (server variant)              */
+/* ------------------------------------------------------------------ */
+function minTx(
+  rows: { id: string; name: string; bal: number }[],
+): { fromId: string; toId: string; amount: number }[] {
+  const creditors = rows.filter((r) => r.bal > 0).map((r) => ({ ...r }));
+  const debtors   = rows.filter((r) => r.bal < 0).map((r) => ({ ...r }));
+  const tx: { fromId: string; toId: string; amount: number }[] = [];
 
   let i = 0,
     j = 0;
   while (i < debtors.length && j < creditors.length) {
-    const debtor = debtors[i];
-    const creditor = creditors[j];
-    if (!debtor || !creditor) break;
-    const amount = Math.min(-debtor.balance, creditor.balance);
-    if (amount > 0.01) { // Skip very small amounts
-      transactions.push({
-        fromId: debtor.personId,
-        toId: creditor.personId,
-        amount,
-      });
-      debtor.balance += amount;
-      creditor.balance -= amount;
+    const d = debtors[i];
+    const c = creditors[j];
+    if (!d || !c) break; // concise guard
+    const amt = Math.min(-d.bal, c.bal);
+    if (amt > 0.01) {
+      tx.push({ fromId: d.id, toId: c.id, amount: amt });
+      d.bal += amt;
+      c.bal -= amt;
     }
-    if (Math.abs(debtor.balance) < 0.01) i++;
-    if (Math.abs(creditor.balance) < 0.01) j++;
+    if (Math.abs(d.bal) < 0.01) i++;
+    if (Math.abs(c.bal) < 0.01) j++;
   }
-  return transactions;
+  return tx;
 }
 
-export async function computeAndUpsertSettlements(ctx: Context, groupId: string) {
-  // First check if user has access to this group
-  const group = await ctx.db.group.findFirst({
+/* ------------------------------------------------------------------ */
+/* 2. MAIN ENTRY POINT                                                */
+/* ------------------------------------------------------------------ */
+export async function computeAndUpsertSettlements(
+  ctx: Ctx,
+  groupId: string,
+) {
+  /* -------------------------------------------------------------- */
+  /* Guard – membership / ownership                                 */
+  /* -------------------------------------------------------------- */
+  const ok = await ctx.db.group.findFirst({
     where: {
       id: groupId,
       OR: [
@@ -54,126 +58,133 @@ export async function computeAndUpsertSettlements(ctx: Context, groupId: string)
         { members: { some: { id: ctx.session.user.id } } },
       ],
     },
+    select: { id: true },
   });
-
-  if (!group) {
-    throw new TRPCError({
-      code: "FORBIDDEN",
-      message: "You don't have access to this group",
-    });
+  if (!ok) {
+    throw new TRPCError({ code: "FORBIDDEN", message: "No access" });
   }
 
-  // Get all unsettled expenses and calculate balances
-  const groupWithExpenses = await ctx.db.group.findUnique({
-    where: {
-      id: groupId,
-    },
+  /* -------------------------------------------------------------- */
+  /* Pull everything we need in one round trip                      */
+  /* -------------------------------------------------------------- */
+  const g = await ctx.db.group.findUnique({
+    where: { id: groupId },
     include: {
       people: true,
       expenses: {
         include: {
           paidBy: true,
-          shares: {
-            include: {
-              person: true,
-            },
-          },
+          shares: { include: { person: true } },
+        },
+        orderBy: {
+          createdAt: 'asc',
         },
       },
+      settlements: true, // we'll split into settled / unsettled later
     },
   });
+  if (!g) throw new TRPCError({ code: "NOT_FOUND" });
 
-  if (!groupWithExpenses) {
-    throw new TRPCError({
-      code: "NOT_FOUND",
-      message: "Group not found",
+  /* -------------------------------------------------------------- */
+  /* 2a.  Build per-person balance from *expenses only*             */
+  /* -------------------------------------------------------------- */
+  const bal = new Map<string, number>();
+  g.people.forEach((p) => bal.set(p.id, 0));
+
+  type X = Expense & { shares: (Share & { person: Person })[] };
+  g.expenses.forEach((e: X) => {
+    bal.set(e.paidById, (bal.get(e.paidById) ?? 0) + e.amount);
+    e.shares.forEach((s) =>
+      bal.set(s.personId, (bal.get(s.personId) ?? 0) - s.amount),
+    );
+  });
+
+  /* -------------------------------------------------------------- */
+  /* 2b.  Apply every *settled* row: money already transferred      */
+  /* -------------------------------------------------------------- */
+  g.settlements
+    .filter((s) => s.settled)
+    .forEach((s: Settlement) => {
+      // debtor paid → raise his balance
+      bal.set(s.fromId, (bal.get(s.fromId) ?? 0) + s.amount);
+      // creditor received → lower her balance
+      bal.set(s.toId, (bal.get(s.toId) ?? 0) - s.amount);
     });
-  }
 
-  // Calculate balances from expenses
-  const balances = new Map<string, number>();
-  groupWithExpenses.people.forEach((person: Person) => {
-    balances.set(person.id, 0);
-  });
-
-  type ExpenseWithRelations = Expense & {
-    paidBy: Person;
-    shares: (Share & { person: Person })[];
-  };
-
-  groupWithExpenses.expenses.forEach((expense: ExpenseWithRelations) => {
-    // Add amount to payer's balance
-    const currentPayerBalance = balances.get(expense.paidById) ?? 0;
-    balances.set(expense.paidById, currentPayerBalance + expense.amount);
-
-    // Subtract share amount from each person's balance
-    expense.shares.forEach((share) => {
-      const currentBalance = balances.get(share.personId) ?? 0;
-      balances.set(share.personId, currentBalance - share.amount);
-    });
-  });
-
-  // 1️⃣ subtract everything that is already settled
-  const settledRows = await ctx.db.settlement.findMany({
-    where: { groupId, settled: true },
-    select: { fromId: true, toId: true, amount: true },
-  });
-
-  // subtract settledRows from balances
-  for (const row of settledRows) {
-    // the debtor (row.fromId) already paid, so *increase* his balance
-    balances.set(row.fromId, (balances.get(row.fromId) ?? 0) + row.amount);
-    // the creditor (row.toId) already received money, so *decrease* his balance
-    balances.set(row.toId, (balances.get(row.toId) ?? 0) - row.amount);
-  }
-
-  // Create balance objects for getWhoOwesWhom
-  const balanceObjects = Array.from(balances.entries())
-    .filter(([_, balance]) => Math.abs(balance) > 0.01) // Filter out zero or very small balances
-    .map(([personId, balance]) => ({
-      personId,
-      balance,
-      person: groupWithExpenses.people.find((p: Person) => p.id === personId),
+  /* -------------------------------------------------------------- */
+  /* 3.  Convert balances → minimal new transactions                */
+  /* -------------------------------------------------------------- */
+  const rows = Array.from(bal.entries())
+    .filter(([, v]) => Math.abs(v) > 0.01)
+    .map(([id, v]) => ({
+      id,
+      name: g.people.find((p) => p.id === id)!.name,
+      bal: v,
     }));
 
-  // Get minimal set of transactions
-  const transactions = getWhoOwesWhom(balanceObjects);
-  
-  // Get existing settled settlements to preserve them
-  const existingSettledSettlements = await ctx.db.settlement.findMany({
-    where: {
-      groupId,
-      settled: true,
-    },
-    select: {
-      id: true
-    }
-  });
-  
-  // Delete only unsettled settlements for this group
-  await ctx.db.settlement.deleteMany({
-    where: {
-      groupId,
-      settled: false,
-    },
-  });
+  const newTx = minTx(rows); // what is STILL owed (unsettled)
 
-  // Create new settlements
-  if (transactions.length > 0) {
-    await ctx.db.settlement.createMany({
-      data: transactions.map((tx) => ({
-        groupId,
-        fromId: tx.fromId,
-        toId: tx.toId,
-        amount: tx.amount,
-        settled: false,
-      })),
+  /* -------------------------------------------------------------- */
+  /* 4.  Replace every old "unsettled" row with the fresh set       */
+  /* -------------------------------------------------------------- */
+  
+  // Track person-to-person pairs to find originating expense
+  const pairToFirstExpense = new Map<string, string>();
+  
+  // For each expense, check if it creates a debt between people
+  g.expenses.forEach((expense) => {
+    const { paidById } = expense;
+    expense.shares.forEach((share) => {
+      if (share.personId !== paidById) {
+        // This expense creates a debt from share.personId to paidById
+        const pairKey = `${share.personId}-${paidById}`;
+        if (!pairToFirstExpense.has(pairKey)) {
+          pairToFirstExpense.set(pairKey, expense.id);
+        }
+      }
     });
-  }
+  });
 
-  return { 
-    success: true, 
-    settlementsCount: transactions.length,
-    settledSettlementsCount: existingSettledSettlements.length
-  };
-} 
+  await ctx.db.$transaction([
+    ctx.db.settlement.deleteMany({ where: { groupId, settled: false } }),
+    ...(newTx.length
+      ? [
+          ctx.db.settlement.createMany({
+            data: newTx.map((t) => {
+              // Find the first expense that caused this from->to pair
+              const pairKey = `${t.fromId}-${t.toId}`;
+              const expenseId = pairToFirstExpense.get(pairKey) || g.expenses[0]?.id;
+              
+              if (!expenseId) {
+                throw new TRPCError({
+                  code: "INTERNAL_SERVER_ERROR",
+                  message: "Could not find a valid expense for settlement",
+                });
+              }
+              
+              return {
+                groupId,
+                fromId: t.fromId,
+                toId: t.toId,
+                amount: t.amount,
+                settled: false,
+                expenseId,
+              };
+            }),
+          }),
+        ]
+      : []),
+  ]);
+
+  // Update each expense's settledAmount based on related settlements
+  await ctx.db.$executeRaw`
+    UPDATE "Expense" e
+    SET "settledAmount" = COALESCE(
+      (SELECT SUM(s."amount") 
+       FROM "Settlement" s 
+       WHERE s."expenseId" = e.id AND s.settled = true
+      ), 0)
+    WHERE e."groupId" = ${groupId}`;
+
+  return { success: true, newUnsettled: newTx.length };
+}

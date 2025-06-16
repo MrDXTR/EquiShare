@@ -57,7 +57,7 @@ export function GroupSummary({
     onSuccess: async () => {
       await utils.group.getById.invalidate();
       await utils.expense.getBalances.invalidate();
-      await utils.settlement.list.invalidate(settlementQueryInput);
+      await utils.settlement.list.invalidate();
       toast.success("Expense deleted successfully", {
         id: "delete-expense",
         style: {
@@ -84,7 +84,7 @@ export function GroupSummary({
       setNewPersonName("");
       await utils.group.getById.invalidate(group.id);
       await utils.expense.getBalances.invalidate(group.id);
-      await utils.settlement.list.invalidate(settlementQueryInput);
+      await utils.settlement.list.invalidate();
       toast.success("Person added successfully", {
         id: "add-person",
       });
@@ -105,7 +105,7 @@ export function GroupSummary({
     onSuccess: async () => {
       await utils.group.getById.invalidate(group.id);
       await utils.expense.getBalances.invalidate(group.id);
-      await utils.settlement.list.invalidate(settlementQueryInput);
+      await utils.settlement.list.invalidate();
       toast.success("Person deleted successfully", {
         id: "delete-person",
         style: {
@@ -194,7 +194,7 @@ export function GroupSummary({
             onExpenseDeleted={() => {
               void utils.group.getById.invalidate(group.id);
               void utils.expense.getBalances.invalidate(group.id);
-              void utils.settlement.list.invalidate(settlementQueryInput);
+              void utils.settlement.list.invalidate();
             }}
           />
           <div className="lg:col-span-2">

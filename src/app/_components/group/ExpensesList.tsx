@@ -48,7 +48,7 @@ export function ExpensesList({
   const [isAddingExpense, setIsAddingExpense] = useState(false);
   const utils = api.useUtils();
   
-  // Define settlement query input
+  // Define settlement query input for invalidation
   const settlementQueryInput = { groupId: group.id };
 
   const deleteExpense = api.expense.delete.useMutation({
@@ -138,62 +138,83 @@ export function ExpensesList({
                 <p className="text-lg">No expenses yet</p>
               </div>
             ) : (
-              group.expenses.map((expense: any, index: number) => (
-                <motion.div
-                  key={expense.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.1 }}
-                  className="group relative overflow-hidden rounded-xl border border-gray-200/60 bg-gradient-to-r from-white to-gray-50/50 p-5 transition-all duration-300 hover:shadow-lg hover:shadow-blue-100/50 dark:border-gray-700/60 dark:from-gray-800 dark:to-gray-900/50 dark:hover:shadow-blue-900/20"
-                >
-                  <div className="absolute inset-0 bg-gradient-to-r from-blue-500/5 to-indigo-500/5 opacity-0 transition-opacity duration-300 group-hover:opacity-100 dark:from-blue-500/10 dark:to-indigo-500/10" />
-                  <div className="relative flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                    <div className="space-y-2">
-                      <div className="flex flex-wrap items-center gap-2">
-                        <h3 className="text-lg font-semibold text-gray-900 transition-colors group-hover:text-blue-700 dark:text-gray-100 dark:group-hover:text-blue-400">
-                          {expense.description}
-                        </h3>
+              group.expenses.map((expense: any, index: number) => {
+                // Calculate the settled percentage
+                const amount = typeof expense.amount === "number" ? expense.amount : 0;
+                const settledAmount = typeof expense.settledAmount === "number" ? expense.settledAmount : 0;
+                const settledPercent = amount > 0
+                  ? Math.round((settledAmount / amount) * 100)
+                  : 0;
+                
+                return (
+                  <motion.div
+                    key={expense.id}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: index * 0.1 }}
+                    className="group relative overflow-hidden rounded-xl border border-gray-200/60 bg-gradient-to-r from-white to-gray-50/50 p-5 transition-all duration-300 hover:shadow-lg hover:shadow-blue-100/50 dark:border-gray-700/60 dark:from-gray-800 dark:to-gray-900/50 dark:hover:shadow-blue-900/20"
+                  >
+                    <div className="absolute inset-0 bg-gradient-to-r from-blue-500/5 to-indigo-500/5 opacity-0 transition-opacity duration-300 group-hover:opacity-100 dark:from-blue-500/10 dark:to-indigo-500/10" />
+                    <div className="relative flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                      <div className="space-y-2">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <h3 className="text-lg font-semibold text-gray-900 transition-colors group-hover:text-blue-700 dark:text-gray-100 dark:group-hover:text-blue-400">
+                            {expense.description}
+                          </h3>
+                          <Badge
+                            variant={settledPercent > 0 ? "default" : "outline"}
+                            className={
+                              settledPercent === 100
+                                ? "bg-green-100 text-green-800 border-green-200 dark:bg-green-900/50 dark:text-green-400 dark:border-green-700"
+                                : settledPercent > 0
+                                ? "bg-orange-100 text-orange-800 border-orange-200 dark:bg-orange-900/50 dark:text-orange-400 dark:border-orange-700"
+                                : "bg-gray-100 text-gray-800 border-gray-200 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-700"
+                            }
+                          >
+                            {settledPercent}% settled
+                          </Badge>
+                        </div>
+                        <div className="flex flex-wrap items-center gap-2">
+                          <Badge
+                            variant="outline"
+                            className="border-blue-200 bg-blue-50 text-blue-700 dark:border-blue-800 dark:bg-blue-900/50 dark:text-blue-400"
+                          >
+                            Paid by {expense.paidBy.name}
+                          </Badge>
+                        </div>
                       </div>
-                      <div className="flex flex-wrap items-center gap-2">
-                        <Badge
-                          variant="outline"
-                          className="border-blue-200 bg-blue-50 text-blue-700 dark:border-blue-800 dark:bg-blue-900/50 dark:text-blue-400"
+                      <div className="space-y-1 text-right">
+                        <p className="text-2xl font-bold text-gray-900 transition-colors group-hover:text-green-600 dark:text-gray-100 dark:group-hover:text-green-400">
+                          ₹{expense.amount.toFixed(2)}
+                        </p>
+                        <div className="flex items-center gap-1 text-sm text-gray-600 dark:text-gray-400">
+                          <span>Split {expense.shares.length} ways</span>
+                        </div>
+                      </div>
+                    </div>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="absolute top-2 right-2 opacity-0 group-focus-within:opacity-100 group-hover:opacity-100 hover:bg-gray-100 dark:hover:bg-gray-700"
                         >
-                          Paid by {expense.paidBy.name}
-                        </Badge>
-                      </div>
-                    </div>
-                    <div className="space-y-1 text-right">
-                      <p className="text-2xl font-bold text-gray-900 transition-colors group-hover:text-green-600 dark:text-gray-100 dark:group-hover:text-green-400">
-                        ₹{expense.amount.toFixed(2)}
-                      </p>
-                      <div className="flex items-center gap-1 text-sm text-gray-600 dark:text-gray-400">
-                        <span>Split {expense.shares.length} ways</span>
-                      </div>
-                    </div>
-                  </div>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="absolute top-2 right-2 opacity-0 group-focus-within:opacity-100 group-hover:opacity-100 hover:bg-gray-100 dark:hover:bg-gray-700"
-                      >
-                        <MoreVertical className="h-4 w-4" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuItem
-                        className="text-red-600 focus:text-red-600 dark:text-red-500 dark:focus:text-red-500"
-                        onClick={() => setExpenseToDelete(expense.id)}
-                      >
-                        <Trash2 className="mr-2 h-4 w-4" />
-                        Delete
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </motion.div>
-              ))
+                          <MoreVertical className="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuItem
+                          className="text-red-600 focus:text-red-600 dark:text-red-500 dark:focus:text-red-500"
+                          onClick={() => setExpenseToDelete(expense.id)}
+                        >
+                          <Trash2 className="mr-2 h-4 w-4" />
+                          Delete
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </motion.div>
+                );
+              })
             )}
           </div>
         </CardContent>

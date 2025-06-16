@@ -21,11 +21,11 @@ export function SettlementsList({ groupId }: SettlementsListProps) {
   const [showSettled, setShowSettled] = useState(false);
   const utils = api.useUtils();
   
-  // Store the query input to reuse it for both useQuery and invalidate
-  const queryInput = { groupId, showSettled };
+  // Query all settlements (the API doesn't filter by settled status anymore)
+  const { data: allSettlements, isLoading } = api.settlement.list.useQuery({ groupId });
   
-  // Query settlements using the stored query input
-  const { data: settlements, isLoading } = api.settlement.list.useQuery(queryInput);
+  // Filter the settlements client-side based on showSettled state
+  const settlements = showSettled ? allSettlements : allSettlements?.filter(s => !s.settled);
   
   const settleTransaction = api.settlement.settle.useMutation({
     onMutate: (id) => {
@@ -34,7 +34,7 @@ export function SettlementsList({ groupId }: SettlementsListProps) {
     },
     onSuccess: async () => {
       toast.success("Transaction settled", { id: "settle-transaction" });
-      await utils.settlement.list.invalidate(queryInput);
+      await utils.settlement.list.invalidate({ groupId });
       await utils.group.getById.invalidate(groupId);
       await utils.expense.getBalances.invalidate(groupId);
       setSettlingId(null);
@@ -51,7 +51,7 @@ export function SettlementsList({ groupId }: SettlementsListProps) {
     },
     onSuccess: async () => {
       toast.success("All transactions settled", { id: "settle-all" });
-      await utils.settlement.list.invalidate(queryInput);
+      await utils.settlement.list.invalidate({ groupId });
       await utils.group.getById.invalidate(groupId);
       await utils.expense.getBalances.invalidate(groupId);
     },
@@ -72,7 +72,7 @@ export function SettlementsList({ groupId }: SettlementsListProps) {
     setShowSettled(!showSettled);
   };
   
-  const activeSettlements = settlements?.filter(s => !s.settled) || [];
+  const activeSettlements = allSettlements?.filter(s => !s.settled) || [];
   const noRows = (settlements?.length ?? 0) === 0;
   
   return (

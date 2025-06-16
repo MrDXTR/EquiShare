@@ -7,10 +7,9 @@ export const settlementRouter = createTRPCRouter({
   list: protectedProcedure
     .input(z.object({
       groupId: z.string(),
-      showSettled: z.boolean().optional().default(false),
     }))
     .query(async ({ ctx, input }) => {
-      const { groupId, showSettled } = input;
+      const { groupId } = input;
       
       // Check if user has access to this group
       const group = await ctx.db.group.findFirst({
@@ -30,15 +29,19 @@ export const settlementRouter = createTRPCRouter({
         });
       }
 
-      // Get all settlements for the group, filtering by settled status if needed
+      // Get all settlements for the group (both settled and unsettled)
       const settlements = await ctx.db.settlement.findMany({
         where: {
           groupId,
-          ...(showSettled ? {} : { settled: false }),
         },
         include: {
           from: true,
           to: true,
+          expense: {
+            select: {
+              description: true,
+            },
+          },
         },
         orderBy: [
           { settled: "asc" },           // unsettled (false) first
@@ -89,6 +92,16 @@ export const settlementRouter = createTRPCRouter({
         data: { settled: true },
       });
 
+      // Update the expense's settledAmount
+      await ctx.db.$executeRaw`
+        UPDATE "Expense" e
+        SET "settledAmount" = COALESCE(
+          (SELECT SUM(s."amount") 
+           FROM "Settlement" s 
+           WHERE s."expenseId" = e.id AND s.settled = true
+          ), 0)
+        WHERE e.id = ${updatedSettlement.expenseId}`;
+
       // Recompute settlements after settling one
       await computeAndUpsertSettlements(ctx, settlement.groupId);
 
@@ -124,6 +137,16 @@ export const settlementRouter = createTRPCRouter({
         },
         data: { settled: true },
       });
+      
+      // Update all expenses' settledAmount in this group
+      await ctx.db.$executeRaw`
+        UPDATE "Expense" e
+        SET "settledAmount" = COALESCE(
+          (SELECT SUM(s."amount") 
+           FROM "Settlement" s 
+           WHERE s."expenseId" = e.id AND s.settled = true
+          ), 0)
+        WHERE e."groupId" = ${groupId}`;
       
       // Recompute settlements after settling all
       await computeAndUpsertSettlements(ctx, groupId);

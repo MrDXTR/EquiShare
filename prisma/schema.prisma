@@ -140,6 +140,7 @@ model Expense {
     amount      Float
     createdAt   DateTime @default(now())
     updatedAt   DateTime @updatedAt
+    settledAmount Float   @default(0)   // derived but cached for easy UI
 
     group   Group  @relation(fields: [groupId], references: [id], onDelete: Cascade)
     groupId String
@@ -152,6 +153,7 @@ model Expense {
 
     @@index([groupId])
     @@index([paidById])
+    @@index([groupId, settledAmount])
 }
 
 model Share {
@@ -186,8 +188,8 @@ model Settlement {
     to        Person   @relation("SettlementTo",   fields: [toId],   references: [id])
     toId      String
 
-    expense   Expense? @relation(fields: [expenseId], references: [id], onDelete: Cascade)
-    expenseId String?
+    expense   Expense @relation(fields: [expenseId], references: [id], onDelete: Cascade)
+    expenseId String
 
     @@index([groupId])
     @@index([fromId])
