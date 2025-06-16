@@ -113,6 +113,20 @@ export async function computeAndUpsertSettlements(ctx: Context, groupId: string)
     });
   });
 
+  // 1️⃣ subtract everything that is already settled
+  const settledRows = await ctx.db.settlement.findMany({
+    where: { groupId, settled: true },
+    select: { fromId: true, toId: true, amount: true },
+  });
+
+  // subtract settledRows from balances
+  for (const row of settledRows) {
+    // the debtor (row.fromId) already paid, so *increase* his balance
+    balances.set(row.fromId, (balances.get(row.fromId) ?? 0) + row.amount);
+    // the creditor (row.toId) already received money, so *decrease* his balance
+    balances.set(row.toId, (balances.get(row.toId) ?? 0) - row.amount);
+  }
+
   // Create balance objects for getWhoOwesWhom
   const balanceObjects = Array.from(balances.entries())
     .filter(([_, balance]) => Math.abs(balance) > 0.01) // Filter out zero or very small balances

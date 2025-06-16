@@ -47,6 +47,9 @@ export function ExpensesList({
   const [expenseToDelete, setExpenseToDelete] = useState<string | null>(null);
   const [isAddingExpense, setIsAddingExpense] = useState(false);
   const utils = api.useUtils();
+  
+  // Define settlement query input
+  const settlementQueryInput = { groupId: group.id };
 
   const deleteExpense = api.expense.delete.useMutation({
     onMutate: () => {
@@ -58,7 +61,7 @@ export function ExpensesList({
       if (!group) return;
       await utils.group.getById.invalidate();
       await utils.expense.getBalances.invalidate(group.id);
-      await utils.settlement.list.invalidate({ groupId: group.id });
+      await utils.settlement.list.invalidate(settlementQueryInput);
       toast.success("Expense deleted successfully", {
         id: "delete-expense",
         style: {
@@ -86,7 +89,7 @@ export function ExpensesList({
   const handleExpenseCreated = async () => {
     await utils.group.getById.invalidate();
     await utils.expense.getBalances.invalidate(group.id);
-    await utils.settlement.list.invalidate({ groupId: group.id });
+    await utils.settlement.list.invalidate(settlementQueryInput);
     setIsAddingExpense(false);
   };
 

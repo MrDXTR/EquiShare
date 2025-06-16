@@ -21,11 +21,11 @@ export function SettlementsList({ groupId }: SettlementsListProps) {
   const [showSettled, setShowSettled] = useState(false);
   const utils = api.useUtils();
   
-  // Query settlements using the new settlement API with showSettled filter
-  const { data: settlements, isLoading } = api.settlement.list.useQuery({
-    groupId,
-    showSettled
-  });
+  // Store the query input to reuse it for both useQuery and invalidate
+  const queryInput = { groupId, showSettled };
+  
+  // Query settlements using the stored query input
+  const { data: settlements, isLoading } = api.settlement.list.useQuery(queryInput);
   
   const settleTransaction = api.settlement.settle.useMutation({
     onMutate: (id) => {
@@ -34,7 +34,7 @@ export function SettlementsList({ groupId }: SettlementsListProps) {
     },
     onSuccess: async () => {
       toast.success("Transaction settled", { id: "settle-transaction" });
-      await utils.settlement.list.invalidate();
+      await utils.settlement.list.invalidate(queryInput);
       await utils.group.getById.invalidate(groupId);
       await utils.expense.getBalances.invalidate(groupId);
       setSettlingId(null);
@@ -51,7 +51,7 @@ export function SettlementsList({ groupId }: SettlementsListProps) {
     },
     onSuccess: async () => {
       toast.success("All transactions settled", { id: "settle-all" });
-      await utils.settlement.list.invalidate();
+      await utils.settlement.list.invalidate(queryInput);
       await utils.group.getById.invalidate(groupId);
       await utils.expense.getBalances.invalidate(groupId);
     },
@@ -73,7 +73,7 @@ export function SettlementsList({ groupId }: SettlementsListProps) {
   };
   
   const activeSettlements = settlements?.filter(s => !s.settled) || [];
-  const isAllSettled = activeSettlements.length === 0;
+  const noRows = (settlements?.length ?? 0) === 0;
   
   return (
     <motion.div
@@ -114,7 +114,7 @@ export function SettlementsList({ groupId }: SettlementsListProps) {
                 </Label>
               </div>
               
-              {!isAllSettled && activeSettlements.length > 0 && (
+              {activeSettlements.length > 0 && (
                 <Button
                   size="sm"
                   variant="outline"
@@ -143,7 +143,7 @@ export function SettlementsList({ groupId }: SettlementsListProps) {
                   </div>
                 ))}
               </div>
-            ) : isAllSettled && !showSettled ? (
+            ) : noRows ? (
               <motion.div
                 initial={{ opacity: 0, scale: 0.8 }}
                 animate={{ opacity: 1, scale: 1 }}
@@ -178,7 +178,7 @@ export function SettlementsList({ groupId }: SettlementsListProps) {
                           : "border-orange-200/60 bg-gradient-to-r from-orange-50 to-red-50 hover:shadow-orange-100/50 dark:border-orange-900/30 dark:from-orange-900/20 dark:to-red-900/20 dark:hover:shadow-orange-900/20"
                         }`}
                     >
-                      <div className={`absolute inset-0 bg-gradient-to-r opacity-0 transition-opacity duration-300 group-hover:opacity-100 
+                      <div className={`absolute inset-0 bg-gradient-to-r opacity-0 transition-opacity duration-300 group-hover:opacity-100 pointer-events-none
                         ${isSettled 
                           ? "from-green-500/5 to-emerald-500/5 dark:from-green-500/10 dark:to-emerald-500/10" 
                           : "from-orange-500/5 to-red-500/5 dark:from-orange-500/10 dark:to-red-500/10"

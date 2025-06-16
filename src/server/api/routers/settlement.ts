@@ -40,9 +40,10 @@ export const settlementRouter = createTRPCRouter({
           from: true,
           to: true,
         },
-        orderBy: {
-          createdAt: "desc",
-        },
+        orderBy: [
+          { settled: "asc" },           // unsettled (false) first
+          { createdAt: "desc" },
+        ],
       });
 
       return settlements;
@@ -88,6 +89,9 @@ export const settlementRouter = createTRPCRouter({
         data: { settled: true },
       });
 
+      // Recompute settlements after settling one
+      await computeAndUpsertSettlements(ctx, settlement.groupId);
+
       return { success: true, settlement: updatedSettlement };
     }),
 
@@ -120,6 +124,9 @@ export const settlementRouter = createTRPCRouter({
         },
         data: { settled: true },
       });
+      
+      // Recompute settlements after settling all
+      await computeAndUpsertSettlements(ctx, groupId);
 
       return { success: true, count: result.count };
     }),
