@@ -77,6 +77,7 @@ model Group {
     createdById String
     people      Person[]
     expenses    Expense[]
+    settlements Settlement[]
     
     // New relations for group invitation system
     members User[]       @relation("GroupMembers")
@@ -125,8 +126,10 @@ model Person {
     group   Group  @relation(fields: [groupId], references: [id], onDelete: Cascade)
     groupId String
 
-    paidExpenses Expense[] @relation("PaidBy")
-    shares       Share[]
+    paidExpenses    Expense[]    @relation("PaidBy")
+    shares          Share[]
+    fromSettlements Settlement[] @relation("SettlementFrom")
+    toSettlements   Settlement[] @relation("SettlementTo")
 
     @@index([groupId])
 }
@@ -135,7 +138,6 @@ model Expense {
     id          String   @id @default(cuid())
     description String
     amount      Float
-    settled     Boolean  @default(false)
     createdAt   DateTime @default(now())
     updatedAt   DateTime @updatedAt
 
@@ -145,7 +147,8 @@ model Expense {
     paidBy   Person @relation("PaidBy", fields: [paidById], references: [id])
     paidById String
 
-    shares Share[]
+    shares     Share[]
+    settlements Settlement[]
 
     @@index([groupId])
     @@index([paidById])
@@ -166,4 +169,26 @@ model Share {
     @@unique([expenseId, personId])
     @@index([expenseId])
     @@index([personId])
+}
+
+model Settlement {
+    id        String   @id @default(cuid())
+    amount    Float
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    group     Group    @relation(fields: [groupId], references: [id], onDelete: Cascade)
+    groupId   String
+
+    from      Person   @relation("SettlementFrom", fields: [fromId], references: [id])
+    fromId    String
+    to        Person   @relation("SettlementTo",   fields: [toId],   references: [id])
+    toId      String
+
+    expense   Expense? @relation(fields: [expenseId], references: [id], onDelete: Cascade)
+    expenseId String?
+
+    @@index([groupId])
+    @@index([fromId])
+    @@index([toId])
 }

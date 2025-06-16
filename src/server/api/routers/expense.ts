@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 import { TRPCError } from "@trpc/server";
+import { computeAndUpsertSettlements } from "../utils/computeSettlement";
 
 export const expenseRouter = createTRPCRouter({
   create: protectedProcedure
@@ -38,196 +39,39 @@ export const expenseRouter = createTRPCRouter({
           },
         },
       });
+
+      // Recompute settlements after creating an expense
+      await computeAndUpsertSettlements(ctx, input.groupId);
+
       return expense;
     }),
 
   delete: protectedProcedure
     .input(z.string())
     .mutation(async ({ ctx, input }) => {
+      // Get the groupId before deleting the expense
+      const expense = await ctx.db.expense.findUnique({
+        where: { id: input },
+        select: { groupId: true },
+      });
+
+      if (!expense) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Expense not found",
+        });
+      }
+
       await ctx.db.expense.delete({
         where: {
           id: input,
         },
       });
+
+      // Recompute settlements after deleting an expense
+      await computeAndUpsertSettlements(ctx, expense.groupId);
+
       return { success: true };
-    }),
-
-  settleUp: protectedProcedure
-    .input(z.string())
-    .mutation(async ({ ctx, input }) => {
-      const expense = await ctx.db.expense.update({
-        where: {
-          id: input,
-        },
-        data: {
-          settled: true,
-        },
-      });
-      return expense;
-    }),
-    
-  // New endpoint to settle a specific transaction
-  settleTransaction: protectedProcedure
-    .input(
-      z.object({
-        groupId: z.string(),
-        fromName: z.string(),
-        toName: z.string(),
-        amount: z.number().positive(),
-      }),
-    )
-    .mutation(async ({ ctx, input }) => {
-      // Check if user has access to this group
-      const group = await ctx.db.group.findFirst({
-        where: {
-          id: input.groupId,
-          OR: [
-            { createdById: ctx.session.user.id },
-            { members: { some: { id: ctx.session.user.id } } },
-          ],
-        },
-        include: {
-          people: true,
-        },
-      });
-
-      if (!group) {
-        throw new TRPCError({
-          code: "FORBIDDEN",
-          message: "You don't have access to this group",
-        });
-      }
-
-      // Find the people involved in the transaction
-      const fromPerson = group.people.find(p => p.name === input.fromName);
-      const toPerson = group.people.find(p => p.name === input.toName);
-
-      if (!fromPerson || !toPerson) {
-        throw new TRPCError({
-          code: "NOT_FOUND",
-          message: "One or both people involved in the transaction were not found",
-        });
-      }
-
-      // Create a settlement expense
-      const settlement = await ctx.db.expense.create({
-        data: {
-          description: `Settlement: ${input.fromName} paid ${input.toName}`,
-          amount: input.amount,
-          groupId: input.groupId,
-          paidById: fromPerson.id,
-          settled: true, // Mark as settled immediately
-          shares: {
-            create: [
-              {
-                amount: input.amount,
-                personId: toPerson.id,
-              },
-            ],
-          },
-        },
-      });
-
-      return settlement;
-    }),
-
-  // New endpoint to settle all transactions in a group
-  settleAllTransactions: protectedProcedure
-    .input(z.string()) // groupId
-    .mutation(async ({ ctx, input: groupId }) => {
-      // Check if user has access to this group
-      const group = await ctx.db.group.findFirst({
-        where: {
-          id: groupId,
-          OR: [
-            { createdById: ctx.session.user.id },
-            { members: { some: { id: ctx.session.user.id } } },
-          ],
-        },
-        include: {
-          people: true,
-          expenses: {
-            where: {
-              settled: false,
-            },
-            include: {
-              paidBy: true,
-              shares: {
-                include: {
-                  person: true,
-                },
-              },
-            },
-          },
-        },
-      });
-
-      if (!group) {
-        throw new TRPCError({
-          code: "FORBIDDEN",
-          message: "You don't have access to this group",
-        });
-      }
-
-      // Mark all unsettled expenses as settled
-      await ctx.db.expense.updateMany({
-        where: {
-          groupId,
-          settled: false,
-        },
-        data: {
-          settled: true,
-        },
-      });
-
-      return { success: true, settledCount: group.expenses.length };
-    }),
-
-  // New endpoint to get all settlement transactions
-  getSettlements: protectedProcedure
-    .input(z.string()) // groupId
-    .query(async ({ ctx, input: groupId }) => {
-      // Check if user has access to this group
-      const group = await ctx.db.group.findFirst({
-        where: {
-          id: groupId,
-          OR: [
-            { createdById: ctx.session.user.id },
-            { members: { some: { id: ctx.session.user.id } } },
-          ],
-        },
-      });
-
-      if (!group) {
-        throw new TRPCError({
-          code: "FORBIDDEN",
-          message: "You don't have access to this group",
-        });
-      }
-
-      // Get all settlement transactions (expenses with settled=true)
-      const settlements = await ctx.db.expense.findMany({
-        where: {
-          groupId,
-          settled: true,
-          description: {
-            startsWith: "Settlement:",
-          },
-        },
-        include: {
-          paidBy: true,
-          shares: {
-            include: {
-              person: true,
-            },
-          },
-        },
-        orderBy: {
-          createdAt: "desc",
-        },
-      });
-
-      return settlements;
     }),
 
   getBalances: protectedProcedure
@@ -245,9 +89,6 @@ export const expenseRouter = createTRPCRouter({
         include: {
           people: true,
           expenses: {
-            where: {
-              settled: false, // Only consider unsettled expenses for balances
-            },
             include: {
               paidBy: true,
               shares: {
@@ -267,7 +108,7 @@ export const expenseRouter = createTRPCRouter({
         });
       }
 
-      // If there are no unsettled expenses, return empty balances
+      // If there are no expenses, return empty balances
       if (group.expenses.length === 0) {
         return [];
       }

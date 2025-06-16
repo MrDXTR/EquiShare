@@ -1,27 +1,8 @@
 "use client";
 
-import { motion, AnimatePresence } from "framer-motion";
 import { api } from "~/trpc/react";
-import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
-import { Badge } from "~/components/ui/badge";
 import { toast } from "sonner";
-import {
-  Receipt,
-  Users,
-  TrendingUp,
-  ArrowRight,
-  CheckCircle2,
-  AlertCircle,
-  Trash2,
-  MoreVertical,
-  CheckCircle,
-  Loader2,
-  Plus,
-  UserPlus,
-  UserMinus,
-} from "lucide-react";
-import type { RouterOutputs } from "~/trpc/shared";
-import { Button } from "~/components/ui/button";
+
 import {
   AlertDialog,
   AlertDialogAction,
@@ -32,23 +13,12 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "~/components/ui/alert-dialog";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "~/components/ui/dropdown-menu";
 import { useState } from "react";
-import { Skeleton } from "~/components/ui/skeleton";
-import { Input } from "~/components/ui/input";
-import { Label } from "~/components/ui/label";
 import type { Group } from "./group/utils";
 import { GroupHeader } from "./group/GroupHeader";
 import { PeopleManagement } from "./group/PeopleManagement";
 import { ExpensesList } from "./group/ExpensesList";
 import { SettlementsList } from "./group/SettlementsList";
-import { getWhoOwesWhom, getPendingSettlementsCount } from "./group/utils";
-
 interface GroupSummaryProps {
   group: Group;
   onExpenseCreated?: () => Promise<void>;
@@ -62,15 +32,18 @@ export function GroupSummary({
 }: GroupSummaryProps) {
   const [expenseToDelete, setExpenseToDelete] = useState<string | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
-  const [settlingUpExpense, setSettlingUpExpense] = useState<string | null>(
-    null,
-  );
   const [newPersonName, setNewPersonName] = useState("");
   const [personToDelete, setPersonToDelete] = useState<string | null>(null);
   const [isDeletingPerson, setIsDeletingPerson] = useState(false);
   const utils = api.useUtils();
+  
+  // Query balances for UI display
   const { data: balances, isLoading: isLoadingBalances } =
     api.expense.getBalances.useQuery(group.id);
+    
+  // Query settlements to know if we have any
+  const { data: settlements, isLoading: isLoadingSettlements } =
+    api.settlement.list.useQuery(group.id);
 
   const deleteExpense = api.expense.delete.useMutation({
     onMutate: () => {
@@ -81,6 +54,7 @@ export function GroupSummary({
     onSuccess: async () => {
       await utils.group.getById.invalidate();
       await utils.expense.getBalances.invalidate();
+      await utils.settlement.list.invalidate(group.id);
       toast.success("Expense deleted successfully", {
         id: "delete-expense",
         style: {
@@ -97,26 +71,6 @@ export function GroupSummary({
     },
   });
 
-  const settleUpExpense = api.expense.settleUp.useMutation({
-    onMutate: () => {
-      toast.loading("Settling expense...", {
-        id: "settle-expense",
-      });
-    },
-    onSuccess: async () => {
-      await utils.group.getById.invalidate();
-      await utils.expense.getBalances.invalidate();
-      toast.success("Expense settled successfully", {
-        id: "settle-expense",
-      });
-    },
-    onError: () => {
-      toast.error("Failed to settle expense", {
-        id: "settle-expense",
-      });
-    },
-  });
-
   const addPerson = api.group.addPerson.useMutation({
     onMutate: () => {
       toast.loading("Adding person...", {
@@ -127,6 +81,7 @@ export function GroupSummary({
       setNewPersonName("");
       await utils.group.getById.invalidate(group.id);
       await utils.expense.getBalances.invalidate(group.id);
+      await utils.settlement.list.invalidate(group.id);
       toast.success("Person added successfully", {
         id: "add-person",
       });
@@ -147,6 +102,7 @@ export function GroupSummary({
     onSuccess: async () => {
       await utils.group.getById.invalidate(group.id);
       await utils.expense.getBalances.invalidate(group.id);
+      await utils.settlement.list.invalidate(group.id);
       toast.success("Person deleted successfully", {
         id: "delete-person",
         style: {
@@ -175,17 +131,6 @@ export function GroupSummary({
         setIsDeleting(false);
         setExpenseToDelete(null);
       }
-    }
-  };
-
-  const handleSettleUp = async (expenseId: string) => {
-    setSettlingUpExpense(expenseId);
-    try {
-      await settleUpExpense.mutateAsync(expenseId);
-      // Wait for the data to be refetched
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-    } finally {
-      setSettlingUpExpense(null);
     }
   };
 
@@ -220,27 +165,9 @@ export function GroupSummary({
     0,
   );
 
-  const mappedBalances =
-    balances
-      ?.map((b) => ({
-        person: b.person ? { id: b.person.id, name: b.person.name } : null,
-        balance: b.balance,
-      }))
-      .filter(
-        (b): b is { person: { id: string; name: string }; balance: number } =>
-          b.person !== null,
-      ) ?? [];
-
-  const whoOwesWhom = getWhoOwesWhom(mappedBalances);
-
-  const hasUnsettledExpenses = group.expenses.some(
-    (expense) => !expense.settled,
-  );
-  const isAllSettled = !hasUnsettledExpenses || whoOwesWhom.length === 0;
-
-  const pendingSettlements = group.expenses.filter(
-    (expense) => !expense.settled,
-  ).length;
+  // Check if there are any settlements
+  const isAllSettled = !settlements || settlements.length === 0;
+  const pendingSettlements = settlements?.length ?? 0;
 
   return (
     <div className="min-h-screen p-4 md:p-8">
@@ -252,7 +179,7 @@ export function GroupSummary({
           isAllSettled={isAllSettled}
           pendingSettlements={pendingSettlements}
           isOwner={group.isOwner}
-          hasUnsettledExpenses={hasUnsettledExpenses}
+          hasUnsettledExpenses={!isAllSettled}
           onExpenseCreated={onExpenseCreated}
           setShowMembersDialog={setShowMembersDialog}
         />
@@ -264,22 +191,11 @@ export function GroupSummary({
             onExpenseDeleted={() => {
               void utils.group.getById.invalidate(group.id);
               void utils.expense.getBalances.invalidate(group.id);
-            }}
-            onExpenseSettled={() => {
-              void utils.group.getById.invalidate(group.id);
-              void utils.expense.getBalances.invalidate(group.id);
-            }}
-            onExpenseUnsettled={() => {
-              void utils.group.getById.invalidate(group.id);
-              void utils.expense.getBalances.invalidate(group.id);
+              void utils.settlement.list.invalidate(group.id);
             }}
           />
           <div className="lg:col-span-2">
-            <SettlementsList
-              balances={mappedBalances}
-              isLoading={isLoadingBalances}
-              hasUnsettledExpenses={hasUnsettledExpenses}
-            />
+            <SettlementsList groupId={group.id} />
           </div>
         </div>
 
