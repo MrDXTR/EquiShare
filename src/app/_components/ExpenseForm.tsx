@@ -495,7 +495,7 @@ export function ExpenseForm({
                           Paid By
                         </Label>
                         <Select value={formState.paidById} onValueChange={(value) => updateFormState({ paidById: value })}>
-                          <SelectTrigger className="h-14 w-full bg-white/80 dark:bg-gray-800/80 border-2 border-gray-200 dark:border-gray-700 focus:border-violet-400 dark:focus:border-violet-500 rounded-xl text-base">
+                          <SelectTrigger className="min-h-14 w-full bg-white/80 dark:bg-gray-800/80 border-2 border-gray-200 dark:border-gray-700 focus:border-violet-400 dark:focus:border-violet-500 rounded-xl text-base">
                             <SelectValue placeholder="Who paid for this expense?" />
                           </SelectTrigger>
                           <SelectContent className="max-h-60">
