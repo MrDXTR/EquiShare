@@ -58,7 +58,7 @@ export function ExpensesList({
       if (!group) return;
       await utils.group.getById.invalidate();
       await utils.expense.getBalances.invalidate(group.id);
-      await utils.settlement.list.invalidate(group.id);
+      await utils.settlement.list.invalidate({ groupId: group.id });
       toast.success("Expense deleted successfully", {
         id: "delete-expense",
         style: {
@@ -86,7 +86,7 @@ export function ExpensesList({
   const handleExpenseCreated = async () => {
     await utils.group.getById.invalidate();
     await utils.expense.getBalances.invalidate(group.id);
-    await utils.settlement.list.invalidate(group.id);
+    await utils.settlement.list.invalidate({ groupId: group.id });
     setIsAddingExpense(false);
   };
 

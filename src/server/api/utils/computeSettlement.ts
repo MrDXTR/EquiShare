@@ -124,11 +124,23 @@ export async function computeAndUpsertSettlements(ctx: Context, groupId: string)
 
   // Get minimal set of transactions
   const transactions = getWhoOwesWhom(balanceObjects);
-
-  // Delete all existing settlements for this group
+  
+  // Get existing settled settlements to preserve them
+  const existingSettledSettlements = await ctx.db.settlement.findMany({
+    where: {
+      groupId,
+      settled: true,
+    },
+    select: {
+      id: true
+    }
+  });
+  
+  // Delete only unsettled settlements for this group
   await ctx.db.settlement.deleteMany({
     where: {
       groupId,
+      settled: false,
     },
   });
 
@@ -140,9 +152,14 @@ export async function computeAndUpsertSettlements(ctx: Context, groupId: string)
         fromId: tx.fromId,
         toId: tx.toId,
         amount: tx.amount,
+        settled: false,
       })),
     });
   }
 
-  return { success: true, settlementsCount: transactions.length };
+  return { 
+    success: true, 
+    settlementsCount: transactions.length,
+    settledSettlementsCount: existingSettledSettlements.length
+  };
 } 

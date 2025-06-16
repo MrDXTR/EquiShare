@@ -5,8 +5,13 @@ import { computeAndUpsertSettlements } from "../utils/computeSettlement";
 
 export const settlementRouter = createTRPCRouter({
   list: protectedProcedure
-    .input(z.string())
-    .query(async ({ ctx, input: groupId }) => {
+    .input(z.object({
+      groupId: z.string(),
+      showSettled: z.boolean().optional().default(false),
+    }))
+    .query(async ({ ctx, input }) => {
+      const { groupId, showSettled } = input;
+      
       // Check if user has access to this group
       const group = await ctx.db.group.findFirst({
         where: {
@@ -25,10 +30,11 @@ export const settlementRouter = createTRPCRouter({
         });
       }
 
-      // Get all settlements for the group
+      // Get all settlements for the group, filtering by settled status if needed
       const settlements = await ctx.db.settlement.findMany({
         where: {
           groupId,
+          ...(showSettled ? {} : { settled: false }),
         },
         include: {
           from: true,
@@ -76,12 +82,13 @@ export const settlementRouter = createTRPCRouter({
         });
       }
 
-      // Delete the settlement
-      await ctx.db.settlement.delete({
+      // Mark the settlement as settled instead of deleting it
+      const updatedSettlement = await ctx.db.settlement.update({
         where: { id: settlementId },
+        data: { settled: true },
       });
 
-      return { success: true };
+      return { success: true, settlement: updatedSettlement };
     }),
 
   settleAll: protectedProcedure
@@ -105,9 +112,13 @@ export const settlementRouter = createTRPCRouter({
         });
       }
 
-      // Delete all settlements for this group
-      const result = await ctx.db.settlement.deleteMany({
-        where: { groupId },
+      // Mark all settlements as settled instead of deleting them
+      const result = await ctx.db.settlement.updateMany({
+        where: { 
+          groupId,
+          settled: false 
+        },
+        data: { settled: true },
       });
 
       return { success: true, count: result.count };

@@ -43,7 +43,7 @@ export function GroupSummary({
     
   // Query settlements to know if we have any
   const { data: settlements, isLoading: isLoadingSettlements } =
-    api.settlement.list.useQuery(group.id);
+    api.settlement.list.useQuery({ groupId: group.id });
 
   const deleteExpense = api.expense.delete.useMutation({
     onMutate: () => {
@@ -54,7 +54,7 @@ export function GroupSummary({
     onSuccess: async () => {
       await utils.group.getById.invalidate();
       await utils.expense.getBalances.invalidate();
-      await utils.settlement.list.invalidate(group.id);
+      await utils.settlement.list.invalidate({ groupId: group.id });
       toast.success("Expense deleted successfully", {
         id: "delete-expense",
         style: {
@@ -81,7 +81,7 @@ export function GroupSummary({
       setNewPersonName("");
       await utils.group.getById.invalidate(group.id);
       await utils.expense.getBalances.invalidate(group.id);
-      await utils.settlement.list.invalidate(group.id);
+      await utils.settlement.list.invalidate({ groupId: group.id });
       toast.success("Person added successfully", {
         id: "add-person",
       });
@@ -102,7 +102,7 @@ export function GroupSummary({
     onSuccess: async () => {
       await utils.group.getById.invalidate(group.id);
       await utils.expense.getBalances.invalidate(group.id);
-      await utils.settlement.list.invalidate(group.id);
+      await utils.settlement.list.invalidate({ groupId: group.id });
       toast.success("Person deleted successfully", {
         id: "delete-person",
         style: {
@@ -191,7 +191,7 @@ export function GroupSummary({
             onExpenseDeleted={() => {
               void utils.group.getById.invalidate(group.id);
               void utils.expense.getBalances.invalidate(group.id);
-              void utils.settlement.list.invalidate(group.id);
+              void utils.settlement.list.invalidate({ groupId: group.id });
             }}
           />
           <div className="lg:col-span-2">
