@@ -161,7 +161,7 @@ export function ExpensesList({
                           <h3 className="text-lg font-semibold text-gray-900 transition-colors group-hover:text-blue-700 dark:text-gray-100 dark:group-hover:text-blue-400">
                             {expense.description}
                           </h3>
-                          <Badge
+                          {/* <Badge
                             variant={settledPercent > 0 ? "default" : "outline"}
                             className={
                               settledPercent === 100
@@ -172,7 +172,7 @@ export function ExpensesList({
                             }
                           >
                             {settledPercent}% settled
-                          </Badge>
+                          </Badge> */}
                         </div>
                         <div className="flex flex-wrap items-center gap-2">
                           <Badge
