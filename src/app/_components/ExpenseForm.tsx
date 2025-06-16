@@ -612,7 +612,7 @@ export function ExpenseForm({
                       {filteredPeople.length === 0 && (
                         <div className="text-center py-8 text-gray-500">
                           <Users className="h-12 w-12 mx-auto mb-3 opacity-50" />
-                          <p>No people found matching "{searchQuery}"</p>
+                          <p>No people found matching &quot;{searchQuery}&quot;</p>
                         </div>
                       )}
                     </motion.div>
