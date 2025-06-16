@@ -86,7 +86,11 @@ export const inviteRouter = createTRPCRouter({
       });
 
       // Format the inviteLink based on the deployment URL
-      const baseUrl = process.env.NEXTAUTH_URL || "http://localhost:3000";
+      const headers = ctx.headers;
+      const protocol =
+        headers.get("x-forwarded-proto")?.split(",")[0] || "http";
+      const host = headers.get("host");
+      const baseUrl = `${protocol}://${host}`;
       const inviteLink = `${baseUrl}/invite/${inviteToken}`;
 
       return {
