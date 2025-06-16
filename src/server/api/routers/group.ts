@@ -82,10 +82,17 @@ export const groupRouter = createTRPCRouter({
         where: {
           id: input,
         },
-        include: {
+        select: {
+          id: true,
+          name: true,
+          createdById: true,
           people: true,
           expenses: {
-            include: {
+            select: {
+              id: true,
+              description: true,
+              amount: true,
+              settledAmount: true,
               paidBy: true,
               shares: {
                 include: {

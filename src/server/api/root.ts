@@ -1,6 +1,7 @@
 import { groupRouter } from "~/server/api/routers/group";
 import { expenseRouter } from "~/server/api/routers/expense";
 import { inviteRouter } from "~/server/api/routers/invite";
+import { settlementRouter } from "~/server/api/routers/settlement";
 import { createCallerFactory, createTRPCRouter } from "~/server/api/trpc";
 
 /**
@@ -12,6 +13,7 @@ export const appRouter = createTRPCRouter({
   group: groupRouter,
   expense: expenseRouter,
   invite: inviteRouter,
+  settlement: settlementRouter,
 });
 
 // export type definition of API

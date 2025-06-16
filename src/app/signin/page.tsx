@@ -26,10 +26,10 @@ export default function SignInPage() {
         {/* Logo/Brand */}
         <div className="mb-12 text-center">
           <div className="mb-4 flex items-center justify-center">
-            <Image src="/file.svg" alt="DxtrSplit" width={100} height={100} />
+            <Image src="/file.svg" alt="EquiShare" width={100} height={100} />
           </div>
           <h1 className="text-2xl font-light text-gray-900 dark:text-gray-100">
-            Welcome to DxtrSplit
+            Welcome to EquiShare
           </h1>
           <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
             Sign in to continue
