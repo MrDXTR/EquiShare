@@ -101,11 +101,13 @@ export function InviteDialog({ children, groupId }: InviteDialogProps) {
                 Generate an invite link to share with others. The link will be
                 valid for 7 days.
               </p>
-              
+
               <div className="w-full space-y-2">
-                <Label htmlFor="max-uses">Number of people who can use this link</Label>
-                <Select 
-                  value={String(maxUses)} 
+                <Label htmlFor="max-uses">
+                  Number of people who can use this link
+                </Label>
+                <Select
+                  value={String(maxUses)}
                   onValueChange={(value) => setMaxUses(parseInt(value))}
                 >
                   <SelectTrigger className="w-full">
@@ -120,7 +122,7 @@ export function InviteDialog({ children, groupId }: InviteDialogProps) {
                   </SelectContent>
                 </Select>
               </div>
-              
+
               <Button
                 onClick={handleGenerateInvite}
                 className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 dark:text-white"

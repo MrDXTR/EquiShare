@@ -1,11 +1,10 @@
-import { InvitePageClient } from "../../_components/invite/InvitePageClient";
+import { InvitePageClient } from "~/app/_components/invite/InvitePageClient";
 
-export const dynamic = 'force-dynamic';
-
-export default function InvitePage({
+export default async function InvitePage({
   params,
 }: {
-  params: { token: string };
+  params: Promise<{ token: string }>;
 }) {
-  return <InvitePageClient token={params.token} />;
+  const { token } = await params;
+  return <InvitePageClient token={token} />;
 }

@@ -9,19 +9,20 @@ import crypto from "crypto";
 
 // Helper function to generate a short token and its hash
 function generateInviteToken() {
-  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-  let token = '';
+  const characters =
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+  let token = "";
   for (let i = 0; i < 10; i++) {
     token += characters.charAt(Math.floor(Math.random() * characters.length));
   }
-  
-  const hash = crypto.createHash('sha256').update(token).digest('hex');
-  
+
+  const hash = crypto.createHash("sha256").update(token).digest("hex");
+
   return { token, hash };
 }
 
 function hashToken(token: string) {
-  return crypto.createHash('sha256').update(token).digest('hex');
+  return crypto.createHash("sha256").update(token).digest("hex");
 }
 
 export const inviteRouter = createTRPCRouter({
@@ -71,8 +72,9 @@ export const inviteRouter = createTRPCRouter({
       }
 
       // Generate token and hash
-      const { token: inviteToken, hash: inviteTokenHash } = generateInviteToken();
-      
+      const { token: inviteToken, hash: inviteTokenHash } =
+        generateInviteToken();
+
       // Set expiration to 7 days from now
       const expiresAt = new Date();
       expiresAt.setDate(expiresAt.getDate() + 7);
@@ -128,7 +130,7 @@ export const inviteRouter = createTRPCRouter({
     .query(async ({ ctx, input }) => {
       // Hash the input token to find it in the database
       const tokenHash = hashToken(input);
-      
+
       const invite = await ctx.db.groupInvite.findUnique({
         where: {
           inviteToken: tokenHash,
@@ -203,7 +205,7 @@ export const inviteRouter = createTRPCRouter({
     .mutation(async ({ ctx, input }) => {
       // Hash the input token to find it in the database
       const tokenHash = hashToken(input);
-      
+
       const invite = await ctx.db.groupInvite.findUnique({
         where: {
           inviteToken: tokenHash,
@@ -280,7 +282,7 @@ export const inviteRouter = createTRPCRouter({
 
       // Decrement remaining uses
       const remainingUses = invite.remainingUses - 1;
-      
+
       // Update the invite status if no uses left
       const status = remainingUses <= 0 ? "USED" : "PENDING";
 
@@ -318,7 +320,7 @@ export const inviteRouter = createTRPCRouter({
     .mutation(async ({ ctx, input }) => {
       // Hash the input token to find it in the database
       const tokenHash = hashToken(input);
-      
+
       const invite = await ctx.db.groupInvite.findUnique({
         where: {
           inviteToken: tokenHash,

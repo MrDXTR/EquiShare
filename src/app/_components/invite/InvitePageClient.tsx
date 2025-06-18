@@ -76,22 +76,32 @@ export function InvitePageClient({ token }: InvitePageClientProps) {
     }
   };
 
- useEffect(() => {
-    if (sessionStatus === "authenticated" && !acceptingInvite && !acceptInvite.isSuccess) {
+  useEffect(() => {
+    if (
+      sessionStatus === "authenticated" &&
+      !acceptingInvite &&
+      !acceptInvite.isSuccess
+    ) {
       const currentPathname = window.location.pathname;
-      const isInvitePage = currentPathname.startsWith('/invite/');
-      
-     if (isInvitePage) {
+      const isInvitePage = currentPathname.startsWith("/invite/");
+
+      if (isInvitePage) {
         const pendingInvite = sessionStorage.getItem("pendingInvite");
         if (pendingInvite) {
           acceptInvite.mutate(pendingInvite);
           sessionStorage.removeItem("pendingInvite");
         } else {
-                   acceptInvite.mutate(token);
+          acceptInvite.mutate(token);
         }
       }
     }
-  }, [sessionStatus, acceptingInvite, acceptInvite.isSuccess, acceptInvite, token]);
+  }, [
+    sessionStatus,
+    acceptingInvite,
+    acceptInvite.isSuccess,
+    acceptInvite,
+    token,
+  ]);
 
   if (isLoading) {
     return (
@@ -216,11 +226,9 @@ export function InvitePageClient({ token }: InvitePageClientProps) {
 
                 {invite.remainingUses > 0 && (
                   <div className="mt-2 text-sm text-gray-500 dark:text-gray-400">
-                    {invite.remainingUses === 1 ? (
-                      "Last spot remaining!"
-                    ) : (
-                      `${invite.remainingUses} spots remaining`
-                    )}
+                    {invite.remainingUses === 1
+                      ? "Last spot remaining!"
+                      : `${invite.remainingUses} spots remaining`}
                   </div>
                 )}
 
