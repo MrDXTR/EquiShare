@@ -654,7 +654,7 @@ export function ExpenseForm({
         </div>
 
         {/* Footer */}
-        <div className="border-t bg-gray-50/80 p-6 dark:bg-gray-800/80">
+        <div className="border-t bg-gray-50/80 p-6 dark:bg-gray-950/80">
           <div className="flex justify-between gap-3">
             <Button
               type="button"
