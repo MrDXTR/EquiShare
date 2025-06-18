@@ -63,9 +63,8 @@ export function InvitePageClient({ token }: InvitePageClientProps) {
     if (sessionStatus === "authenticated") {
       acceptInvite.mutate(token);
     } else {
-      // Store the token in session storage and redirect to login
       sessionStorage.setItem("pendingInvite", token);
-      router.push(`/api/auth/signin?callbackUrl=/invite/${token}`);
+      router.push(`/api/auth/signin`);
     }
   };
 
@@ -77,24 +76,31 @@ export function InvitePageClient({ token }: InvitePageClientProps) {
     }
   };
 
-  // Check for pending invite after login
   useEffect(() => {
-    const pendingInvite = sessionStorage.getItem("pendingInvite");
     if (
-      pendingInvite === token &&
       sessionStatus === "authenticated" &&
       !acceptingInvite &&
       !acceptInvite.isSuccess
     ) {
-      acceptInvite.mutate(token);
-      sessionStorage.removeItem("pendingInvite");
+      const currentPathname = window.location.pathname;
+      const isInvitePage = currentPathname.startsWith("/invite/");
+
+      if (isInvitePage) {
+        const pendingInvite = sessionStorage.getItem("pendingInvite");
+        if (pendingInvite) {
+          acceptInvite.mutate(pendingInvite);
+          sessionStorage.removeItem("pendingInvite");
+        } else {
+          acceptInvite.mutate(token);
+        }
+      }
     }
   }, [
     sessionStatus,
-    token,
     acceptingInvite,
     acceptInvite.isSuccess,
     acceptInvite,
+    token,
   ]);
 
   if (isLoading) {
@@ -217,6 +223,14 @@ export function InvitePageClient({ token }: InvitePageClientProps) {
                     Invited by {invite.invitedBy.name}
                   </span>
                 </div>
+
+                {invite.remainingUses > 0 && (
+                  <div className="mt-2 text-sm text-gray-500 dark:text-gray-400">
+                    {invite.remainingUses === 1
+                      ? "Last spot remaining!"
+                      : `${invite.remainingUses} spots remaining`}
+                  </div>
+                )}
 
                 <div className="mt-6 flex w-full flex-col space-y-3">
                   <Button

@@ -91,17 +91,21 @@ model GroupInvite {
     id              String   @id @default(cuid())
     groupId         String
     invitedByUserId String
-    invitedUserId   String?
     inviteToken     String   @unique
     status          InviteStatus @default(PENDING)
     expiresAt       DateTime
     createdAt       DateTime @default(now())
     updatedAt       DateTime @updatedAt
+    maxUses         Int      @default(10)  // Maximum number of times this invite can be used
+    remainingUses   Int      @default(10)  // Number of uses remaining
 
     // Relations
     group           Group    @relation(fields: [groupId], references: [id], onDelete: Cascade)
     invitedBy       User     @relation("SentInvites", fields: [invitedByUserId], references: [id], onDelete: Cascade)
-    invitedUser     User?    @relation("ReceivedInvites", fields: [invitedUserId], references: [id], onDelete: SetNull)
+    
+    // Track users who used this invite in a many-to-many relationship
+    usedBy          User?    @relation("ReceivedInvites", fields: [invitedUserId], references: [id], onDelete: SetNull)
+    invitedUserId   String?
 
     @@index([groupId])
     @@index([inviteToken])
@@ -115,6 +119,7 @@ enum InviteStatus {
     ACCEPTED
     REJECTED
     EXPIRED
+    USED
 }
 
 model Person {

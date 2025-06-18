@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { api } from "~/trpc/react";
 import { Button } from "~/components/ui/button";
@@ -22,13 +22,32 @@ import { CreateGroupDialog } from "~/app/_components/groups/CreateGroupDialog";
 
 export default function GroupsPage() {
   const router = useRouter();
-  const { data: session } = useSession();
+  const { data: session, status: sessionStatus } = useSession();
   const [groupToDelete, setGroupToDelete] = useState<string | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
   const utils = api.useUtils();
   const { data: groups, isLoading } = api.group.getAll.useQuery(undefined, {
     refetchOnWindowFocus: false,
   });
+
+  const acceptInvite = api.invite.acceptInvite.useMutation({
+    onSuccess: (data) => {
+      toast.success("You've successfully joined the group!");
+
+      router.push(`/groups/${data.groupId}`);
+    },
+    onError: (error) => {
+      toast.error(`Failed to join group: ${error.message}`);
+    },
+  });
+
+  useEffect(() => {
+    const pendingInvite = sessionStorage.getItem("pendingInvite");
+    if (pendingInvite && sessionStatus === "authenticated") {
+      acceptInvite.mutate(pendingInvite);
+      sessionStorage.removeItem("pendingInvite");
+    }
+  }, [sessionStatus, acceptInvite]);
 
   const deleteGroup = api.group.delete.useMutation({
     onMutate: () => {

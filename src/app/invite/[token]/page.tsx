@@ -1,4 +1,4 @@
-import { InvitePageClient } from "../../_components/invite/InvitePageClient";
+import { InvitePageClient } from "~/app/_components/invite/InvitePageClient";
 
 export default async function InvitePage({
   params,
