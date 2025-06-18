@@ -5,12 +5,14 @@ import { computeAndUpsertSettlements } from "../utils/computeSettlement";
 
 export const settlementRouter = createTRPCRouter({
   list: protectedProcedure
-    .input(z.object({
-      groupId: z.string(),
-    }))
+    .input(
+      z.object({
+        groupId: z.string(),
+      }),
+    )
     .query(async ({ ctx, input }) => {
       const { groupId } = input;
-      
+
       // Check if user has access to this group
       const group = await ctx.db.group.findFirst({
         where: {
@@ -44,7 +46,7 @@ export const settlementRouter = createTRPCRouter({
           },
         },
         orderBy: [
-          { settled: "asc" },           // unsettled (false) first
+          { settled: "asc" }, // unsettled (false) first
           { createdAt: "desc" },
         ],
       });
@@ -131,13 +133,13 @@ export const settlementRouter = createTRPCRouter({
 
       // Mark all settlements as settled instead of deleting them
       const result = await ctx.db.settlement.updateMany({
-        where: { 
+        where: {
           groupId,
-          settled: false 
+          settled: false,
         },
         data: { settled: true },
       });
-      
+
       // Update all expenses' settledAmount in this group
       await ctx.db.$executeRaw`
         UPDATE "Expense" e
@@ -147,7 +149,7 @@ export const settlementRouter = createTRPCRouter({
            WHERE s."expenseId" = e.id AND s.settled = true
           ), 0)
         WHERE e."groupId" = ${groupId}`;
-      
+
       // Recompute settlements after settling all
       await computeAndUpsertSettlements(ctx, groupId);
 
@@ -158,7 +160,7 @@ export const settlementRouter = createTRPCRouter({
     .input(z.string())
     .mutation(async ({ ctx, input: groupId }) => {
       const result = await computeAndUpsertSettlements(ctx, groupId);
-      
+
       return result;
     }),
-}); 
+});

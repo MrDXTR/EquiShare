@@ -76,19 +76,20 @@ export function getPendingSettlementsCount(
 export function generateShareValues(
   splitMode: SplitMode,
   selectedPersonIds: string[],
-  totalAmount: number
+  totalAmount: number,
 ): Record<string, number> {
   const newValues: Record<string, number> = {};
-  
+
   if (splitMode === "EQUAL") {
     return newValues; // Equal split doesn't need individual values
   }
-  
+
   if (splitMode === "PERCENT") {
-    const evenPercent = selectedPersonIds.length > 0
-      ? Math.floor(100 / selectedPersonIds.length)
-      : 0;
-    
+    const evenPercent =
+      selectedPersonIds.length > 0
+        ? Math.floor(100 / selectedPersonIds.length)
+        : 0;
+
     selectedPersonIds.forEach((id, index) => {
       // Give any remainder to the last person
       if (index === selectedPersonIds.length - 1) {
@@ -99,17 +100,16 @@ export function generateShareValues(
       }
     });
   }
-  
+
   if (splitMode === "EXACT") {
-    const evenAmount = selectedPersonIds.length > 0
-      ? totalAmount / selectedPersonIds.length
-      : 0;
-    
-    selectedPersonIds.forEach(id => {
+    const evenAmount =
+      selectedPersonIds.length > 0 ? totalAmount / selectedPersonIds.length : 0;
+
+    selectedPersonIds.forEach((id) => {
       newValues[id] = Number(evenAmount.toFixed(2));
     });
   }
-  
+
   return newValues;
 }
 
@@ -117,59 +117,41 @@ export function generateShareValues(
 export function validateSplitShares(
   splitMode: SplitMode,
   shareValues: Record<string, number>,
-  totalAmount: number
+  totalAmount: number,
 ): { isValid: boolean; errorMessage: string | null } {
   if (splitMode === "EQUAL") {
     return { isValid: true, errorMessage: null };
   }
-  
+
   if (splitMode === "PERCENT") {
-    const totalPercent = Object.values(shareValues)
-      .reduce((sum, value) => sum + value, 0);
-      
+    const totalPercent = Object.values(shareValues).reduce(
+      (sum, value) => sum + value,
+      0,
+    );
+
     if (Math.abs(totalPercent - 100) > 0.01) {
       return {
         isValid: false,
-        errorMessage: "Percentages must add up to 100%"
+        errorMessage: "Percentages must add up to 100%",
       };
     }
   }
-  
+
   if (splitMode === "EXACT") {
-    const totalExact = Object.values(shareValues)
-      .reduce((sum, value) => sum + value, 0);
-      
+    const totalExact = Object.values(shareValues).reduce(
+      (sum, value) => sum + value,
+      0,
+    );
+
     if (Math.abs(totalExact - totalAmount) > 0.01) {
       return {
         isValid: false,
-        errorMessage: `Exact amounts must add up to ₹${totalAmount.toFixed(2)}`
+        errorMessage: `Exact amounts must add up to ₹${totalAmount.toFixed(2)}`,
       };
     }
   }
-  
-  return { isValid: true, errorMessage: null };
-}
 
-// Format share text for display
-export function formatShareText(
-  splitMode: SplitMode,
-  personId: string,
-  shareValues: Record<string, number>,
-  selectedPersonIds: string[],
-  totalAmount: number
-): string {
-  switch (splitMode) {
-    case "EQUAL":
-      return `₹${(totalAmount / selectedPersonIds.length).toFixed(2)}`;
-    case "PERCENT": 
-      const percent = shareValues[personId] || 0;
-      const amount = (percent * totalAmount / 100);
-      return `${percent.toFixed(0)}% (₹${amount.toFixed(2)})`;
-    case "EXACT":
-      return `₹${(shareValues[personId] || 0).toFixed(2)}`;
-    default:
-      return "";
-  }
+  return { isValid: true, errorMessage: null };
 }
 
 // Initialize form state
@@ -190,7 +172,7 @@ export function togglePersonSelection(
   personId: string,
   currentSelection: string[],
   splitMode: SplitMode,
-  totalAmount: number
+  totalAmount: number,
 ): {
   newSelection: string[];
   newShareValues: Record<string, number>;
@@ -198,11 +180,12 @@ export function togglePersonSelection(
   const newSelection = currentSelection.includes(personId)
     ? currentSelection.filter((id) => id !== personId)
     : [...currentSelection, personId];
-  
-  const newShareValues = splitMode !== "EQUAL" 
-    ? generateShareValues(splitMode, newSelection, totalAmount)
-    : {};
-  
+
+  const newShareValues =
+    splitMode !== "EQUAL"
+      ? generateShareValues(splitMode, newSelection, totalAmount)
+      : {};
+
   return { newSelection, newShareValues };
 }
 
@@ -210,46 +193,168 @@ export function togglePersonSelection(
 export function handleSplitModeChange(
   newMode: SplitMode,
   selectedPersonIds: string[],
-  totalAmount: number
+  totalAmount: number,
 ): Record<string, number> {
   return generateShareValues(newMode, selectedPersonIds, totalAmount);
 }
 
-// Update share value with better validation
-export function updateShareValue(
+// Enhanced share update with auto-adjustment
+export function updateShareValueWithAutoAdjust(
   personId: string,
   value: number,
   currentShareValues: Record<string, number>,
   selectedPersonIds: string[],
-  splitMode: SplitMode
+  splitMode: SplitMode,
+  totalAmount: number,
 ): Record<string, number> {
-  const newValues = { ...currentShareValues };
-  
+  const newShareValues = { ...currentShareValues };
+
   // Ensure value is valid
   if (isNaN(value) || value < 0) {
     value = 0;
   }
-  
-  newValues[personId] = value;
-  
-  // For percentage mode, ensure we don't exceed 100%
+
   if (splitMode === "PERCENT") {
-    const maxAllowed = 100;
-    if (value > maxAllowed) {
-      newValues[personId] = maxAllowed;
+    // Ensure percentage doesn't exceed 100%
+    const maxAllowed = Math.min(100, value);
+    newShareValues[personId] = maxAllowed;
+
+    // Auto-adjust other percentages if total exceeds 100%
+    const currentTotal = Object.entries(newShareValues)
+      .filter(([id]) => selectedPersonIds.includes(id))
+      .reduce((sum, [, val]) => sum + val, 0);
+
+    if (currentTotal > 100) {
+      const excess = currentTotal - 100;
+      const otherPersonIds = selectedPersonIds.filter((id) => id !== personId);
+
+      if (otherPersonIds.length > 0) {
+        // Distribute the excess reduction proportionally among other people
+        const otherTotal = otherPersonIds.reduce(
+          (sum, id) => sum + (newShareValues[id] || 0),
+          0,
+        );
+
+        if (otherTotal > 0) {
+          otherPersonIds.forEach((id) => {
+            const currentValue = newShareValues[id] || 0;
+            const proportion = currentValue / otherTotal;
+            const reduction = excess * proportion;
+            newShareValues[id] = Math.max(
+              0,
+              Math.round((currentValue - reduction) * 10) / 10,
+            );
+          });
+        }
+      }
+    }
+  } else if (splitMode === "EXACT") {
+    // Ensure exact amount doesn't exceed total
+    const maxAllowed = Math.min(totalAmount, value);
+    newShareValues[personId] = maxAllowed;
+
+    // Auto-adjust other amounts if total exceeds the expense amount
+    const currentTotal = Object.entries(newShareValues)
+      .filter(([id]) => selectedPersonIds.includes(id))
+      .reduce((sum, [, val]) => sum + val, 0);
+
+    if (currentTotal > totalAmount) {
+      const excess = currentTotal - totalAmount;
+      const otherPersonIds = selectedPersonIds.filter((id) => id !== personId);
+
+      if (otherPersonIds.length > 0) {
+        // Distribute the excess reduction proportionally among other people
+        const otherTotal = otherPersonIds.reduce(
+          (sum, id) => sum + (newShareValues[id] || 0),
+          0,
+        );
+
+        if (otherTotal > 0) {
+          otherPersonIds.forEach((id) => {
+            const currentValue = newShareValues[id] || 0;
+            const proportion = currentValue / otherTotal;
+            const reduction = excess * proportion;
+            newShareValues[id] = Math.max(
+              0,
+              Math.round((currentValue - reduction) * 100) / 100,
+            );
+          });
+        }
+      }
     }
   }
-  
-  return newValues;
+
+  return newShareValues;
+}
+
+// Auto-balance function for quick equal distribution
+export function autoBalanceShares(
+  selectedPersonIds: string[],
+  splitMode: SplitMode,
+  totalAmount: number,
+): Record<string, number> {
+  const newShareValues: Record<string, number> = {};
+
+  if (splitMode === "PERCENT") {
+    const evenPercent = 100 / selectedPersonIds.length;
+    selectedPersonIds.forEach((id, index) => {
+      // Give any remainder to the last person
+      if (index === selectedPersonIds.length - 1) {
+        const totalAssigned =
+          (Math.floor(evenPercent * 10) / 10) * (selectedPersonIds.length - 1);
+        newShareValues[id] = Math.round((100 - totalAssigned) * 10) / 10;
+      } else {
+        newShareValues[id] = Math.floor(evenPercent * 10) / 10; // Round to 1 decimal place
+      }
+    });
+  } else if (splitMode === "EXACT") {
+    const evenAmount = totalAmount / selectedPersonIds.length;
+    selectedPersonIds.forEach((id, index) => {
+      // Give any remainder to the last person
+      if (index === selectedPersonIds.length - 1) {
+        const totalAssigned =
+          (Math.floor(evenAmount * 100) / 100) * (selectedPersonIds.length - 1);
+        newShareValues[id] =
+          Math.round((totalAmount - totalAssigned) * 100) / 100;
+      } else {
+        newShareValues[id] = Math.floor(evenAmount * 100) / 100; // Round to 2 decimal places
+      }
+    });
+  }
+
+  return newShareValues;
+}
+
+// Calculate current totals for display
+export function calculateCurrentTotals(
+  shareValues: Record<string, number>,
+  selectedPersonIds: string[],
+  splitMode: SplitMode,
+): { percentTotal: number; exactTotal: number } {
+  const percentTotal =
+    splitMode === "PERCENT"
+      ? Object.entries(shareValues)
+          .filter(([id]) => selectedPersonIds.includes(id))
+          .reduce((sum, [, val]) => sum + val, 0)
+      : 0;
+
+  const exactTotal =
+    splitMode === "EXACT"
+      ? Object.entries(shareValues)
+          .filter(([id]) => selectedPersonIds.includes(id))
+          .reduce((sum, [, val]) => sum + val, 0)
+      : 0;
+
+  return { percentTotal, exactTotal };
 }
 
 // Prepare shares for API submission
 export function prepareShares(
   selectedPersonIds: string[],
   splitMode: SplitMode,
-  shareValues: Record<string, number>
+  shareValues: Record<string, number>,
 ): PersonShare[] {
-  return selectedPersonIds.map(personId => ({
+  return selectedPersonIds.map((personId) => ({
     personId,
     type: splitMode,
     ...(splitMode !== "EQUAL" && { value: shareValues[personId] || 0 }),
@@ -261,37 +366,23 @@ export function isFormValid(
   description: string,
   amount: string,
   paidById: string,
-  selectedPersonIds: string[]
+  selectedPersonIds: string[],
 ): boolean {
-  return !!(description.trim() && amount && parseFloat(amount) > 0 && paidById && selectedPersonIds.length > 0);
+  return !!(
+    description.trim() &&
+    amount &&
+    parseFloat(amount) > 0 &&
+    paidById &&
+    selectedPersonIds.length > 0
+  );
 }
 
 // Get person initials for avatar
 export function getPersonInitials(name: string): string {
   return name
-    .split(' ')
-    .map(part => part.charAt(0))
-    .join('')
+    .split(" ")
+    .map((part) => part.charAt(0))
+    .join("")
     .toUpperCase()
     .slice(0, 2);
-}
-
-// Get step titles
-export function getStepTitle(step: number): string {
-  switch (step) {
-    case 1: return "Expense Details";
-    case 2: return "Select People";
-    case 3: return "Split Amount";
-    default: return "";
-  }
-}
-
-// Get step descriptions
-export function getStepDescription(step: number): string {
-  switch (step) {
-    case 1: return "What did you spend on?";
-    case 2: return "Who should split this expense?";
-    case 3: return "How should we divide the cost?";
-    default: return "";
-  }
 }

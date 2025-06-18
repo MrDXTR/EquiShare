@@ -2,13 +2,7 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
-import {
-  Receipt,
-  MoreVertical,
-  Loader2,
-  Trash2,
-  Plus,
-} from "lucide-react";
+import { Receipt, MoreVertical, Loader2, Trash2, Plus } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { Button } from "~/components/ui/button";
 import { Badge } from "~/components/ui/badge";
@@ -40,14 +34,11 @@ interface ExpensesListProps {
   onExpenseDeleted: () => void;
 }
 
-export function ExpensesList({
-  group,
-  onExpenseDeleted,
-}: ExpensesListProps) {
+export function ExpensesList({ group, onExpenseDeleted }: ExpensesListProps) {
   const [expenseToDelete, setExpenseToDelete] = useState<string | null>(null);
   const [isAddingExpense, setIsAddingExpense] = useState(false);
   const utils = api.useUtils();
-  
+
   // Define settlement query input for invalidation
   const settlementQueryInput = { groupId: group.id };
 
@@ -140,12 +131,15 @@ export function ExpensesList({
             ) : (
               group.expenses.map((expense: any, index: number) => {
                 // Calculate the settled percentage
-                const amount = typeof expense.amount === "number" ? expense.amount : 0;
-                const settledAmount = typeof expense.settledAmount === "number" ? expense.settledAmount : 0;
-                const settledPercent = amount > 0
-                  ? Math.round((settledAmount / amount) * 100)
-                  : 0;
-                
+                const amount =
+                  typeof expense.amount === "number" ? expense.amount : 0;
+                const settledAmount =
+                  typeof expense.settledAmount === "number"
+                    ? expense.settledAmount
+                    : 0;
+                const settledPercent =
+                  amount > 0 ? Math.round((settledAmount / amount) * 100) : 0;
+
                 return (
                   <motion.div
                     key={expense.id}

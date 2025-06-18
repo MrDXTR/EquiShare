@@ -19,7 +19,7 @@ function minTx(
   rows: { id: string; name: string; bal: number }[],
 ): { fromId: string; toId: string; amount: number }[] {
   const creditors = rows.filter((r) => r.bal > 0).map((r) => ({ ...r }));
-  const debtors   = rows.filter((r) => r.bal < 0).map((r) => ({ ...r }));
+  const debtors = rows.filter((r) => r.bal < 0).map((r) => ({ ...r }));
   const tx: { fromId: string; toId: string; amount: number }[] = [];
 
   let i = 0,
@@ -43,10 +43,7 @@ function minTx(
 /* ------------------------------------------------------------------ */
 /* 2. MAIN ENTRY POINT                                                */
 /* ------------------------------------------------------------------ */
-export async function computeAndUpsertSettlements(
-  ctx: Ctx,
-  groupId: string,
-) {
+export async function computeAndUpsertSettlements(ctx: Ctx, groupId: string) {
   /* -------------------------------------------------------------- */
   /* Guard – membership / ownership                                 */
   /* -------------------------------------------------------------- */
@@ -77,7 +74,7 @@ export async function computeAndUpsertSettlements(
           shares: { include: { person: true } },
         },
         orderBy: {
-          createdAt: 'asc',
+          createdAt: "asc",
         },
       },
       settlements: true, // we'll split into settled / unsettled later
@@ -127,10 +124,10 @@ export async function computeAndUpsertSettlements(
   /* -------------------------------------------------------------- */
   /* 4.  Replace every old "unsettled" row with the fresh set       */
   /* -------------------------------------------------------------- */
-  
+
   // Track person-to-person pairs to find originating expense
   const pairToFirstExpense = new Map<string, string>();
-  
+
   // For each expense, check if it creates a debt between people
   g.expenses.forEach((expense) => {
     const { paidById } = expense;
@@ -153,15 +150,16 @@ export async function computeAndUpsertSettlements(
             data: newTx.map((t) => {
               // Find the first expense that caused this from->to pair
               const pairKey = `${t.fromId}-${t.toId}`;
-              const expenseId = pairToFirstExpense.get(pairKey) || g.expenses[0]?.id;
-              
+              const expenseId =
+                pairToFirstExpense.get(pairKey) || g.expenses[0]?.id;
+
               if (!expenseId) {
                 throw new TRPCError({
                   code: "INTERNAL_SERVER_ERROR",
                   message: "Could not find a valid expense for settlement",
                 });
               }
-              
+
               return {
                 groupId,
                 fromId: t.fromId,

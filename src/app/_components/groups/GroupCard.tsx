@@ -44,7 +44,7 @@ export function GroupCard({ group, onDelete, index }: GroupCardProps) {
     <motion.div
       initial={{ opacity: 0, y: 20, scale: 0.9 }}
       animate={{ opacity: 1, y: 0, scale: 1 }}
-      transition={{ delay: index * 0.1, duration: 0.5 }}
+      transition={{ delay: index * 0.1, duration: 0.1 }}
       whileHover={{ y: -4, scale: 1.02 }}
       className="group relative"
     >

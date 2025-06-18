@@ -25,10 +25,10 @@ interface GroupSummaryProps {
   setShowMembersDialog?: (show: boolean) => void;
 }
 
-export function GroupSummary({ 
-  group, 
+export function GroupSummary({
+  group,
   onExpenseCreated,
-  setShowMembersDialog 
+  setShowMembersDialog,
 }: GroupSummaryProps) {
   const [expenseToDelete, setExpenseToDelete] = useState<string | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -36,14 +36,14 @@ export function GroupSummary({
   const [personToDelete, setPersonToDelete] = useState<string | null>(null);
   const [isDeletingPerson, setIsDeletingPerson] = useState(false);
   const utils = api.useUtils();
-  
+
   // Define settlement query input
   const settlementQueryInput = { groupId: group.id };
-  
+
   // Query balances for UI display
   const { data: balances, isLoading: isLoadingBalances } =
     api.expense.getBalances.useQuery(group.id);
-    
+
   // Query settlements to know if we have any
   const { data: settlements, isLoading: isLoadingSettlements } =
     api.settlement.list.useQuery(settlementQueryInput);
@@ -170,7 +170,7 @@ export function GroupSummary({
 
   // Check if there are any settlements
   const noRows = !settlements || settlements.length === 0;
-  const pendingSettlements = settlements?.filter(s => !s.settled).length ?? 0;
+  const pendingSettlements = settlements?.filter((s) => !s.settled).length ?? 0;
 
   return (
     <div className="min-h-screen p-4 md:p-8">
@@ -259,7 +259,9 @@ export function GroupSummary({
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
-              <AlertDialogCancel disabled={isDeleting}>Cancel</AlertDialogCancel>
+              <AlertDialogCancel disabled={isDeleting}>
+                Cancel
+              </AlertDialogCancel>
               <AlertDialogAction
                 onClick={handleDeleteExpense}
                 disabled={isDeleting}

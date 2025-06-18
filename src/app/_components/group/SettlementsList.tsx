@@ -11,6 +11,7 @@ import { api } from "~/trpc/react";
 import { toast } from "sonner";
 import { Switch } from "~/components/ui/switch";
 import { Label } from "~/components/ui/label";
+import { SettleAllConfirmationDialog } from "./SettleAllConfirmationDialog";
 
 interface SettlementsListProps {
   groupId: string;
@@ -20,13 +21,17 @@ export function SettlementsList({ groupId }: SettlementsListProps) {
   const [settlingId, setSettlingId] = useState<string | null>(null);
   const [showSettled, setShowSettled] = useState(false);
   const utils = api.useUtils();
-  
+
   // Query all settlements (the API doesn't filter by settled status anymore)
-  const { data: allSettlements, isLoading } = api.settlement.list.useQuery({ groupId });
-  
+  const { data: allSettlements, isLoading } = api.settlement.list.useQuery({
+    groupId,
+  });
+
   // Filter the settlements client-side based on showSettled state
-  const settlements = showSettled ? allSettlements : allSettlements?.filter(s => !s.settled);
-  
+  const settlements = showSettled
+    ? allSettlements
+    : allSettlements?.filter((s) => !s.settled);
+
   const settleTransaction = api.settlement.settle.useMutation({
     onMutate: (id) => {
       setSettlingId(id);
@@ -44,7 +49,7 @@ export function SettlementsList({ groupId }: SettlementsListProps) {
       setSettlingId(null);
     },
   });
-  
+
   const settleAllTransactions = api.settlement.settleAll.useMutation({
     onMutate: () => {
       toast.loading("Settling all transactions...", { id: "settle-all" });
@@ -59,22 +64,22 @@ export function SettlementsList({ groupId }: SettlementsListProps) {
       toast.error("Failed to settle all transactions", { id: "settle-all" });
     },
   });
-  
+
   const handleSettleTransaction = (id: string) => {
     settleTransaction.mutate(id);
   };
-  
+
   const handleSettleAll = () => {
     settleAllTransactions.mutate(groupId);
   };
-  
+
   const handleToggleSettled = () => {
     setShowSettled(!showSettled);
   };
-  
-  const activeSettlements = allSettlements?.filter(s => !s.settled) || [];
+
+  const activeSettlements = allSettlements?.filter((s) => !s.settled) || [];
   const noRows = (settlements?.length ?? 0) === 0;
-  
+
   return (
     <motion.div
       initial={{ opacity: 0, x: 50 }}
@@ -83,7 +88,7 @@ export function SettlementsList({ groupId }: SettlementsListProps) {
     >
       <Card className="h-full border-0 bg-white/80 shadow-xl shadow-indigo-100/50 backdrop-blur-sm transition-all duration-300 hover:shadow-2xl hover:shadow-indigo-200/60 dark:bg-gray-800/80 dark:shadow-none dark:hover:shadow-none">
         <CardHeader className="pb-4">
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between md:gap-0">
             <CardTitle className="flex items-center gap-3 text-2xl">
               <div className="rounded-lg bg-gradient-to-r from-indigo-500 to-purple-600 p-2">
                 <ArrowRight className="h-6 w-6 text-white" />
@@ -94,7 +99,7 @@ export function SettlementsList({ groupId }: SettlementsListProps) {
             </CardTitle>
             <div className="flex items-center gap-4">
               <div className="flex items-center gap-2">
-                <Switch 
+                <Switch
                   id="show-settled"
                   checked={showSettled}
                   onCheckedChange={handleToggleSettled}
@@ -113,22 +118,13 @@ export function SettlementsList({ groupId }: SettlementsListProps) {
                   )}
                 </Label>
               </div>
-              
+
               {activeSettlements.length > 0 && (
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={handleSettleAll}
-                  disabled={settleAllTransactions.isPending}
-                  className="bg-green-50 text-green-700 border-green-200 hover:bg-green-100 dark:bg-green-900/30 dark:text-green-400 dark:border-green-800 dark:hover:bg-green-800/50"
-                >
-                  {settleAllTransactions.isPending ? (
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  ) : (
-                    <CheckCircle2 className="mr-2 h-4 w-4" />
-                  )}
-                  <span>Settle All</span>
-                </Button>
+                <SettleAllConfirmationDialog
+                  onConfirm={handleSettleAll}
+                  isPending={settleAllTransactions.isPending}
+                  activeSettlementsCount={activeSettlements.length}
+                />
               )}
             </div>
           </div>
@@ -164,7 +160,7 @@ export function SettlementsList({ groupId }: SettlementsListProps) {
               <div className="space-y-3">
                 {settlements.map((settlement, idx) => {
                   const isSettled = settlement.settled;
-                  
+
                   return (
                     <motion.div
                       key={settlement.id}
@@ -172,36 +168,36 @@ export function SettlementsList({ groupId }: SettlementsListProps) {
                       animate={{ opacity: 1, y: 0, scale: 1 }}
                       exit={{ opacity: 0, y: -20, scale: 0.95 }}
                       transition={{ delay: idx * 0.1 }}
-                      className={`group relative overflow-hidden rounded-xl border p-4 transition-all duration-300 hover:scale-[1.02] hover:shadow-lg
-                        ${isSettled 
-                          ? "border-green-200/60 bg-gradient-to-r from-green-50 to-emerald-50 hover:shadow-green-100/50 dark:border-green-900/30 dark:from-green-900/20 dark:to-emerald-900/20 dark:hover:shadow-green-900/20" 
+                      className={`group relative overflow-hidden rounded-xl border p-4 transition-all duration-300 hover:scale-[1.02] hover:shadow-lg ${
+                        isSettled
+                          ? "border-green-200/60 bg-gradient-to-r from-green-50 to-emerald-50 hover:shadow-green-100/50 dark:border-green-900/30 dark:from-green-900/20 dark:to-emerald-900/20 dark:hover:shadow-green-900/20"
                           : "border-orange-200/60 bg-gradient-to-r from-orange-50 to-red-50 hover:shadow-orange-100/50 dark:border-orange-900/30 dark:from-orange-900/20 dark:to-red-900/20 dark:hover:shadow-orange-900/20"
-                        }`}
+                      }`}
                     >
-                      <div className={`absolute inset-0 bg-gradient-to-r opacity-0 transition-opacity duration-300 group-hover:opacity-100 pointer-events-none
-                        ${isSettled 
-                          ? "from-green-500/5 to-emerald-500/5 dark:from-green-500/10 dark:to-emerald-500/10" 
-                          : "from-orange-500/5 to-red-500/5 dark:from-orange-500/10 dark:to-red-500/10"
-                        }`} 
+                      <div
+                        className={`pointer-events-none absolute inset-0 bg-gradient-to-r opacity-0 transition-opacity duration-300 group-hover:opacity-100 ${
+                          isSettled
+                            ? "from-green-500/5 to-emerald-500/5 dark:from-green-500/10 dark:to-emerald-500/10"
+                            : "from-orange-500/5 to-red-500/5 dark:from-orange-500/10 dark:to-red-500/10"
+                        }`}
                       />
                       <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
                         <div className="flex flex-wrap items-center gap-2">
-                          <Badge 
-                            className="border-orange-300 bg-orange-100 font-semibold text-orange-800 dark:border-orange-700 dark:bg-orange-900/50 dark:text-orange-300"
-                          >
+                          <Badge className="border-orange-300 bg-orange-100 font-semibold text-orange-800 dark:border-orange-700 dark:bg-orange-900/50 dark:text-orange-300">
                             {settlement.from.name}
                           </Badge>
-                          <ArrowRight className={`h-4 w-4 transition-colors group-hover:text-orange-600 dark:group-hover:text-orange-400
-                            ${isSettled 
-                              ? "text-green-500 group-hover:text-green-600 dark:text-green-400 dark:group-hover:text-green-500" 
-                              : "text-gray-500 dark:text-gray-400"
+                          <ArrowRight
+                            className={`h-4 w-4 transition-colors group-hover:text-orange-600 dark:group-hover:text-orange-400 ${
+                              isSettled
+                                ? "text-green-500 group-hover:text-green-600 dark:text-green-400 dark:group-hover:text-green-500"
+                                : "text-gray-500 dark:text-gray-400"
                             }`}
                           />
                           <Badge className="border-green-300 bg-green-100 font-semibold text-green-800 dark:border-green-700 dark:bg-green-900/50 dark:text-green-300">
                             {settlement.to.name}
                           </Badge>
                           {isSettled && (
-                            <Badge 
+                            <Badge
                               variant="outline"
                               className="ml-2 border-green-300 bg-green-50 font-semibold text-green-800 dark:border-green-700 dark:bg-green-900/30 dark:text-green-300"
                             >
@@ -211,10 +207,11 @@ export function SettlementsList({ groupId }: SettlementsListProps) {
                           )}
                         </div>
                         <div className="flex items-center gap-3">
-                          <span className={`text-2xl font-bold transition-colors
-                            ${isSettled 
-                              ? "text-green-600 group-hover:text-green-700 dark:text-green-400 dark:group-hover:text-green-300" 
-                              : "text-red-600 group-hover:text-red-700 dark:text-red-400 dark:group-hover:text-red-300"
+                          <span
+                            className={`text-2xl font-bold transition-colors ${
+                              isSettled
+                                ? "text-green-600 group-hover:text-green-700 dark:text-green-400 dark:group-hover:text-green-300"
+                                : "text-red-600 group-hover:text-red-700 dark:text-red-400 dark:group-hover:text-red-300"
                             }`}
                           >
                             ₹{settlement.amount.toFixed(2)}
@@ -223,9 +220,11 @@ export function SettlementsList({ groupId }: SettlementsListProps) {
                             <Button
                               size="sm"
                               variant="outline"
-                              onClick={() => handleSettleTransaction(settlement.id)}
+                              onClick={() =>
+                                handleSettleTransaction(settlement.id)
+                              }
                               disabled={settlingId === settlement.id}
-                              className="bg-green-50 text-green-700 border-green-200 hover:bg-green-100 dark:bg-green-900/30 dark:text-green-400 dark:border-green-800 dark:hover:bg-green-800/50"
+                              className="border-green-200 bg-green-50 text-green-700 hover:bg-green-100 dark:border-green-800 dark:bg-green-900/30 dark:text-green-400 dark:hover:bg-green-800/50"
                             >
                               {settlingId === settlement.id ? (
                                 <Loader2 className="h-4 w-4 animate-spin" />

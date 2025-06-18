@@ -23,14 +23,14 @@ export const expenseRouter = createTRPCRouter({
     )
     .mutation(async ({ ctx, input }) => {
       const { groupId, description, amount, paidById, shares } = input;
-      
+
       // Calculate share amounts based on type
       const sharesWithAmount = shares.map((share) => {
         let shareAmount: number;
-        
+
         switch (share.type) {
           case "EQUAL": {
-            const equalCount = shares.filter(s => s.type === "EQUAL").length;
+            const equalCount = shares.filter((s) => s.type === "EQUAL").length;
             shareAmount = equalCount > 0 ? amount / equalCount : 0;
             break;
           }
@@ -55,15 +55,18 @@ export const expenseRouter = createTRPCRouter({
             break;
           }
         }
-        
+
         return {
           personId: share.personId,
           amount: shareAmount,
         };
       });
-      
+
       // Validate that share total equals expense amount (with small tolerance for floating point)
-      const totalShares = sharesWithAmount.reduce((sum, share) => sum + share.amount, 0);
+      const totalShares = sharesWithAmount.reduce(
+        (sum, share) => sum + share.amount,
+        0,
+      );
       if (Math.abs(totalShares - amount) > 0.01) {
         throw new TRPCError({
           code: "BAD_REQUEST",
@@ -112,12 +115,12 @@ export const expenseRouter = createTRPCRouter({
           message: "Expense not found",
         });
       }
-      
+
       // Delete settlements first, then delete the expense
-      await ctx.db.settlement.deleteMany({ 
-        where: { expenseId: input } 
+      await ctx.db.settlement.deleteMany({
+        where: { expenseId: input },
       });
-      
+
       await ctx.db.expense.delete({
         where: {
           id: input,
