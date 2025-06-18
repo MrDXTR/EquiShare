@@ -15,6 +15,14 @@ import { toast } from "sonner";
 import { format } from "date-fns";
 import { Card } from "~/components/ui/card";
 import { Input } from "~/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "~/components/ui/select";
+import { Label } from "~/components/ui/label";
 
 interface InviteDialogProps {
   children: React.ReactNode;
@@ -24,6 +32,7 @@ interface InviteDialogProps {
 export function InviteDialog({ children, groupId }: InviteDialogProps) {
   const [open, setOpen] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [maxUses, setMaxUses] = useState<number>(10);
 
   const createInvite = api.invite.createInvite.useMutation({
     onSuccess: () => {
@@ -35,7 +44,7 @@ export function InviteDialog({ children, groupId }: InviteDialogProps) {
   });
 
   const handleGenerateInvite = async () => {
-    createInvite.mutate({ groupId });
+    createInvite.mutate({ groupId, maxUses });
   };
 
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -66,7 +75,10 @@ export function InviteDialog({ children, groupId }: InviteDialogProps) {
       open={open}
       onOpenChange={(v) => {
         setOpen(v);
-        if (!v) createInvite.reset(); // reset to idle when the dialog closes
+        if (!v) {
+          createInvite.reset(); // reset to idle when the dialog closes
+          setMaxUses(10); // reset max uses
+        }
       }}
     >
       <DialogTrigger asChild>{children}</DialogTrigger>
@@ -89,6 +101,26 @@ export function InviteDialog({ children, groupId }: InviteDialogProps) {
                 Generate an invite link to share with others. The link will be
                 valid for 7 days.
               </p>
+              
+              <div className="w-full space-y-2">
+                <Label htmlFor="max-uses">Number of people who can use this link</Label>
+                <Select 
+                  value={String(maxUses)} 
+                  onValueChange={(value) => setMaxUses(parseInt(value))}
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Maximum uses" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((num) => (
+                      <SelectItem key={num} value={String(num)}>
+                        {num} {num === 1 ? "person" : "people"}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              
               <Button
                 onClick={handleGenerateInvite}
                 className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 dark:text-white"
@@ -157,10 +189,14 @@ export function InviteDialog({ children, groupId }: InviteDialogProps) {
                 </div>
               </div>
 
-              <div>
+              <div className="space-y-1">
                 <p className="text-sm text-gray-500">
                   Expires on{" "}
                   {formatExpiryDate(createInvite.data.invite.expiresAt)}
+                </p>
+                <p className="text-sm text-gray-500">
+                  Can be used by up to {createInvite.data.invite.maxUses}{" "}
+                  {createInvite.data.invite.maxUses === 1 ? "person" : "people"}
                 </p>
               </div>
 

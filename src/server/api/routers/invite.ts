@@ -7,12 +7,30 @@ import {
 } from "~/server/api/trpc";
 import crypto from "crypto";
 
+// Helper function to generate a short token and its hash
+function generateInviteToken() {
+  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  let token = '';
+  for (let i = 0; i < 10; i++) {
+    token += characters.charAt(Math.floor(Math.random() * characters.length));
+  }
+  
+  const hash = crypto.createHash('sha256').update(token).digest('hex');
+  
+  return { token, hash };
+}
+
+function hashToken(token: string) {
+  return crypto.createHash('sha256').update(token).digest('hex');
+}
+
 export const inviteRouter = createTRPCRouter({
   // Create a new invite for a group
   createInvite: protectedProcedure
     .input(
       z.object({
         groupId: z.string(),
+        maxUses: z.number().min(1).max(10).optional().default(10),
       }),
     )
     .mutation(async ({ ctx, input }) => {
@@ -52,8 +70,9 @@ export const inviteRouter = createTRPCRouter({
         });
       }
 
-      // Generate a secure token
-      const inviteToken = crypto.randomBytes(32).toString("hex");
+      // Generate token and hash
+      const { token: inviteToken, hash: inviteTokenHash } = generateInviteToken();
+      
       // Set expiration to 7 days from now
       const expiresAt = new Date();
       expiresAt.setDate(expiresAt.getDate() + 7);
@@ -61,8 +80,11 @@ export const inviteRouter = createTRPCRouter({
       // Create the invite
       const invite = await ctx.db.groupInvite.create({
         data: {
-          inviteToken,
+          inviteToken: inviteTokenHash, // Store the hash in the database
           expiresAt,
+          maxUses: input.maxUses ?? 10,
+          remainingUses: input.maxUses ?? 10,
+          status: "PENDING",
           group: {
             connect: { id: input.groupId },
           },
@@ -104,9 +126,12 @@ export const inviteRouter = createTRPCRouter({
   getInviteByToken: publicProcedure
     .input(z.string())
     .query(async ({ ctx, input }) => {
+      // Hash the input token to find it in the database
+      const tokenHash = hashToken(input);
+      
       const invite = await ctx.db.groupInvite.findUnique({
         where: {
-          inviteToken: input,
+          inviteToken: tokenHash,
         },
         include: {
           group: {
@@ -153,6 +178,14 @@ export const inviteRouter = createTRPCRouter({
         });
       }
 
+      // Check if the invite has no uses left
+      if (invite.remainingUses <= 0) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "This invite has reached its maximum number of uses",
+        });
+      }
+
       // Check if the invite is already used
       if (invite.status !== "PENDING") {
         throw new TRPCError({
@@ -168,9 +201,12 @@ export const inviteRouter = createTRPCRouter({
   acceptInvite: protectedProcedure
     .input(z.string())
     .mutation(async ({ ctx, input }) => {
+      // Hash the input token to find it in the database
+      const tokenHash = hashToken(input);
+      
       const invite = await ctx.db.groupInvite.findUnique({
         where: {
-          inviteToken: input,
+          inviteToken: tokenHash,
         },
         include: {
           group: true,
@@ -195,6 +231,14 @@ export const inviteRouter = createTRPCRouter({
         throw new TRPCError({
           code: "BAD_REQUEST",
           message: "This invite has expired",
+        });
+      }
+
+      // Check if the invite has no uses left
+      if (invite.remainingUses <= 0) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "This invite has reached its maximum number of uses",
         });
       }
 
@@ -234,12 +278,19 @@ export const inviteRouter = createTRPCRouter({
         });
       }
 
+      // Decrement remaining uses
+      const remainingUses = invite.remainingUses - 1;
+      
+      // Update the invite status if no uses left
+      const status = remainingUses <= 0 ? "USED" : "PENDING";
+
       // Accept the invite
       await ctx.db.groupInvite.update({
         where: { id: invite.id },
         data: {
-          status: "ACCEPTED",
-          invitedUser: {
+          remainingUses,
+          status,
+          usedBy: {
             connect: { id: ctx.session.user.id },
           },
         },
@@ -265,9 +316,12 @@ export const inviteRouter = createTRPCRouter({
   rejectInvite: protectedProcedure
     .input(z.string())
     .mutation(async ({ ctx, input }) => {
+      // Hash the input token to find it in the database
+      const tokenHash = hashToken(input);
+      
       const invite = await ctx.db.groupInvite.findUnique({
         where: {
-          inviteToken: input,
+          inviteToken: tokenHash,
         },
       });
 
@@ -285,24 +339,10 @@ export const inviteRouter = createTRPCRouter({
         });
       }
 
-      // Check if the invite has an assigned user and that it matches the current user
-      if (
-        invite.invitedUserId !== null &&
-        invite.invitedUserId !== ctx.session.user.id
-      ) {
-        throw new TRPCError({
-          code: "FORBIDDEN",
-          message: "You don't have permission to reject this invitation",
-        });
-      }
-
       await ctx.db.groupInvite.update({
         where: { id: invite.id },
         data: {
           status: "REJECTED",
-          invitedUser: {
-            connect: { id: ctx.session.user.id },
-          },
         },
       });
 
