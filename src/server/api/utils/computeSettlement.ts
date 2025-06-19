@@ -174,15 +174,29 @@ export async function computeAndUpsertSettlements(ctx: Ctx, groupId: string) {
       : []),
   ]);
 
-  // Update each expense's settledAmount based on related settlements
-  await ctx.db.$executeRaw`
-    UPDATE "Expense" e
-    SET "settledAmount" = COALESCE(
-      (SELECT SUM(s."amount") 
-       FROM "Settlement" s 
-       WHERE s."expenseId" = e.id AND s.settled = true
-      ), 0)
-    WHERE e."groupId" = ${groupId}`;
+  const sums = await ctx.db.settlement.groupBy({
+    by: ["expenseId"],
+    where: {
+      groupId,
+      settled: true,
+    },
+    _sum: { amount: true },
+  });
+
+  const sumMap = new Map<string, number>();
+  sums.forEach((s) => {
+    // @ts-ignore keep Decimal support
+    sumMap.set(s.expenseId, (s._sum.amount ?? 0) as unknown as number);
+  });
+
+  const expenseUpdatePromises = g.expenses.map((exp) =>
+    ctx.db.expense.update({
+      where: { id: exp.id },
+      data: { settledAmount: sumMap.get(exp.id) ?? 0 },
+    }),
+  );
+
+  await ctx.db.$transaction(expenseUpdatePromises);
 
   return { success: true, newUnsettled: newTx.length };
 }
