@@ -142,33 +142,47 @@ export async function computeAndUpsertSettlements(ctx: Ctx, groupId: string) {
     });
   });
 
+  // Build a set of settled pairs (fromId-toId) to prevent re-creating unsettled settlements for already settled pairs
+  const settledPairs = new Set<string>();
+  g.settlements
+    .filter((s) => s.settled)
+    .forEach((s) => {
+      settledPairs.add(`${s.fromId}-${s.toId}`);
+    });
+
   await ctx.db.$transaction([
     ctx.db.settlement.deleteMany({ where: { groupId, settled: false } }),
     ...(newTx.length
       ? [
           ctx.db.settlement.createMany({
-            data: newTx.map((t) => {
-              // Find the first expense that caused this from->to pair
-              const pairKey = `${t.fromId}-${t.toId}`;
-              const expenseId =
-                pairToFirstExpense.get(pairKey) || g.expenses[0]?.id;
+            data: newTx
+              .filter((t) => {
+                // Only create unsettled settlement if this pair is not already settled
+                const pairKey = `${t.fromId}-${t.toId}`;
+                return !settledPairs.has(pairKey);
+              })
+              .map((t) => {
+                // Find the first expense that caused this from->to pair
+                const pairKey = `${t.fromId}-${t.toId}`;
+                const expenseId =
+                  pairToFirstExpense.get(pairKey) || g.expenses[0]?.id;
 
-              if (!expenseId) {
-                throw new TRPCError({
-                  code: "INTERNAL_SERVER_ERROR",
-                  message: "Could not find a valid expense for settlement",
-                });
-              }
+                if (!expenseId) {
+                  throw new TRPCError({
+                    code: "INTERNAL_SERVER_ERROR",
+                    message: "Could not find a valid expense for settlement",
+                  });
+                }
 
-              return {
-                groupId,
-                fromId: t.fromId,
-                toId: t.toId,
-                amount: t.amount,
-                settled: false,
-                expenseId,
-              };
-            }),
+                return {
+                  groupId,
+                  fromId: t.fromId,
+                  toId: t.toId,
+                  amount: t.amount,
+                  settled: false,
+                  expenseId,
+                };
+              }),
           }),
         ]
       : []),
