@@ -102,20 +102,7 @@ export default function SignInPage() {
         {/* Footer */}
         <div className="mt-8 text-center">
           <p className="text-xs text-gray-400 dark:text-gray-500">
-            By continuing, you agree to our{" "}
-            <a
-              href="#"
-              className="text-gray-600 underline hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200"
-            >
-              Terms of Service
-            </a>{" "}
-            and{" "}
-            <a
-              href="#"
-              className="text-gray-600 underline hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200"
-            >
-              Privacy Policy
-            </a>
+            By continuing, you acknowledge and accept the EquiShare user agreement
           </p>
         </div>
       </div>

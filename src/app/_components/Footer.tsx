@@ -8,18 +8,12 @@ export function Footer() {
           © {new Date().getFullYear()} EquiShare. All rights reserved.
         </p>
 
-        <div className="flex items-center gap-6">
+        <div className="flex items-center">
           <Link
-            href="/privacy"
+            href="/"
             className="text-muted-foreground hover:text-foreground text-sm transition-colors"
           >
-            Privacy
-          </Link>
-          <Link
-            href="/terms"
-            className="text-muted-foreground hover:text-foreground text-sm transition-colors"
-          >
-            Terms
+            Home
           </Link>
         </div>
       </div>
