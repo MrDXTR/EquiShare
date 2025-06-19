@@ -238,17 +238,17 @@ export function SplitConfiguration({
                     </span>
                   </div>
 
-                  {splitMode === "PERCENT" ? (
-                    <Slider
-                      value={[currentValue]}
-                      onValueChange={(values) =>
-                        handleShareUpdate(personId, values[0] || 0)
-                      }
-                      max={maxValue}
-                      step={0.1}
-                      className="py-1"
-                    />
-                  ) : (
+                {splitMode === "PERCENT" ? (
+  <Slider
+    value={[currentValue]}
+    onValueChange={(values) =>
+      handleShareUpdate(personId, values[0] || 0)
+    }
+    max={maxValue}
+    step={0.5} 
+    className="py-1"
+  />
+) : (
                     <div className="relative">
                       <IndianRupee className="absolute top-1/2 left-2 h-3 w-3 -translate-y-1/2 transform text-gray-400" />
                       <Input
