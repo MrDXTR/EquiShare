@@ -19,6 +19,18 @@ export const metadata: Metadata = {
   title: "Split Expenses",
   description: "The Smart Way to Split Bills",
   icons: [{ rel: "icon", url: "/favicon.ico" }],
+  openGraph: {
+    title: "Split Expenses",
+    description: "The Smart Way to Split Bills",
+    images: [
+      {
+        url: "/screen.png",
+        width: 1200,
+        height: 630,
+        alt: "Split Expenses Preview",
+      },
+    ],
+  },
 };
 
 const geist = Geist({
