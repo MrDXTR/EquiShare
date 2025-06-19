@@ -198,7 +198,7 @@ export function ExpensesList({ group, onExpenseDeleted }: ExpensesListProps) {
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
                         <DropdownMenuItem
-                          className="text-red-600 focus:text-red-600 dark:text-red-500 dark:focus:text-red-500"
+                          className="text-red-600  focus:text-red-600 dark:text-red-500 dark:focus:text-red-500"
                           onClick={() => setExpenseToDelete(expense.id)}
                         >
                           <Trash2 className="mr-2 h-4 w-4" />
@@ -235,7 +235,7 @@ export function ExpensesList({ group, onExpenseDeleted }: ExpensesListProps) {
             <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction
               onClick={handleDelete}
-              className="bg-red-600 hover:bg-red-700 focus:ring-red-600 dark:bg-red-700 dark:hover:bg-red-800 dark:focus:ring-red-700"
+              className="bg-red-600 dark:text-white hover:bg-red-700 focus:ring-red-600 dark:bg-red-700 dark:hover:bg-red-800 dark:focus:ring-red-700"
             >
               Delete
             </AlertDialogAction>

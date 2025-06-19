@@ -226,7 +226,7 @@ export function GroupSummary({
               <AlertDialogAction
                 onClick={handleDeletePerson}
                 disabled={isDeletingPerson}
-                className="bg-red-600 hover:bg-red-700 focus:ring-red-600"
+                className="bg-red-600 dark:text-white hover:bg-red-700 focus:ring-red-600"
               >
                 {isDeletingPerson ? (
                   <div className="flex items-center gap-2">
@@ -265,7 +265,7 @@ export function GroupSummary({
               <AlertDialogAction
                 onClick={handleDeleteExpense}
                 disabled={isDeleting}
-                className="bg-red-600 hover:bg-red-700 focus:ring-red-600"
+                className="bg-red-600 dark:text-white hover:bg-red-700 focus:ring-red-600"
               >
                 {isDeleting ? (
                   <div className="flex items-center gap-2">

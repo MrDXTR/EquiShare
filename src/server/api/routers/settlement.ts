@@ -153,8 +153,8 @@ export const settlementRouter = createTRPCRouter({
 
       const sumMap = new Map<string, number>();
       sums.forEach((s) => {
-        // @ts-ignore Prisma decimal support – pass through value
-        sumMap.set(s.expenseId, (s._sum.amount ?? 0) as unknown as number);
+        // Prisma returns Decimal, but we assume number for settledAmount
+        sumMap.set(s.expenseId, Number(s._sum.amount ?? 0));
       });
 
       const groupExpenses = await ctx.db.expense.findMany({
