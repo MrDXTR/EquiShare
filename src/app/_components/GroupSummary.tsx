@@ -18,7 +18,8 @@ import type { Group } from "./group/utils";
 import { GroupHeader } from "./group/GroupHeader";
 import { PeopleManagement } from "./group/PeopleManagement";
 import { ExpensesList } from "./group/ExpensesList";
-import { SettlementsList } from "./group/SettlementsList";
+import { SettlementsExportWrapper } from "./group/SettlementsExportWrapper";
+
 interface GroupSummaryProps {
   group: Group;
   onExpenseCreated?: () => Promise<void>;
@@ -198,7 +199,7 @@ export function GroupSummary({
             }}
           />
           <div className="lg:col-span-2">
-            <SettlementsList groupId={group.id} />
+            <SettlementsExportWrapper groupId={group.id} />
           </div>
         </div>
 
