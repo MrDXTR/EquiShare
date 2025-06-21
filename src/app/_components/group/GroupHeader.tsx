@@ -25,6 +25,7 @@ import {
   DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
 import type { Group } from "./utils";
+import { GroupDataExport } from "./GroupDataExport";
 
 interface GroupHeaderProps {
   group: Group;
@@ -56,9 +57,15 @@ export function GroupHeader({
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div className="flex items-center gap-2">
-          <h1 className="bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-3xl font-bold text-transparent sm:text-4xl dark:from-blue-400 dark:to-indigo-400">
-            {group.name || "Group Expenses"}
-          </h1>
+          <div className="flex items-center">
+            <h1 className="bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-3xl font-bold text-transparent sm:text-4xl dark:from-blue-400 dark:to-indigo-400">
+              {group.name || "Group Expenses"}
+            </h1>
+
+            <div className="ml-2 flex items-center">
+              <GroupDataExport group={group} />
+            </div>
+          </div>
 
           {!isOwner && (
             <Badge
