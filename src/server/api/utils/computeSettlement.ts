@@ -199,7 +199,6 @@ export async function computeAndUpsertSettlements(ctx: Ctx, groupId: string) {
 
   const sumMap = new Map<string, number>();
   sums.forEach((s) => {
-  
     sumMap.set(s.expenseId, (s._sum.amount ?? 0) as unknown as number);
   });
 

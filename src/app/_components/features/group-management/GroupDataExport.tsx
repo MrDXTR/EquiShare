@@ -13,7 +13,12 @@ import {
 import { Button } from "~/components/ui/button";
 import { api } from "~/trpc/react";
 import { toast } from "sonner";
-import { convertToCSV, generateAllGroupData, downloadCSV, generatePDF } from "./exportUtils";
+import {
+  convertToCSV,
+  generateAllGroupData,
+  downloadCSV,
+  generatePDF,
+} from "./exportUtils";
 import type { Group } from "./utils";
 
 interface GroupDataExportProps {
@@ -21,30 +26,33 @@ interface GroupDataExportProps {
 }
 
 export function GroupDataExport({ group }: GroupDataExportProps) {
-  const [isExporting, setIsExporting] = useState<'csv' | 'pdf' | null>(null);
-  
-  const { data: settlements } = api.settlement.list.useQuery({
-    groupId: group.id,
-  }, {
-    enabled: !!group.id,
-    staleTime: 5 * 60 * 1000, 
-  });
+  const [isExporting, setIsExporting] = useState<"csv" | "pdf" | null>(null);
 
-  const handleExport = async (type: 'csv' | 'pdf') => {
+  const { data: settlements } = api.settlement.list.useQuery(
+    {
+      groupId: group.id,
+    },
+    {
+      enabled: !!group.id,
+      staleTime: 5 * 60 * 1000,
+    },
+  );
+
+  const handleExport = async (type: "csv" | "pdf") => {
     setIsExporting(type);
-    
+
     try {
-      const filename = `${group.name.replace(/\s+/g, '-')}-export`;
+      const filename = `${group.name.replace(/\s+/g, "-")}-export`;
       const allData = generateAllGroupData(group, settlements || []);
       const csvData = convertToCSV(allData);
-      
-      if (type === 'csv') {
+
+      if (type === "csv") {
         downloadCSV(csvData, `${filename}.csv`);
         toast.success("CSV file downloaded!");
-      } else if (type === 'pdf') {
+      } else if (type === "pdf") {
         const pdfBlob = await generatePDF(csvData, group.name);
         const url = URL.createObjectURL(pdfBlob);
-        const link = document.createElement('a');
+        const link = document.createElement("a");
         link.href = url;
         link.download = `${filename}.pdf`;
         document.body.appendChild(link);
@@ -72,30 +80,30 @@ export function GroupDataExport({ group }: GroupDataExportProps) {
           <Download className="h-4 w-4" />
         </Button>
       </DropdownMenuTrigger>
-      
+
       <DropdownMenuContent align="end" className="w-48">
         <DropdownMenuLabel>Export Group Data</DropdownMenuLabel>
         <DropdownMenuSeparator />
-        
-        <DropdownMenuItem 
-          onClick={() => handleExport('csv')} 
+
+        <DropdownMenuItem
+          onClick={() => handleExport("csv")}
           disabled={isExporting !== null}
           className="cursor-pointer"
         >
-          {isExporting === 'csv' ? (
+          {isExporting === "csv" ? (
             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
           ) : (
             <FileSpreadsheet className="mr-2 h-4 w-4" />
           )}
           <span>Download CSV</span>
         </DropdownMenuItem>
-        
-        <DropdownMenuItem 
-          onClick={() => handleExport('pdf')} 
+
+        <DropdownMenuItem
+          onClick={() => handleExport("pdf")}
           disabled={isExporting !== null}
           className="cursor-pointer"
         >
-          {isExporting === 'pdf' ? (
+          {isExporting === "pdf" ? (
             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
           ) : (
             <File className="mr-2 h-4 w-4" />
@@ -105,4 +113,4 @@ export function GroupDataExport({ group }: GroupDataExportProps) {
       </DropdownMenuContent>
     </DropdownMenu>
   );
-} 
+}

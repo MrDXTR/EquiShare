@@ -102,7 +102,8 @@ export default function SignInPage() {
         {/* Footer */}
         <div className="mt-8 text-center">
           <p className="text-xs text-gray-400 dark:text-gray-500">
-            By continuing, you acknowledge and accept the EquiShare user agreement
+            By continuing, you acknowledge and accept the EquiShare user
+            agreement
           </p>
         </div>
       </div>

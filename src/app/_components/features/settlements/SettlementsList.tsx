@@ -18,7 +18,10 @@ interface SettlementsListProps {
   exportButton?: React.ReactNode;
 }
 
-export function SettlementsList({ groupId, exportButton }: SettlementsListProps) {
+export function SettlementsList({
+  groupId,
+  exportButton,
+}: SettlementsListProps) {
   const [settlingId, setSettlingId] = useState<string | null>(null);
   const [showSettled, setShowSettled] = useState(false);
   const utils = api.useUtils();
@@ -99,7 +102,9 @@ export function SettlementsList({ groupId, exportButton }: SettlementsListProps)
                   Settlements
                 </span>
                 {exportButton && (
-                  <div className="flex items-center md:hidden">{exportButton}</div>
+                  <div className="flex items-center md:hidden">
+                    {exportButton}
+                  </div>
                 )}
               </div>
             </CardTitle>

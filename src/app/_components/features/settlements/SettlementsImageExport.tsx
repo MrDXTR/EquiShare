@@ -27,7 +27,7 @@ export function SettlementsImageExport({
     toast.loading("Generating image...", { id: "export-image" });
 
     try {
-      const style = document.createElement('style');
+      const style = document.createElement("style");
       style.textContent = `
         .export-mode * {
           font-family: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif !important;
@@ -35,57 +35,60 @@ export function SettlementsImageExport({
       `;
       document.head.appendChild(style);
 
-      contentRef.current.classList.add('export-mode');
+      contentRef.current.classList.add("export-mode");
 
-      await new Promise(resolve => setTimeout(resolve, 200));
+      await new Promise((resolve) => setTimeout(resolve, 200));
 
       const dataUrl = await toPng(contentRef.current, {
-        backgroundColor: '#1f2937',
+        backgroundColor: "#1f2937",
         pixelRatio: 2,
         skipFonts: true,
         style: {
-          fontFamily: 'var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif',
+          fontFamily:
+            "var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif",
         },
         filter: (node) => {
           if (node.nodeType === Node.ELEMENT_NODE) {
             const element = node as Element;
-            
-            if (element.tagName === 'BUTTON') {
+
+            if (element.tagName === "BUTTON") {
               return false;
             }
-            
-            if (element.classList?.contains('flex') && 
-                element.classList?.contains('items-center') && 
-                element.classList?.contains('gap-4') &&
-                element.querySelector('[role="switch"]')) {
+
+            if (
+              element.classList?.contains("flex") &&
+              element.classList?.contains("items-center") &&
+              element.classList?.contains("gap-4") &&
+              element.querySelector('[role="switch"]')
+            ) {
               return false;
             }
           }
-          
+
           return true;
         },
       });
 
-      contentRef.current.classList.remove('export-mode');
+      contentRef.current.classList.remove("export-mode");
       document.head.removeChild(style);
 
-      const link = document.createElement('a');
-      link.download = `${groupName.replace(/\s+/g, '-')}-settlements.png`;
+      const link = document.createElement("a");
+      link.download = `${groupName.replace(/\s+/g, "-")}-settlements.png`;
       link.href = dataUrl;
       link.click();
 
       toast.success("Image downloaded!", { id: "export-image" });
     } catch (error) {
-      console.error('Export error:', error);
-      
-      if (contentRef.current?.classList.contains('export-mode')) {
-        contentRef.current.classList.remove('export-mode');
+      console.error("Export error:", error);
+
+      if (contentRef.current?.classList.contains("export-mode")) {
+        contentRef.current.classList.remove("export-mode");
       }
-      const existingStyle = document.querySelector('head style:last-child');
-      if (existingStyle?.textContent?.includes('export-mode')) {
+      const existingStyle = document.querySelector("head style:last-child");
+      if (existingStyle?.textContent?.includes("export-mode")) {
         document.head.removeChild(existingStyle);
       }
-      
+
       toast.error("Failed to generate image", { id: "export-image" });
     } finally {
       setIsExporting(false);
@@ -98,7 +101,7 @@ export function SettlementsImageExport({
       size="icon"
       onClick={handleExportImage}
       disabled={isExporting}
-      className="h-8 w-8 rounded-full border-indigo-200 bg-indigo-50 p-1 text-indigo-700 hover:bg-indigo-100 dark:border-indigo-800 dark:bg-indigo-900/30 dark:text-indigo-400 dark:hover:bg-indigo-800/50 md:size-sm md:h-8 md:w-auto md:rounded-md md:p-2"
+      className="md:size-sm h-8 w-8 rounded-full border-indigo-200 bg-indigo-50 p-1 text-indigo-700 hover:bg-indigo-100 md:h-8 md:w-auto md:rounded-md md:p-2 dark:border-indigo-800 dark:bg-indigo-900/30 dark:text-indigo-400 dark:hover:bg-indigo-800/50"
     >
       {isExporting ? (
         <Loader2 className="h-4 w-4 animate-spin" />

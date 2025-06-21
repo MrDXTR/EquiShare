@@ -217,10 +217,10 @@ export function updateShareValueWithAutoAdjust(
   if (splitMode === "PERCENT") {
     // Ensure percentage doesn't exceed 100%
     value = Math.min(100, value);
-    
+
     // Round to nearest 0.5
     value = Math.round(value * 2) / 2;
-    
+
     newShareValues[personId] = value;
 
     // Calculate current total
@@ -243,10 +243,10 @@ export function updateShareValueWithAutoAdjust(
         if (otherTotal > 0) {
           // Reduce other people's shares proportionally
           let remainingExcess = excess;
-          
+
           otherPersonIds.forEach((id, index) => {
             const currentValue = newShareValues[id] || 0;
-            
+
             if (index === otherPersonIds.length - 1) {
               // Give all remaining excess to the last person
               newShareValues[id] = Math.max(0, currentValue - remainingExcess);
@@ -256,33 +256,35 @@ export function updateShareValueWithAutoAdjust(
               newShareValues[id] = Math.max(0, currentValue - reduction);
               remainingExcess -= reduction;
             }
-            
+
             // Round to nearest 0.5
             newShareValues[id] = Math.round((newShareValues[id] || 0) * 2) / 2;
           });
         }
       }
     }
-    
+
     // Final check to ensure total doesn't exceed 100%
     const finalTotal = Object.entries(newShareValues)
       .filter(([id]) => selectedPersonIds.includes(id))
       .reduce((sum, [, val]) => sum + val, 0);
-      
+
     if (finalTotal > 100) {
       // If still over 100%, reduce the current person's share
       const overAmount = finalTotal - 100;
-      newShareValues[personId] = Math.max(0, newShareValues[personId] - overAmount);
+      newShareValues[personId] = Math.max(
+        0,
+        newShareValues[personId] - overAmount,
+      );
       newShareValues[personId] = Math.round(newShareValues[personId] * 2) / 2;
     }
-
   } else if (splitMode === "EXACT") {
     // Ensure exact amount doesn't exceed total
     value = Math.min(totalAmount, value);
-    
+
     // Round to nearest cent
     value = Math.round(value * 100) / 100;
-    
+
     newShareValues[personId] = value;
 
     // Calculate current total
@@ -305,10 +307,10 @@ export function updateShareValueWithAutoAdjust(
         if (otherTotal > 0) {
           // Reduce other people's shares proportionally
           let remainingExcess = excess;
-          
+
           otherPersonIds.forEach((id, index) => {
             const currentValue = newShareValues[id] || 0;
-            
+
             if (index === otherPersonIds.length - 1) {
               // Give all remaining excess to the last person
               newShareValues[id] = Math.max(0, currentValue - remainingExcess);
@@ -318,24 +320,29 @@ export function updateShareValueWithAutoAdjust(
               newShareValues[id] = Math.max(0, currentValue - reduction);
               remainingExcess -= reduction;
             }
-            
+
             // Round to nearest cent
-            newShareValues[id] = Math.round((newShareValues[id] || 0) * 100) / 100;
+            newShareValues[id] =
+              Math.round((newShareValues[id] || 0) * 100) / 100;
           });
         }
       }
     }
-    
+
     // Final check to ensure total doesn't exceed totalAmount
     const finalTotal = Object.entries(newShareValues)
       .filter(([id]) => selectedPersonIds.includes(id))
       .reduce((sum, [, val]) => sum + val, 0);
-      
+
     if (finalTotal > totalAmount) {
       // If still over totalAmount, reduce the current person's share
       const overAmount = finalTotal - totalAmount;
-      newShareValues[personId] = Math.max(0, newShareValues[personId] - overAmount);
-      newShareValues[personId] = Math.round(newShareValues[personId] * 100) / 100;
+      newShareValues[personId] = Math.max(
+        0,
+        newShareValues[personId] - overAmount,
+      );
+      newShareValues[personId] =
+        Math.round(newShareValues[personId] * 100) / 100;
     }
   }
 
@@ -357,7 +364,7 @@ export function autoBalanceShares(
       if (index === selectedPersonIds.length - 1) {
         const totalAssigned = selectedPersonIds
           .slice(0, -1)
-          .reduce((sum) => sum + (Math.round(evenPercent * 2) / 2), 0);
+          .reduce((sum) => sum + Math.round(evenPercent * 2) / 2, 0);
         newShareValues[id] = Math.round((100 - totalAssigned) * 2) / 2;
       } else {
         newShareValues[id] = Math.round(evenPercent * 2) / 2; // Round to nearest 0.5
@@ -370,8 +377,9 @@ export function autoBalanceShares(
       if (index === selectedPersonIds.length - 1) {
         const totalAssigned = selectedPersonIds
           .slice(0, -1)
-          .reduce((sum) => sum + (Math.round(evenAmount * 100) / 100), 0);
-        newShareValues[id] = Math.round((totalAmount - totalAssigned) * 100) / 100;
+          .reduce((sum) => sum + Math.round(evenAmount * 100) / 100, 0);
+        newShareValues[id] =
+          Math.round((totalAmount - totalAssigned) * 100) / 100;
       } else {
         newShareValues[id] = Math.round(evenAmount * 100) / 100; // Round to 2 decimal places
       }

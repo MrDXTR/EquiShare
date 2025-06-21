@@ -9,7 +9,9 @@ interface SettlementsExportWrapperProps {
   groupId: string;
 }
 
-export function SettlementsExportWrapper({ groupId }: SettlementsExportWrapperProps) {
+export function SettlementsExportWrapper({
+  groupId,
+}: SettlementsExportWrapperProps) {
   const contentRef = useRef<HTMLDivElement>(null);
 
   const { data: group } = api.group.getById.useQuery(groupId);
@@ -18,16 +20,16 @@ export function SettlementsExportWrapper({ groupId }: SettlementsExportWrapperPr
   return (
     <div className="space-y-4">
       <div ref={contentRef}>
-        <SettlementsList 
-          groupId={groupId} 
+        <SettlementsList
+          groupId={groupId}
           exportButton={
-            <SettlementsImageExport 
-              groupName={groupName} 
-              contentRef={contentRef} 
+            <SettlementsImageExport
+              groupName={groupName}
+              contentRef={contentRef}
             />
           }
         />
       </div>
     </div>
   );
-} 
+}

@@ -213,7 +213,7 @@ export function PeopleManagement({ group }: PeopleManagementProps) {
             <AlertDialogAction
               onClick={handleDeletePerson}
               disabled={isDeletingPerson}
-              className="bg-red-600 dark:text-white hover:bg-red-700 focus:ring-red-600 dark:bg-red-700 dark:hover:bg-red-800 dark:focus:ring-red-700"
+              className="bg-red-600 hover:bg-red-700 focus:ring-red-600 dark:bg-red-700 dark:text-white dark:hover:bg-red-800 dark:focus:ring-red-700"
             >
               {isDeletingPerson ? (
                 <div className="flex items-center gap-2">

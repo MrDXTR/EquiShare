@@ -8,7 +8,10 @@ import {
   SelectValue,
 } from "~/components/ui/select";
 import { IndianRupee, Receipt, Users } from "lucide-react";
-import { type Person, getPersonInitials } from "~/app/_components/features/group-management/utils";
+import {
+  type Person,
+  getPersonInitials,
+} from "~/app/_components/features/group-management/utils";
 import { PeopleSelection } from "./PeopleSelection";
 
 interface ExpenseDetailsProps {
