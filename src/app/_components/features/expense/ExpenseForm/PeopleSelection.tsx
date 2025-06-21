@@ -7,7 +7,7 @@ import {
   type Person,
   togglePersonSelection,
   getPersonInitials,
-} from "~/app/_components/group/utils";
+} from "~/app/_components/features/group-management/utils";
 
 interface PeopleSelectionProps {
   people: Person[];

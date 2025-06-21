@@ -21,7 +21,7 @@ import {
   autoBalanceShares,
   calculateCurrentTotals,
   getPersonInitials,
-} from "~/app/_components/group/utils";
+} from "~/app/_components/features/group-management/utils";
 
 interface SplitConfigurationProps {
   people: Person[];

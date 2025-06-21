@@ -17,8 +17,8 @@ import {
   AlertDialogTitle,
 } from "~/components/ui/alert-dialog";
 import { toast } from "sonner";
-import { GroupCard } from "~/app/_components/groups/GroupCard";
-import { CreateGroupDialog } from "~/app/_components/groups/CreateGroupDialog";
+import { GroupCard } from "../_components/features/group-management/groups/GroupCard";
+import { CreateGroupDialog } from "../_components/features/group-management/groups/CreateGroupDialog";
 
 export default function GroupsPage() {
   const router = useRouter();

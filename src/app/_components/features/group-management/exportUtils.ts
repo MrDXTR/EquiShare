@@ -146,14 +146,12 @@ export async function generatePDF(csvData: string, title: string): Promise<Blob>
   doc.setFontSize(18);
   doc.text(title, 14, 22);
   
-  const parseCSVRow = (row: string): string[] => {
+  const parseCsvRow = (row: string): string[] => {
     const result: string[] = [];
-    let inQuotes = false;
     let currentValue = '';
-    
-    for (let i = 0; i < row.length; i++) {
-      const char = row[i];
-      
+    let inQuotes = false;
+
+    for (const char of row) {
       if (char === '"') {
         inQuotes = !inQuotes;
       } else if (char === ',' && !inQuotes) {
@@ -168,7 +166,7 @@ export async function generatePDF(csvData: string, title: string): Promise<Blob>
     return result.map(val => val.replace(/^"(.*)"$/, '$1'));
   };
   
-  const rows = csvData.split('\n').map(row => parseCSVRow(row));
+  const rows = csvData.split('\n').map(row => parseCsvRow(row));
   
   let currentY = 30;
   let currentSection = "";
