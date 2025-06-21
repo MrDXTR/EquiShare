@@ -13,7 +13,7 @@ import {
 } from "lucide-react";
 import { Skeleton } from "~/components/ui/skeleton";
 import { Button } from "~/components/ui/button";
-import { InviteDialog } from "~/app/_components/group/InviteDialog";
+import { InviteDialog } from "~/app/_components/features/group-management/InviteDialog";
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 import { Badge } from "~/components/ui/badge";
 import {

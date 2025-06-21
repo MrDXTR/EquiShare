@@ -1,6 +1,6 @@
 import { Inter } from "next/font/google";
-import { Header } from "./_components/Header";
-import { Footer } from "./_components/Footer";
+import { Header } from "./_components/common/Header";
+import { Footer } from "./_components/common/Footer";
 import { Providers } from "./providers";
 import "~/styles/globals.css";
 import { Toaster } from "sonner";

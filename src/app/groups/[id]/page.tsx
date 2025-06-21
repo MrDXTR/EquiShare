@@ -4,7 +4,7 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { api } from "~/trpc/react";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
-import { GroupSummary } from "~/app/_components/GroupSummary";
+import { GroupSummary } from "~/app/_components/common/GroupSummary";
 import { use } from "react";
 import { Skeleton } from "~/components/ui/skeleton";
 import {
@@ -13,7 +13,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "~/components/ui/dialog";
-import { GroupMembers } from "~/app/_components/group/GroupMembers";
+import { GroupMembers } from "~/app/_components/features/group-management/GroupMembers";
 
 export default function GroupDetailPage({
   params,

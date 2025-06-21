@@ -14,11 +14,11 @@ import {
   AlertDialogTitle,
 } from "~/components/ui/alert-dialog";
 import { useState } from "react";
-import type { Group } from "./group/utils";
-import { GroupHeader } from "./group/GroupHeader";
-import { PeopleManagement } from "./group/PeopleManagement";
-import { ExpensesList } from "./group/ExpensesList";
-import { SettlementsExportWrapper } from "./group/SettlementsExportWrapper";
+import type { Group } from "../features/group-management/utils";
+import { GroupHeader } from "../features/group-management/GroupHeader";
+import { PeopleManagement } from "../features/group-management/PeopleManagement";
+import { ExpensesList } from "../features/expense/ExpensesList";
+import { SettlementsExportWrapper } from "../features/settlements/SettlementsExportWrapper";
 
 interface GroupSummaryProps {
   group: Group;

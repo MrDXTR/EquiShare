@@ -25,7 +25,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
-import { ExpenseForm } from "~/app/_components/ExpenseForm/ExpenseForm";
+import { ExpenseForm } from "~/app/_components/features/expense/ExpenseForm/ExpenseForm";
 
 type Group = RouterOutputs["group"]["getById"];
 

@@ -20,11 +20,11 @@ import {
   validateSplitShares,
   prepareShares,
   isFormValid,
-} from "~/app/_components/group/utils";
-import { ExpenseDetails } from "~/app/_components/ExpenseForm/ExpenseDetails";
-import { SplitConfiguration } from "~/app/_components/ExpenseForm/SplitConfiguration";
-import { FormHeader } from "~/app/_components/ExpenseForm/FormHeader";
-import { FormFooter } from "~/app/_components/ExpenseForm/FormFooter";
+} from "~/app/_components/features/group-management/utils";
+import { ExpenseDetails } from "~/app/_components/features/expense/ExpenseForm/ExpenseDetails";
+import { SplitConfiguration } from "~/app/_components/features/expense/ExpenseForm/SplitConfiguration";
+import { FormHeader } from "~/app/_components/features/expense/ExpenseForm/FormHeader";
+import { FormFooter } from "~/app/_components/features/expense/ExpenseForm/FormFooter";
 
 interface ExpenseFormProps {
   groupId: string;
