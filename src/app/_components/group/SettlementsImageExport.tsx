@@ -95,17 +95,17 @@ export function SettlementsImageExport({
   return (
     <Button
       variant="outline"
-      size="sm"
+      size="icon"
       onClick={handleExportImage}
       disabled={isExporting}
-      className="border-indigo-200 bg-indigo-50 text-indigo-700 hover:bg-indigo-100 dark:border-indigo-800 dark:bg-indigo-900/30 dark:text-indigo-400 dark:hover:bg-indigo-800/50"
+      className="h-8 w-8 rounded-full border-indigo-200 bg-indigo-50 p-1 text-indigo-700 hover:bg-indigo-100 dark:border-indigo-800 dark:bg-indigo-900/30 dark:text-indigo-400 dark:hover:bg-indigo-800/50 md:size-sm md:h-8 md:w-auto md:rounded-md md:p-2"
     >
       {isExporting ? (
-        <Loader2 className="mr-1 h-4 w-4 animate-spin" />
+        <Loader2 className="h-4 w-4 animate-spin" />
       ) : (
-        <Download className="mr-1 h-4 w-4" />
+        <Download className="h-4 w-4" />
       )}
-      Export Image
+      <span className="ml-1 hidden md:inline">Export Image</span>
     </Button>
   );
 }

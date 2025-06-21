@@ -15,9 +15,10 @@ import { SettleAllConfirmationDialog } from "./SettleAllConfirmationDialog";
 
 interface SettlementsListProps {
   groupId: string;
+  exportButton?: React.ReactNode;
 }
 
-export function SettlementsList({ groupId }: SettlementsListProps) {
+export function SettlementsList({ groupId, exportButton }: SettlementsListProps) {
   const [settlingId, setSettlingId] = useState<string | null>(null);
   const [showSettled, setShowSettled] = useState(false);
   const utils = api.useUtils();
@@ -89,13 +90,18 @@ export function SettlementsList({ groupId }: SettlementsListProps) {
       <Card className="h-full border-0 bg-white/80 shadow-xl shadow-indigo-100/50 backdrop-blur-sm transition-all duration-300 hover:shadow-2xl hover:shadow-indigo-200/60 dark:bg-gray-800/80 dark:shadow-none dark:hover:shadow-none">
         <CardHeader className="pb-4">
           <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between md:gap-0">
-            <CardTitle className="flex items-center gap-3 text-2xl">
+            <CardTitle className="flex flex-wrap items-center gap-3 text-2xl">
               <div className="rounded-lg bg-gradient-to-r from-indigo-500 to-purple-600 p-2">
                 <ArrowRight className="h-6 w-6 text-white" />
               </div>
-              <span className="bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent dark:from-indigo-400 dark:to-purple-400">
-                Settlements
-              </span>
+              <div className="flex items-center gap-2">
+                <span className="bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent dark:from-indigo-400 dark:to-purple-400">
+                  Settlements
+                </span>
+                {exportButton && (
+                  <div className="flex items-center md:hidden">{exportButton}</div>
+                )}
+              </div>
             </CardTitle>
             <div className="flex items-center gap-4">
               <div className="flex items-center gap-2">
@@ -118,6 +124,10 @@ export function SettlementsList({ groupId }: SettlementsListProps) {
                   )}
                 </Label>
               </div>
+
+              {exportButton && (
+                <div className="hidden md:flex">{exportButton}</div>
+              )}
 
               {activeSettlements.length > 0 && (
                 <SettleAllConfirmationDialog

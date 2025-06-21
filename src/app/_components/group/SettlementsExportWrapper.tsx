@@ -17,15 +17,16 @@ export function SettlementsExportWrapper({ groupId }: SettlementsExportWrapperPr
 
   return (
     <div className="space-y-4">
-      <div className="flex justify-end">
-        <SettlementsImageExport 
-          groupName={groupName} 
-          contentRef={contentRef} 
-        />
-      </div>
-      
       <div ref={contentRef}>
-        <SettlementsList groupId={groupId} />
+        <SettlementsList 
+          groupId={groupId} 
+          exportButton={
+            <SettlementsImageExport 
+              groupName={groupName} 
+              contentRef={contentRef} 
+            />
+          }
+        />
       </div>
     </div>
   );
