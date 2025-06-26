@@ -7,17 +7,10 @@ import {
 } from "~/server/api/trpc";
 import crypto from "crypto";
 
-// Helper function to generate a short token and its hash
+
 function generateInviteToken() {
-  const characters =
-    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-  let token = "";
-  for (let i = 0; i < 10; i++) {
-    token += characters.charAt(Math.floor(Math.random() * characters.length));
-  }
-
+  const token = crypto.randomBytes(32).toString("base64url");
   const hash = crypto.createHash("sha256").update(token).digest("hex");
-
   return { token, hash };
 }
 
