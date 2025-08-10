@@ -24,6 +24,42 @@ export const expenseRouter = createTRPCRouter({
     .mutation(async ({ ctx, input }) => {
       const { groupId, description, amount, paidById, shares } = input;
 
+      // Authorization and membership checks for group and participants
+      const group = await ctx.db.group.findFirst({
+        where: {
+          id: groupId,
+          OR: [
+            { createdById: ctx.session.user.id },
+            { members: { some: { id: ctx.session.user.id } } },
+          ],
+        },
+        include: { people: { select: { id: true } } },
+      });
+
+      if (!group) {
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "You do not have access to this group",
+        });
+      }
+
+      const groupPersonIds = new Set(group.people.map((p) => p.id));
+      if (!groupPersonIds.has(paidById)) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Payer must be a person in this group",
+        });
+      }
+
+      for (const s of shares) {
+        if (!groupPersonIds.has(s.personId)) {
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: "All share participants must belong to the group",
+          });
+        }
+      }
+
       // Calculate share amounts based on type
       const sharesWithAmount = shares.map((share) => {
         let shareAmount: number;
@@ -113,6 +149,25 @@ export const expenseRouter = createTRPCRouter({
         throw new TRPCError({
           code: "NOT_FOUND",
           message: "Expense not found",
+        });
+      }
+
+      // Authorization: ensure caller has access to this group
+      const hasAccess = await ctx.db.group.findFirst({
+        where: {
+          id: expense.groupId,
+          OR: [
+            { createdById: ctx.session.user.id },
+            { members: { some: { id: ctx.session.user.id } } },
+          ],
+        },
+        select: { id: true },
+      });
+
+      if (!hasAccess) {
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "You do not have access to this group",
         });
       }
 

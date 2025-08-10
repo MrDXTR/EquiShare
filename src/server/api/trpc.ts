@@ -87,7 +87,7 @@ export const createTRPCRouter = t.router;
 const timingMiddleware = t.middleware(async ({ next, path }) => {
   const start = Date.now();
 
-  if (t._config.isDev) {
+  if (process.env.NODE_ENV !== "production") {
     // artificial delay in dev
     const waitMs = Math.floor(Math.random() * 400) + 100;
     await new Promise((resolve) => setTimeout(resolve, waitMs));
@@ -96,7 +96,9 @@ const timingMiddleware = t.middleware(async ({ next, path }) => {
   const result = await next();
 
   const end = Date.now();
-  console.log(`[TRPC] ${path} took ${end - start}ms to execute`);
+  if (process.env.NODE_ENV !== "production") {
+    console.log(`[TRPC] ${path} took ${end - start}ms to execute`);
+  }
 
   return result;
 });

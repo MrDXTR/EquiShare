@@ -29,13 +29,13 @@ function minTx(
     const c = creditors[j];
     if (!d || !c) break; // concise guard
     const amt = Math.min(-d.bal, c.bal);
-    if (amt > 0.01) {
+    if (amt > 0.009) {
       tx.push({ fromId: d.id, toId: c.id, amount: amt });
       d.bal += amt;
       c.bal -= amt;
     }
-    if (Math.abs(d.bal) < 0.01) i++;
-    if (Math.abs(c.bal) < 0.01) j++;
+    if (Math.abs(d.bal) < 0.009) i++;
+    if (Math.abs(c.bal) < 0.009) j++;
   }
   return tx;
 }
@@ -119,7 +119,11 @@ export async function computeAndUpsertSettlements(ctx: Ctx, groupId: string) {
       bal: v,
     }));
 
-  const newTx = minTx(rows); // what is STILL owed (unsettled)
+  const newTx = minTx(rows).map((t) => ({
+    ...t,
+    // normalize to 2 decimals to minimize float drift; consider Decimal in schema
+    amount: Math.round(t.amount * 100) / 100,
+  })); // what is STILL owed (unsettled)
 
   /* -------------------------------------------------------------- */
   /* 4.  Replace every old "unsettled" row with the fresh set       */
@@ -150,66 +154,66 @@ export async function computeAndUpsertSettlements(ctx: Ctx, groupId: string) {
       settledPairs.add(`${s.fromId}-${s.toId}`);
     });
 
-  await ctx.db.$transaction([
-    ctx.db.settlement.deleteMany({ where: { groupId, settled: false } }),
-    ...(newTx.length
-      ? [
-          ctx.db.settlement.createMany({
-            data: newTx
-              .filter((t) => {
-                // Only create unsettled settlement if this pair is not already settled
-                const pairKey = `${t.fromId}-${t.toId}`;
-                return !settledPairs.has(pairKey);
-              })
-              .map((t) => {
-                // Find the first expense that caused this from->to pair
-                const pairKey = `${t.fromId}-${t.toId}`;
-                const expenseId =
-                  pairToFirstExpense.get(pairKey) || g.expenses[0]?.id;
+  await ctx.db.$transaction(async (tx) => {
+    await tx.settlement.deleteMany({ where: { groupId, settled: false } });
 
-                if (!expenseId) {
-                  throw new TRPCError({
-                    code: "INTERNAL_SERVER_ERROR",
-                    message: "Could not find a valid expense for settlement",
-                  });
-                }
+    if (newTx.length) {
+      const data = newTx
+        .filter((t) => {
+          const pairKey = `${t.fromId}-${t.toId}`;
+          return !settledPairs.has(pairKey);
+        })
+        .map((t) => {
+          const pairKey = `${t.fromId}-${t.toId}`;
+          const expenseId = pairToFirstExpense.get(pairKey) || g.expenses[0]?.id;
 
-                return {
-                  groupId,
-                  fromId: t.fromId,
-                  toId: t.toId,
-                  amount: t.amount,
-                  settled: false,
-                  expenseId,
-                };
-              }),
-          }),
-        ]
-      : []),
-  ]);
+          if (!expenseId) {
+            throw new TRPCError({
+              code: "INTERNAL_SERVER_ERROR",
+              message: "Could not find a valid expense for settlement",
+            });
+          }
 
-  const sums = await ctx.db.settlement.groupBy({
-    by: ["expenseId"],
-    where: {
-      groupId,
-      settled: true,
-    },
-    _sum: { amount: true },
+          return {
+            groupId,
+            fromId: t.fromId,
+            toId: t.toId,
+            amount: t.amount,
+            settled: false,
+            expenseId,
+          };
+        });
+
+      if (data.length) {
+        await tx.settlement.createMany({ data });
+      }
+    }
+
+    const sums = await tx.settlement.groupBy({
+      by: ["expenseId"],
+      where: {
+        groupId,
+        settled: true,
+      },
+      _sum: { amount: true },
+    });
+
+    const sumMap = new Map<string, number>();
+    sums.forEach((s) => {
+      sumMap.set(s.expenseId, (s._sum.amount ?? 0) as unknown as number);
+    });
+
+    const expenseUpdatePromises = g.expenses.map((exp) =>
+      tx.expense.update({
+        where: { id: exp.id },
+        data: { settledAmount: sumMap.get(exp.id) ?? 0 },
+      }),
+    );
+
+    if (expenseUpdatePromises.length) {
+      await Promise.all(expenseUpdatePromises);
+    }
   });
-
-  const sumMap = new Map<string, number>();
-  sums.forEach((s) => {
-    sumMap.set(s.expenseId, (s._sum.amount ?? 0) as unknown as number);
-  });
-
-  const expenseUpdatePromises = g.expenses.map((exp) =>
-    ctx.db.expense.update({
-      where: { id: exp.id },
-      data: { settledAmount: sumMap.get(exp.id) ?? 0 },
-    }),
-  );
-
-  await ctx.db.$transaction(expenseUpdatePromises);
 
   return { success: true, newUnsettled: newTx.length };
 }

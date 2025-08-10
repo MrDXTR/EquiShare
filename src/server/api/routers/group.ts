@@ -148,12 +148,19 @@ export const groupRouter = createTRPCRouter({
   delete: protectedProcedure
     .input(z.string())
     .mutation(async ({ ctx, input }) => {
-      await ctx.db.group.delete({
-        where: {
-          id: input,
-          createdById: ctx.session.user.id,
-        },
+      const group = await ctx.db.group.findFirst({
+        where: { id: input, createdById: ctx.session.user.id },
+        select: { id: true },
       });
+
+      if (!group) {
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "You do not have permission to delete this group",
+        });
+      }
+
+      await ctx.db.group.delete({ where: { id: input } });
       return { success: true };
     }),
 
@@ -218,12 +225,37 @@ export const groupRouter = createTRPCRouter({
         });
       }
 
-      await ctx.db.person.delete({
-        where: {
-          id: input.personId,
-          groupId: input.groupId,
-        },
+      // Ensure the person belongs to the provided group
+      const person = await ctx.db.person.findUnique({
+        where: { id: input.personId },
+        select: { id: true, groupId: true },
       });
+
+      if (!person || person.groupId !== input.groupId) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Person not found in this group",
+        });
+      }
+
+      // Block deletion if the person participates in expenses or settlements
+      const [paidCount, shareCount, fromSettleCount, toSettleCount] =
+        await ctx.db.$transaction([
+          ctx.db.expense.count({ where: { paidById: input.personId } }),
+          ctx.db.share.count({ where: { personId: input.personId } }),
+          ctx.db.settlement.count({ where: { fromId: input.personId } }),
+          ctx.db.settlement.count({ where: { toId: input.personId } }),
+        ]);
+
+      if (paidCount + shareCount + fromSettleCount + toSettleCount > 0) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message:
+            "Cannot delete a person that is referenced by expenses or settlements",
+        });
+      }
+
+      await ctx.db.person.delete({ where: { id: input.personId } });
       return { success: true };
     }),
 
