@@ -146,43 +146,30 @@ export async function computeAndUpsertSettlements(ctx: Ctx, groupId: string) {
     });
   });
 
-  // Build a set of settled pairs (fromId-toId) to prevent re-creating unsettled settlements for already settled pairs
-  const settledPairs = new Set<string>();
-  g.settlements
-    .filter((s) => s.settled)
-    .forEach((s) => {
-      settledPairs.add(`${s.fromId}-${s.toId}`);
-    });
-
   await ctx.db.$transaction(async (tx) => {
     await tx.settlement.deleteMany({ where: { groupId, settled: false } });
 
     if (newTx.length) {
-      const data = newTx
-        .filter((t) => {
-          const pairKey = `${t.fromId}-${t.toId}`;
-          return !settledPairs.has(pairKey);
-        })
-        .map((t) => {
-          const pairKey = `${t.fromId}-${t.toId}`;
-          const expenseId = pairToFirstExpense.get(pairKey) || g.expenses[0]?.id;
+      const data = newTx.map((t) => {
+        const pairKey = `${t.fromId}-${t.toId}`;
+        const expenseId = pairToFirstExpense.get(pairKey) || g.expenses[0]?.id;
 
-          if (!expenseId) {
-            throw new TRPCError({
-              code: "INTERNAL_SERVER_ERROR",
-              message: "Could not find a valid expense for settlement",
-            });
-          }
+        if (!expenseId) {
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: "Could not find a valid expense for settlement",
+          });
+        }
 
-          return {
-            groupId,
-            fromId: t.fromId,
-            toId: t.toId,
-            amount: t.amount,
-            settled: false,
-            expenseId,
-          };
-        });
+        return {
+          groupId,
+          fromId: t.fromId,
+          toId: t.toId,
+          amount: t.amount,
+          settled: false,
+          expenseId,
+        };
+      });
 
       if (data.length) {
         await tx.settlement.createMany({ data });
@@ -200,7 +187,7 @@ export async function computeAndUpsertSettlements(ctx: Ctx, groupId: string) {
 
     const sumMap = new Map<string, number>();
     sums.forEach((s) => {
-      sumMap.set(s.expenseId, (s._sum.amount ?? 0) as unknown as number);
+      sumMap.set(s.expenseId, Number(s._sum.amount ?? 0));
     });
 
     const expenseUpdatePromises = g.expenses.map((exp) =>

@@ -57,6 +57,7 @@ export function ExpenseForm({
       resetForm();
       await utils.group.getById.invalidate(groupId);
       await utils.expense.getBalances.invalidate(groupId);
+      await utils.settlement.list.invalidate({ groupId });
       toast.success("Expense added!", { id: "create-expense" });
       onSuccess?.();
       setOpen(false);
