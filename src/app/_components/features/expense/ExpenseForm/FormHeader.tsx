@@ -33,7 +33,7 @@ export function FormHeader({ currentStep }: FormHeaderProps) {
       </div>
 
       <div className="text-center">
-        <h2 className="bg-gradient-to-r from-violet-600 to-blue-600 bg-clip-text text-xl font-bold text-transparent">
+        <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100">
           {currentStep === 1 ? "Expense Details" : "Split Configuration"}
         </h2>
         <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">

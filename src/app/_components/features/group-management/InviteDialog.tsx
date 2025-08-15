@@ -85,10 +85,10 @@ export function InviteDialog({ children, groupId }: InviteDialogProps) {
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-xl">
-            <div className="rounded-lg bg-gradient-to-r from-indigo-500 to-purple-600 p-2">
+            <div className="rounded-lg bg-indigo-600 p-2">
               <UserPlus className="h-5 w-5 text-white" />
             </div>
-            <span className="bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+            <span className="text-gray-900 dark:text-gray-100">
               Invite Members
             </span>
           </DialogTitle>
@@ -125,7 +125,7 @@ export function InviteDialog({ children, groupId }: InviteDialogProps) {
 
               <Button
                 onClick={handleGenerateInvite}
-                className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 dark:text-white"
+                className="w-full bg-indigo-600 text-white hover:bg-indigo-700"
               >
                 Generate Invite Link
               </Button>
@@ -205,7 +205,7 @@ export function InviteDialog({ children, groupId }: InviteDialogProps) {
               <div className="pt-2">
                 <Button
                   onClick={handleGenerateInvite}
-                  className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 dark:text-white"
+                  className="w-full bg-indigo-600 text-white hover:bg-indigo-700"
                 >
                   Generate New Link
                 </Button>

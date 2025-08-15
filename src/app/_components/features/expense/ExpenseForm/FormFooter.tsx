@@ -38,7 +38,7 @@ export function FormFooter({
             type="button"
             onClick={onContinue}
             disabled={!canContinue}
-            className="h-10 bg-gradient-to-r from-violet-500 to-blue-500 px-4 hover:from-violet-600 hover:to-blue-600 dark:text-white"
+            className="h-10 bg-blue-600 px-4 text-white hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600"
           >
             Continue
             <ArrowRight className="ml-1 h-4 w-4" />
@@ -48,7 +48,7 @@ export function FormFooter({
             type="submit"
             onClick={onSubmit}
             disabled={!formIsValid || isPending}
-            className="h-10 bg-gradient-to-r from-violet-500 to-blue-500 px-4 hover:from-violet-600 hover:to-blue-600 dark:text-white"
+            className="h-10 bg-blue-600 px-4 text-white hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600"
           >
             {isPending ? (
               <>

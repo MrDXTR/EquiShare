@@ -146,12 +146,12 @@ export function ExpenseForm({
       }}
     >
       <DialogTrigger asChild>
-        {trigger || (
-          <Button className="bg-gradient-to-r from-violet-600 to-blue-600 hover:from-violet-700 hover:to-blue-700">
-            <Plus className="mr-2 h-4 w-4" />
-            Add Expense
-          </Button>
-        )}
+                  {trigger || (
+            <Button className="bg-blue-600 text-white hover:bg-blue-700">
+              <Plus className="mr-2 h-4 w-4" />
+              Add Expense
+            </Button>
+          )}
       </DialogTrigger>
 
       <DialogContent className="flex max-h-[90vh] w-[95vw] max-w-2xl flex-col gap-0 p-0">

@@ -112,10 +112,10 @@ export function PeopleManagement({ group }: PeopleManagementProps) {
       <Card className="h-full border-0 bg-white/80 shadow-xl shadow-blue-100/50 backdrop-blur-sm transition-all duration-300 hover:shadow-2xl hover:shadow-blue-200/60 dark:bg-gray-800/80 dark:shadow-none dark:hover:shadow-none">
         <CardHeader className="pb-4">
           <CardTitle className="flex items-center gap-3 text-2xl">
-            <div className="rounded-lg bg-gradient-to-r from-blue-500 to-blue-600 p-2">
+            <div className="rounded-lg bg-blue-600 p-2">
               <Users className="h-6 w-6 text-white" />
             </div>
-            <span className="bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent dark:from-blue-400 dark:to-indigo-400">
+            <span className="text-gray-900 dark:text-gray-100">
               People
             </span>
           </CardTitle>
@@ -138,7 +138,7 @@ export function PeopleManagement({ group }: PeopleManagementProps) {
                 <Button
                   type="submit"
                   disabled={!newPersonName.trim() || addPerson.isPending}
-                  className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white hover:from-blue-700 hover:to-indigo-700 dark:from-blue-500 dark:to-indigo-500 dark:hover:from-blue-600 dark:hover:to-indigo-600"
+                  className="bg-blue-600 text-white hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600"
                 >
                   {addPerson.isPending ? (
                     <Loader2 className="h-4 w-4 animate-spin" />

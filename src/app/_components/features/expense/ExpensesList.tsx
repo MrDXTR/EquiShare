@@ -96,10 +96,10 @@ export function ExpensesList({ group, onExpenseDeleted }: ExpensesListProps) {
         <CardHeader className="pb-4">
           <div className="flex flex-col items-start justify-between gap-3 md:flex-row md:items-center md:gap-0">
             <CardTitle className="flex items-center gap-3 text-2xl">
-              <div className="rounded-lg bg-gradient-to-r from-indigo-500 to-purple-600 p-2">
+              <div className="rounded-lg bg-indigo-600 p-2">
                 <Receipt className="h-6 w-6 text-white" />
               </div>
-              <span className="bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent dark:from-indigo-400 dark:to-purple-400">
+              <span className="text-gray-900 dark:text-gray-100">
                 Expenses
               </span>
             </CardTitle>
@@ -111,7 +111,7 @@ export function ExpensesList({ group, onExpenseDeleted }: ExpensesListProps) {
                 trigger={
                   <Button
                     size="sm"
-                    className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 dark:from-indigo-500 dark:to-purple-500 dark:text-white dark:hover:from-indigo-600 dark:hover:to-purple-600"
+                    className="bg-indigo-600 text-white hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600"
                   >
                     <Plus className="mr-2 h-4 w-4" />
                     Add Expense

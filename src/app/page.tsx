@@ -98,7 +98,7 @@ export default function LandingPage() {
           >
             <h1 className="text-5xl font-bold tracking-tight sm:text-6xl md:text-7xl lg:text-8xl">
               Split Expenses
-              <span className="block bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 bg-clip-text text-transparent dark:from-blue-400 dark:via-purple-400 dark:to-indigo-400">
+              <span className="block text-blue-600 dark:text-blue-400">
                 Smarter
               </span>
             </h1>
@@ -132,7 +132,7 @@ export default function LandingPage() {
             <Button
               size="lg"
               onClick={() => router.push("/signin")}
-              className="hover:shadow-3xl transform bg-gradient-to-r from-blue-600 to-indigo-600 px-8 py-4 text-lg font-semibold text-white shadow-2xl shadow-blue-500/25 transition-all duration-300 hover:-translate-y-1 hover:scale-105 hover:from-blue-700 hover:to-indigo-700 hover:shadow-blue-500/40 dark:from-blue-500 dark:to-indigo-500 dark:shadow-blue-900/25 dark:hover:from-blue-600 dark:hover:to-indigo-600 dark:hover:shadow-blue-900/40"
+              className="hover:shadow-3xl transform bg-blue-600 px-8 py-4 text-lg font-semibold text-white shadow-2xl shadow-blue-500/25 transition-all duration-300 hover:-translate-y-1 hover:scale-105 hover:bg-blue-700 hover:shadow-blue-500/40 dark:bg-blue-500 dark:shadow-blue-900/25 dark:hover:bg-blue-600 dark:hover:shadow-blue-900/40"
             >
               Start Splitting Smarter
               <ArrowRight className="ml-2 h-5 w-5" />
@@ -174,7 +174,7 @@ export default function LandingPage() {
           >
             <h2 className="mb-4 text-4xl font-bold text-gray-900 dark:text-gray-100">
               Everything you need to
-              <span className="bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent dark:from-blue-400 dark:to-indigo-400">
+              <span className="text-blue-600 dark:text-blue-400">
                 {" "}
                 manage expenses
               </span>
@@ -199,7 +199,7 @@ export default function LandingPage() {
                 <Card className="h-full border-0 bg-white/80 shadow-lg backdrop-blur-sm transition-all duration-300 hover:shadow-2xl dark:bg-gray-800/80 dark:shadow-gray-900/30">
                   <CardContent className="space-y-4 p-8 text-center">
                     <div
-                      className={`inline-flex rounded-2xl bg-gradient-to-r p-4 ${feature.color} shadow-lg transition-all duration-300 group-hover:shadow-xl`}
+                      className={`inline-flex rounded-2xl bg-blue-600 p-4 text-white shadow-lg transition-all duration-300 group-hover:shadow-xl`}
                     >
                       <feature.icon className="h-8 w-8 text-white" />
                     </div>
@@ -226,19 +226,19 @@ export default function LandingPage() {
           viewport={{ once: true }}
           className="container mx-auto max-w-4xl text-center"
         >
-          <Card className="border-0 bg-gradient-to-r from-blue-600 to-indigo-600 shadow-2xl shadow-blue-500/25 dark:from-blue-700 dark:to-indigo-700 dark:shadow-blue-900/25">
+          <Card className="border-0 bg-white/80 shadow-xl shadow-indigo-100/50 backdrop-blur-sm transition-all duration-300 hover:shadow-2xl hover:shadow-indigo-200/60 dark:bg-gray-800/80 dark:shadow-none dark:hover:shadow-none">
             <CardContent className="space-y-6 p-12">
-              <h2 className="mb-4 text-4xl font-bold text-white">
+              <h2 className="mb-4 text-4xl font-bold text-gray-900 dark:text-white">
                 Ready to get started?
               </h2>
-              <p className="mx-auto mb-8 max-w-2xl text-xl text-blue-100">
+              <p className="mx-auto mb-8 max-w-2xl text-xl text-gray-600 dark:text-gray-300">
                 Join thousands of users who have simplified their expense
                 sharing experience
               </p>
               <Button
                 size="lg"
                 onClick={() => router.push("/signin")}
-                className="transform bg-white px-8 py-4 text-lg font-semibold text-blue-600 shadow-xl transition-all duration-300 hover:scale-105 hover:bg-gray-50 hover:shadow-2xl dark:bg-gray-100 dark:text-blue-700 dark:hover:bg-gray-200"
+                className="transform bg-blue-600 px-8 py-4 text-lg font-semibold text-white shadow-xl transition-all duration-300 hover:scale-105 hover:bg-blue-700 hover:shadow-2xl dark:bg-blue-700 dark:hover:bg-blue-800"
               >
                 Get Started Now
                 <ArrowRight className="ml-2 h-5 w-5" />

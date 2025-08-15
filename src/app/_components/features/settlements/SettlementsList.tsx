@@ -94,11 +94,11 @@ export function SettlementsList({
         <CardHeader className="pb-4">
           <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between md:gap-0">
             <CardTitle className="flex flex-wrap items-center gap-3 text-2xl">
-              <div className="rounded-lg bg-gradient-to-r from-indigo-500 to-purple-600 p-2">
+              <div className="rounded-lg bg-indigo-600 p-2">
                 <ArrowRight className="h-6 w-6 text-white" />
               </div>
               <div className="flex items-center gap-2">
-                <span className="bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent dark:from-indigo-400 dark:to-purple-400">
+                <span className="text-gray-900 dark:text-gray-100">
                   Settlements
                 </span>
                 {exportButton && (
@@ -161,7 +161,7 @@ export function SettlementsList({
                 exit={{ opacity: 0, scale: 0.8 }}
                 className="py-12 text-center"
               >
-                <div className="mb-4 inline-flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-r from-green-400 to-emerald-500 dark:from-green-500 dark:to-emerald-600">
+                <div className="mb-4 inline-flex h-20 w-20 items-center justify-center rounded-full bg-green-500 dark:bg-green-600">
                   <CheckCircle2 className="h-10 w-10 text-white" />
                 </div>
                 <h3 className="mb-2 text-2xl font-bold text-green-700 dark:text-green-400">

@@ -64,7 +64,7 @@ export function Header() {
                         src={session.user?.image || ""}
                         alt={session.user?.name || "User"}
                       />
-                      <AvatarFallback className="bg-gradient-to-r from-blue-500 to-indigo-600 font-semibold text-white">
+                      <AvatarFallback className="bg-blue-600 font-semibold text-white">
                         {session.user?.name?.charAt(0)?.toUpperCase() || "U"}
                       </AvatarFallback>
                     </Avatar>
@@ -101,7 +101,7 @@ export function Header() {
               <ThemeToggle />
               <Button
                 onClick={() => router.push("/signin")}
-                className="font-medium"
+                className="font-medium cursor-pointer"
               >
                 Sign In
               </Button>
