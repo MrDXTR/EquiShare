@@ -99,9 +99,7 @@ export function ExpensesList({ group, onExpenseDeleted }: ExpensesListProps) {
               <div className="rounded-lg bg-indigo-600 p-2">
                 <Receipt className="h-6 w-6 text-white" />
               </div>
-              <span className="text-gray-900 dark:text-gray-100">
-                Expenses
-              </span>
+              <span className="text-gray-900 dark:text-gray-100">Expenses</span>
             </CardTitle>
             <div>
               <ExpenseForm

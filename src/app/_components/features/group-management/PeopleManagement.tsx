@@ -115,9 +115,7 @@ export function PeopleManagement({ group }: PeopleManagementProps) {
             <div className="rounded-lg bg-blue-600 p-2">
               <Users className="h-6 w-6 text-white" />
             </div>
-            <span className="text-gray-900 dark:text-gray-100">
-              People
-            </span>
+            <span className="text-gray-900 dark:text-gray-100">People</span>
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-6">

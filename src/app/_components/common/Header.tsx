@@ -101,7 +101,7 @@ export function Header() {
               <ThemeToggle />
               <Button
                 onClick={() => router.push("/signin")}
-                className="font-medium cursor-pointer"
+                className="cursor-pointer font-medium"
               >
                 Sign In
               </Button>

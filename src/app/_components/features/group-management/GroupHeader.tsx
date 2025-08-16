@@ -58,7 +58,7 @@ export function GroupHeader({
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div className="flex items-center gap-2">
           <div className="flex items-center">
-            <h1 className="text-3xl font-bold sm:text-4xl text-gray-900 dark:text-gray-100">
+            <h1 className="text-3xl font-bold text-gray-900 sm:text-4xl dark:text-gray-100">
               {group.name || "Group Expenses"}
             </h1>
 

@@ -7,7 +7,6 @@ import {
 } from "~/server/api/trpc";
 import crypto from "crypto";
 
-
 function generateInviteToken() {
   const token = crypto.randomBytes(32).toString("base64url");
   const hash = crypto.createHash("sha256").update(token).digest("hex");

@@ -233,12 +233,12 @@ export function InvitePageClient({ token }: InvitePageClientProps) {
                 )}
 
                 <div className="mt-6 flex w-full flex-col space-y-3">
-                                  <Button
-                  onClick={handleAcceptInvite}
-                  disabled={acceptingInvite}
-                  className="w-full bg-blue-600 text-white hover:bg-blue-700 dark:bg-gray-700 dark:hover:bg-gray-600"
-                  size="lg"
-                >
+                  <Button
+                    onClick={handleAcceptInvite}
+                    disabled={acceptingInvite}
+                    className="w-full bg-blue-600 text-white hover:bg-blue-700 dark:bg-gray-700 dark:hover:bg-gray-600"
+                    size="lg"
+                  >
                     {acceptingInvite ? (
                       <>
                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
