@@ -13,11 +13,14 @@ type Ctx = {
 };
 
 // Compute minimal transfers needed to settle balances
+// This implements the standard debt simplification algorithm
 function minTx(
   rows: { id: string; name: string; bal: number }[],
 ): { fromId: string; toId: string; amount: number }[] {
-  const creditors = rows.filter((r) => r.bal > 0).map((r) => ({ ...r }));
-  const debtors = rows.filter((r) => r.bal < 0).map((r) => ({ ...r }));
+  // Sort creditors (positive balance) in descending order
+  const creditors = rows.filter((r) => r.bal > 0).sort((a, b) => b.bal - a.bal);
+  // Sort debtors (negative balance) in ascending order (most negative first)
+  const debtors = rows.filter((r) => r.bal < 0).sort((a, b) => a.bal - b.bal);
   const tx: { fromId: string; toId: string; amount: number }[] = [];
 
   let i = 0,
@@ -26,12 +29,16 @@ function minTx(
     const d = debtors[i];
     const c = creditors[j];
     if (!d || !c) break;
+    
+    // Calculate the amount to transfer (minimum of what debtor owes and creditor is owed)
     const amt = Math.min(-d.bal, c.bal);
     if (amt > 0.009) {
       tx.push({ fromId: d.id, toId: c.id, amount: amt });
-      d.bal += amt;
-      c.bal -= amt;
+      d.bal += amt;  // Reduce debtor's debt
+      c.bal -= amt;  // Reduce creditor's credit
     }
+    
+    // Move to next debtor/creditor if current one is settled (within tolerance)
     if (Math.abs(d.bal) < 0.009) i++;
     if (Math.abs(c.bal) < 0.009) j++;
   }
@@ -72,22 +79,30 @@ export async function computeAndUpsertSettlements(ctx: Ctx, groupId: string) {
   if (!g) throw new TRPCError({ code: "NOT_FOUND" });
 
   // Build balances from expenses
+  // Positive balance = person is owed money (creditor)
+  // Negative balance = person owes money (debtor)
   const bal = new Map<string, number>();
   g.people.forEach((p) => bal.set(p.id, 0));
 
   type X = Expense & { shares: (Share & { person: Person })[] };
   g.expenses.forEach((e: X) => {
+    // Person who paid gets credited (positive balance)
     bal.set(e.paidById, (bal.get(e.paidById) ?? 0) + e.amount);
+    
+    // People who owe money get debited (negative balance)
     e.shares.forEach((s) =>
       bal.set(s.personId, (bal.get(s.personId) ?? 0) - s.amount),
     );
   });
 
   // Apply settled transfers (already paid)
+  // When a settlement is paid, it reduces the debt between the two people
   g.settlements
     .filter((s) => s.settled)
     .forEach((s: Settlement) => {
+      // Person who paid the settlement gets +amount (reduces their debt)
       bal.set(s.fromId, (bal.get(s.fromId) ?? 0) + s.amount);
+      // Person who received gets -amount (reduces what they're owed)
       bal.set(s.toId, (bal.get(s.toId) ?? 0) - s.amount);
     });
 
@@ -112,8 +127,11 @@ export async function computeAndUpsertSettlements(ctx: Ctx, groupId: string) {
     const { paidById } = expense;
     expense.shares.forEach((share) => {
       if (share.personId !== paidById) {
-        const pairKey = `${share.personId}-${paidById}`;
-        pairToLatestExpense.set(pairKey, expense.id);
+        // Create keys for both directions since settlements can go either way
+        const pairKey1 = `${share.personId}-${paidById}`;
+        const pairKey2 = `${paidById}-${share.personId}`;
+        pairToLatestExpense.set(pairKey1, expense.id);
+        pairToLatestExpense.set(pairKey2, expense.id);
       }
     });
   });
