@@ -6,6 +6,7 @@ import { Check, UserCheck } from "lucide-react";
 import {
   type Person,
   togglePersonSelection,
+  generateShareValues,
   getPersonInitials,
 } from "~/app/_components/features/group-management/utils";
 
@@ -24,6 +25,8 @@ export function PeopleSelection({
   amount,
   updateFormState,
 }: PeopleSelectionProps) {
+  const allSelected = people.length > 0 && selectedPersonIds.length === people.length;
+
   const handlePersonToggle = (personId: string) => {
     const { newSelection, newShareValues } = togglePersonSelection(
       personId,
@@ -39,6 +42,21 @@ export function PeopleSelection({
     });
   };
 
+  const handleSelectAll = () => {
+    const allIds = people.map((p) => p.id);
+    const newShareValues = generateShareValues(
+      splitMode,
+      allIds,
+      parseFloat(amount) || 0,
+    );
+
+    updateFormState({
+      selectedPersonIds: allIds,
+      shareValues: newShareValues,
+      formErrors: null,
+    });
+  };
+
   return (
     <div className="space-y-3 pb-4">
       <div className="flex items-center justify-between">
@@ -46,17 +64,30 @@ export function PeopleSelection({
           <UserCheck className="h-4 w-4 text-violet-500" />
           Split Between ({selectedPersonIds.length} selected)
         </Label>
-        {selectedPersonIds.length > 0 && (
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            onClick={() => updateFormState({ selectedPersonIds: [] })}
-            className="text-violet-600 hover:text-violet-700"
-          >
-            Clear
-          </Button>
-        )}
+        <div className="flex items-center gap-1">
+          {!allSelected && (
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={handleSelectAll}
+              className="text-muted-foreground"
+            >
+              All
+            </Button>
+          )}
+          {selectedPersonIds.length > 0 && (
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={() => updateFormState({ selectedPersonIds: [] })}
+              className="text-muted-foreground"
+            >
+              Clear
+            </Button>
+          )}
+        </div>
       </div>
 
       <div
@@ -77,27 +108,27 @@ export function PeopleSelection({
               onClick={() => handlePersonToggle(person.id)}
               className={`rounded-lg border-2 p-3 text-left transition-all duration-200 ${
                 isSelected
-                  ? "border-violet-400 bg-violet-50 dark:bg-violet-900/30"
-                  : "border-gray-200 hover:border-violet-300 dark:border-gray-700"
+                  ? "border-foreground/30 bg-muted/30"
+                  : "border-border hover:border-foreground/20"
               } `}
             >
               <div className="flex items-center gap-2">
                 <div
-                  className={`relative flex h-8 w-8 items-center justify-center rounded-full text-xs font-bold text-white ${
+                  className={`relative flex h-8 w-8 items-center justify-center rounded-full text-xs font-bold ${
                     isSelected
-                      ? "bg-gradient-to-br from-violet-500 to-blue-500"
-                      : "bg-gray-400"
+                      ? "border border-foreground bg-foreground text-background"
+                      : "border border-border bg-background text-foreground"
                   } `}
                 >
                   {getPersonInitials(person.name)}
                   {isSelected && (
-                    <div className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-green-500">
-                      <Check className="h-2 w-2 text-white" />
+                    <div className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full border border-border bg-background">
+                      <Check className="h-2 w-2 text-foreground" />
                     </div>
                   )}
                 </div>
                 <span
-                  className={`truncate text-sm font-medium ${isSelected ? "text-violet-700 dark:text-violet-400" : ""}`}
+                  className={`truncate text-sm font-medium ${isSelected ? "text-foreground" : ""}`}
                 >
                   {person.name}
                 </span>

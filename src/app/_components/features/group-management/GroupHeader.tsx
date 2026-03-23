@@ -70,7 +70,7 @@ export function GroupHeader({
           {!isOwner && (
             <Badge
               variant="outline"
-              className="ml-2 border-blue-200 bg-blue-50 text-blue-700 dark:border-blue-800 dark:bg-blue-900/50 dark:text-blue-400"
+              className="ml-2 border-border bg-transparent text-muted-foreground"
             >
               <Share2 className="mr-1 h-3 w-3" />
               Shared
@@ -134,7 +134,7 @@ export function GroupHeader({
               <DropdownMenuSeparator />
               <DropdownMenuItem
                 onClick={() =>
-                  setShowMembersDialog && setShowMembersDialog(true)
+                  setShowMembersDialog?.(true)
                 }
               >
                 <span className="text-blue-600 dark:text-blue-400">
@@ -163,32 +163,32 @@ export function GroupHeader({
 
       {/* Stats Overview */}
       <div className="mt-6 flex flex-wrap justify-center gap-4 sm:gap-6">
-        <div className="flex items-center gap-2 rounded-full border border-white/20 bg-white/70 px-4 py-2 shadow-sm backdrop-blur-sm dark:border-gray-700/20 dark:bg-gray-800/70">
-          <TrendingUp className="h-5 w-5 text-green-600 dark:text-green-400" />
-          <span className="font-semibold text-gray-700 dark:text-gray-200">
+        <div className="flex items-center gap-2 rounded-full border border-border bg-background px-4 py-2">
+          <TrendingUp className="h-5 w-5 text-muted-foreground" />
+          <span className="font-semibold text-foreground">
             Total: ₹{totalExpenses.toFixed(2)}
           </span>
         </div>
-        <div className="flex items-center gap-2 rounded-full border border-white/20 bg-white/70 px-4 py-2 shadow-sm backdrop-blur-sm dark:border-gray-700/20 dark:bg-gray-800/70">
-          <Receipt className="h-5 w-5 text-blue-600 dark:text-blue-400" />
-          <span className="font-semibold text-gray-700 dark:text-gray-200">
+        <div className="flex items-center gap-2 rounded-full border border-border bg-background px-4 py-2">
+          <Receipt className="h-5 w-5 text-muted-foreground" />
+          <span className="font-semibold text-foreground">
             {group.expenses.length} Expenses
           </span>
         </div>
-        <div className="flex items-center gap-2 rounded-full border border-white/20 bg-white/70 px-4 py-2 shadow-sm backdrop-blur-sm dark:border-gray-700/20 dark:bg-gray-800/70">
+        <div className="flex items-center gap-2 rounded-full border border-border bg-background px-4 py-2">
           {isLoadingBalances ? (
-            <Skeleton className="h-5 w-24 dark:bg-gray-700" />
+            <Skeleton className="h-5 w-24" />
           ) : showAllSettled ? (
             <>
-              <CheckCircle2 className="h-5 w-5 text-green-600 dark:text-green-400" />
-              <span className="font-semibold text-green-700 dark:text-green-400">
+              <CheckCircle2 className="h-5 w-5 text-foreground" />
+              <span className="font-semibold text-foreground">
                 All Settled!
               </span>
             </>
           ) : (
             <>
-              <AlertCircle className="h-5 w-5 text-orange-600 dark:text-orange-400" />
-              <span className="font-semibold text-orange-700 dark:text-orange-400">
+              <AlertCircle className="h-5 w-5 text-foreground" />
+              <span className="font-semibold text-foreground">
                 {pendingSettlements} Pending
               </span>
             </>
@@ -197,9 +197,9 @@ export function GroupHeader({
 
         {isOwner && (
           <InviteDialog groupId={group.id}>
-            <div className="flex cursor-pointer items-center gap-2 rounded-full border border-white/20 bg-white/70 px-4 py-2 shadow-sm backdrop-blur-sm transition-colors hover:bg-white/90 dark:border-gray-700/20 dark:bg-gray-800/70 dark:hover:bg-gray-800/90">
-              <UserPlus className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
-              <span className="font-semibold text-indigo-700 dark:text-indigo-400">
+            <div className="flex cursor-pointer items-center gap-2 rounded-full border border-border bg-background px-4 py-2 transition-colors hover:bg-muted/40">
+              <UserPlus className="h-5 w-5 text-foreground" />
+              <span className="font-semibold text-foreground">
                 Invite Members
               </span>
             </div>

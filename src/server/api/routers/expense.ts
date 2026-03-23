@@ -1,7 +1,10 @@
 import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 import { TRPCError } from "@trpc/server";
-import { computeAndUpsertSettlements } from "../utils/computeSettlement";
+import {
+  buildGroupBalances,
+  computeAndUpsertSettlements,
+} from "../utils/computeSettlement";
 
 // Define a schema for expense share types
 const shareSchema = z.object({
@@ -171,15 +174,16 @@ export const expenseRouter = createTRPCRouter({
         });
       }
 
-      // Delete settlements first, then delete the expense
-      await ctx.db.settlement.deleteMany({
-        where: { expenseId: input },
-      });
+      await ctx.db.$transaction(async (tx) => {
+        await tx.settlement.deleteMany({
+          where: { expenseId: input },
+        });
 
-      await ctx.db.expense.delete({
-        where: {
-          id: input,
-        },
+        await tx.expense.delete({
+          where: {
+            id: input,
+          },
+        });
       });
 
       // Recompute settlements after deleting an expense
@@ -212,6 +216,9 @@ export const expenseRouter = createTRPCRouter({
               },
             },
           },
+          settlements: {
+            where: { settled: true },
+          },
         },
       });
 
@@ -222,34 +229,21 @@ export const expenseRouter = createTRPCRouter({
         });
       }
 
-      // If there are no expenses, return empty balances
       if (group.expenses.length === 0) {
         return [];
       }
 
-      const balances = new Map<string, number>();
-      group.people.forEach((person) => {
-        balances.set(person.id, 0);
-      });
+      const balances = buildGroupBalances(
+        group.people,
+        group.expenses,
+        group.settlements,
+      );
 
-      group.expenses.forEach((expense) => {
-        // Add amount to payer's balance
-        const currentPayerBalance = balances.get(expense.paidById) ?? 0;
-        balances.set(expense.paidById, currentPayerBalance + expense.amount);
-
-        // Subtract share amount from each person's balance
-        expense.shares.forEach((share) => {
-          const currentBalance = balances.get(share.personId) ?? 0;
-          balances.set(share.personId, currentBalance - share.amount);
-        });
-      });
-
-      // Filter out zero balances to avoid showing settled people
       return Array.from(balances.entries())
-        .filter(([_, balance]) => Math.abs(balance) > 0.01) // Filter out zero or very small balances
+        .filter(([, balance]) => balance !== 0)
         .map(([personId, balance]) => ({
           personId,
-          balance,
+          balance: balance / 100,
           person: group.people.find((p) => p.id === personId),
         }));
     }),

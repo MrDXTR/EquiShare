@@ -94,17 +94,6 @@ export const settlementRouter = createTRPCRouter({
         data: { settled: true },
       });
 
-      // Update the expense's settledAmount
-      const agg = await ctx.db.settlement.aggregate({
-        where: { expenseId: updatedSettlement.expenseId, settled: true },
-        _sum: { amount: true },
-      });
-
-      await ctx.db.expense.update({
-        where: { id: updatedSettlement.expenseId },
-        data: { settledAmount: agg._sum.amount ?? 0 },
-      });
-
       // Recompute settlements after settling one
       await computeAndUpsertSettlements(ctx, settlement.groupId);
 
@@ -140,36 +129,6 @@ export const settlementRouter = createTRPCRouter({
         },
         data: { settled: true },
       });
-
-      // Update all expenses' settledAmount in this group
-      const sums = await ctx.db.settlement.groupBy({
-        by: ["expenseId"],
-        where: {
-          groupId,
-          settled: true,
-        },
-        _sum: { amount: true },
-      });
-
-      const sumMap = new Map<string, number>();
-      sums.forEach((s) => {
-        // Prisma returns Decimal, but we assume number for settledAmount
-        sumMap.set(s.expenseId, Number(s._sum.amount ?? 0));
-      });
-
-      const groupExpenses = await ctx.db.expense.findMany({
-        where: { groupId },
-        select: { id: true },
-      });
-
-      const updatePromises = groupExpenses.map((exp) =>
-        ctx.db.expense.update({
-          where: { id: exp.id },
-          data: { settledAmount: sumMap.get(exp.id) ?? 0 },
-        }),
-      );
-
-      await ctx.db.$transaction(updatePromises);
 
       // Recompute settlements after settling all
       await computeAndUpsertSettlements(ctx, groupId);

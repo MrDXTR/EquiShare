@@ -90,12 +90,12 @@ export function SettlementsList({
       animate={{ opacity: 1, x: 0 }}
       transition={{ delay: 0.4 }}
     >
-      <Card className="h-full border-0 bg-white/80 shadow-xl shadow-indigo-100/50 backdrop-blur-sm transition-all duration-300 hover:shadow-2xl hover:shadow-indigo-200/60 dark:bg-gray-800/80 dark:shadow-none dark:hover:shadow-none">
+      <Card className="h-full border border-border bg-background">
         <CardHeader className="pb-4">
           <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between md:gap-0">
             <CardTitle className="flex flex-wrap items-center gap-3 text-2xl">
-              <div className="rounded-lg bg-indigo-600 p-2">
-                <ArrowRight className="h-6 w-6 text-white" />
+              <div className="rounded-lg border border-border p-2">
+                <ArrowRight className="h-6 w-6 text-foreground" />
               </div>
               <div className="flex items-center gap-2">
                 <span className="text-gray-900 dark:text-gray-100">
@@ -161,13 +161,13 @@ export function SettlementsList({
                 exit={{ opacity: 0, scale: 0.8 }}
                 className="py-12 text-center"
               >
-                <div className="mb-4 inline-flex h-20 w-20 items-center justify-center rounded-full bg-green-500 dark:bg-green-600">
-                  <CheckCircle2 className="h-10 w-10 text-white" />
+                <div className="mb-4 inline-flex h-20 w-20 items-center justify-center rounded-full border border-emerald-500/60 bg-emerald-500/10">
+                  <CheckCircle2 className="h-10 w-10 text-emerald-600 dark:text-emerald-400" />
                 </div>
-                <h3 className="mb-2 text-2xl font-bold text-green-700 dark:text-green-400">
+                <h3 className="mb-2 text-2xl font-bold text-foreground">
                   All Settled Up!
                 </h3>
-                <p className="text-gray-600 dark:text-gray-300">
+                <p className="text-muted-foreground">
                   Everyone&apos;s debts are cleared
                 </p>
               </motion.div>
@@ -183,38 +183,27 @@ export function SettlementsList({
                       animate={{ opacity: 1, y: 0, scale: 1 }}
                       exit={{ opacity: 0, y: -20, scale: 0.95 }}
                       transition={{ delay: idx * 0.1 }}
-                      className={`group relative overflow-hidden rounded-xl border p-4 transition-all duration-300 hover:scale-[1.02] hover:shadow-lg ${
+                      className={`group relative overflow-hidden rounded-xl border bg-background p-4 shadow-lg transition-[box-shadow,border-color] duration-200 hover:border-foreground/20 ${
                         isSettled
-                          ? "border-green-200/60 bg-gradient-to-r from-green-50 to-emerald-50 hover:shadow-green-100/50 dark:border-green-900/30 dark:from-green-900/20 dark:to-emerald-900/20 dark:hover:shadow-green-900/20"
-                          : "border-orange-200/60 bg-gradient-to-r from-orange-50 to-red-50 hover:shadow-orange-100/50 dark:border-orange-900/30 dark:from-orange-900/20 dark:to-red-900/20 dark:hover:shadow-orange-900/20"
+                          ? "shadow-emerald-500/10 hover:shadow-[0_0_0_1px_rgba(16,185,129,0.18),0_10px_30px_rgba(16,185,129,0.10)]"
+                          : "shadow-amber-500/10 hover:shadow-[0_0_0_1px_rgba(34,197,94,0.18),0_10px_30px_rgba(34,197,94,0.12)]"
                       }`}
                     >
-                      <div
-                        className={`pointer-events-none absolute inset-0 bg-gradient-to-r opacity-0 transition-opacity duration-300 group-hover:opacity-100 ${
-                          isSettled
-                            ? "from-green-500/5 to-emerald-500/5 dark:from-green-500/10 dark:to-emerald-500/10"
-                            : "from-orange-500/5 to-red-500/5 dark:from-orange-500/10 dark:to-red-500/10"
-                        }`}
-                      />
                       <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
                         <div className="flex flex-wrap items-center gap-2">
-                          <Badge className="border-orange-300 bg-orange-100 font-semibold text-orange-800 dark:border-orange-700 dark:bg-orange-900/50 dark:text-orange-300">
+                          <Badge className="border-border bg-transparent font-semibold text-foreground">
                             {settlement.from.name}
                           </Badge>
                           <ArrowRight
-                            className={`h-4 w-4 transition-colors group-hover:text-orange-600 dark:group-hover:text-orange-400 ${
-                              isSettled
-                                ? "text-green-500 group-hover:text-green-600 dark:text-green-400 dark:group-hover:text-green-500"
-                                : "text-gray-500 dark:text-gray-400"
-                            }`}
+                            className="h-4 w-4 text-muted-foreground"
                           />
-                          <Badge className="border-green-300 bg-green-100 font-semibold text-green-800 dark:border-green-700 dark:bg-green-900/50 dark:text-green-300">
+                          <Badge className="border-border bg-transparent font-semibold text-foreground">
                             {settlement.to.name}
                           </Badge>
                           {isSettled && (
                             <Badge
                               variant="outline"
-                              className="ml-2 border-green-300 bg-green-50 font-semibold text-green-800 dark:border-green-700 dark:bg-green-900/30 dark:text-green-300"
+                             className="ml-2 border-green-300 bg-green-50 font-semibold text-green-800 dark:border-green-700 dark:bg-green-900/30 dark:text-green-300"
                             >
                               <CheckCircle2 className="mr-1 h-3 w-3" />
                               Settled
@@ -223,11 +212,7 @@ export function SettlementsList({
                         </div>
                         <div className="flex items-center gap-3">
                           <span
-                            className={`text-2xl font-bold transition-colors ${
-                              isSettled
-                                ? "text-green-600 group-hover:text-green-700 dark:text-green-400 dark:group-hover:text-green-300"
-                                : "text-red-600 group-hover:text-red-700 dark:text-red-400 dark:group-hover:text-red-300"
-                            }`}
+                            className="text-2xl font-semibold text-foreground"
                           >
                             ₹{settlement.amount.toFixed(2)}
                           </span>
@@ -239,7 +224,6 @@ export function SettlementsList({
                                 handleSettleTransaction(settlement.id)
                               }
                               disabled={settlingId === settlement.id}
-                              className="border-green-200 bg-green-50 text-green-700 hover:bg-green-100 dark:border-green-800 dark:bg-green-900/30 dark:text-green-400 dark:hover:bg-green-800/50"
                             >
                               {settlingId === settlement.id ? (
                                 <Loader2 className="h-4 w-4 animate-spin" />
@@ -256,7 +240,7 @@ export function SettlementsList({
                 })}
               </div>
             ) : (
-              <div className="py-8 text-center text-gray-500">
+              <div className="py-8 text-center text-muted-foreground">
                 <p>No settlements found</p>
               </div>
             )}

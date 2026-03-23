@@ -155,7 +155,7 @@ export function ExpenseForm({
         )}
       </DialogTrigger>
 
-      <DialogContent className="flex max-h-[90vh] w-[95vw] max-w-2xl flex-col gap-0 p-0">
+      <DialogContent className="flex max-h-[90vh] w-[95vw] max-w-2xl flex-col gap-0 border p-0">
         <DialogHeader className="sr-only">
           <DialogTitle>Add Expense - Step {currentStep}</DialogTitle>
         </DialogHeader>
