@@ -38,7 +38,7 @@ export function ExpenseDetails({
       {/* Description */}
       <div className="space-y-2">
         <Label className="flex items-center gap-2">
-          <Receipt className="h-4 w-4 text-violet-500" />
+          <Receipt className="h-4 w-4 text-muted-foreground" />
           Description
         </Label>
         <Input
@@ -54,7 +54,7 @@ export function ExpenseDetails({
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <div className="space-y-2">
           <Label className="flex items-center gap-2">
-            <IndianRupee className="h-4 w-4 text-violet-500" />
+            <IndianRupee className="h-4 w-4 text-muted-foreground" />
             Amount
           </Label>
           <div className="relative">
@@ -73,7 +73,7 @@ export function ExpenseDetails({
 
         <div className="space-y-2">
           <Label className="flex items-center gap-2">
-            <Users className="h-4 w-4 text-violet-500" />
+            <Users className="h-4 w-4 text-muted-foreground" />
             Paid By
           </Label>
           <Select
@@ -87,7 +87,7 @@ export function ExpenseDetails({
               {people.map((person) => (
                 <SelectItem key={person.id} value={person.id}>
                   <div className="flex items-center gap-2">
-                    <div className="flex h-6 w-6 items-center justify-center rounded-full bg-gradient-to-br from-violet-400 to-blue-400 text-xs font-semibold text-white">
+                    <div className="flex h-6 w-6 items-center justify-center rounded-full border border-border text-xs font-semibold text-foreground">
                       {getPersonInitials(person.name)}
                     </div>
                     {person.name}

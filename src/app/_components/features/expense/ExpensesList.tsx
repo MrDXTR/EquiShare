@@ -92,7 +92,7 @@ export function ExpensesList({ group, onExpenseDeleted }: ExpensesListProps) {
       animate={{ opacity: 1, x: 0 }}
       transition={{ delay: 0.4 }}
     >
-      <Card className="h-full border-0 bg-white/80 shadow-xl shadow-indigo-100/50 backdrop-blur-sm transition-all duration-300 hover:shadow-2xl hover:shadow-indigo-200/60 dark:bg-gray-800/80 dark:shadow-none dark:hover:shadow-none">
+      <Card className="h-full border border-border bg-background">
         <CardHeader className="pb-4">
           <div className="flex flex-col items-start justify-between gap-3 md:flex-row md:items-center md:gap-0">
             <CardTitle className="flex items-center gap-3 text-2xl">
@@ -109,7 +109,7 @@ export function ExpensesList({ group, onExpenseDeleted }: ExpensesListProps) {
                 trigger={
                   <Button
                     size="sm"
-                    className="bg-indigo-600 text-white hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600"
+                    variant="outline"
                   >
                     <Plus className="mr-2 h-4 w-4" />
                     Add Expense
@@ -128,7 +128,6 @@ export function ExpensesList({ group, onExpenseDeleted }: ExpensesListProps) {
               </div>
             ) : (
               group.expenses.map((expense: any, index: number) => {
-                // Calculate the settled percentage
                 const amount =
                   typeof expense.amount === "number" ? expense.amount : 0;
                 const settledAmount =
@@ -144,42 +143,29 @@ export function ExpensesList({ group, onExpenseDeleted }: ExpensesListProps) {
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: index * 0.1 }}
-                    className="group relative overflow-hidden rounded-xl border border-gray-200/60 bg-gradient-to-r from-white to-gray-50/50 p-5 transition-all duration-300 hover:shadow-lg hover:shadow-blue-100/50 dark:border-gray-700/60 dark:from-gray-800 dark:to-gray-900/50 dark:hover:shadow-blue-900/20"
+                    className="group relative overflow-hidden rounded-xl border border-border bg-background p-5 transition-colors duration-200 hover:border-foreground/20"
                   >
-                    <div className="absolute inset-0 bg-gradient-to-r from-blue-500/5 to-indigo-500/5 opacity-0 transition-opacity duration-300 group-hover:opacity-100 dark:from-blue-500/10 dark:to-indigo-500/10" />
                     <div className="relative flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                       <div className="space-y-2">
                         <div className="flex flex-wrap items-center gap-2">
-                          <h3 className="text-lg font-semibold text-gray-900 transition-colors group-hover:text-blue-700 dark:text-gray-100 dark:group-hover:text-blue-400">
+                          <h3 className="text-lg font-semibold text-foreground">
                             {expense.description}
                           </h3>
-                          {/* <Badge
-                            variant={settledPercent > 0 ? "default" : "outline"}
-                            className={
-                              settledPercent === 100
-                                ? "bg-green-100 text-green-800 border-green-200 dark:bg-green-900/50 dark:text-green-400 dark:border-green-700"
-                                : settledPercent > 0
-                                ? "bg-orange-100 text-orange-800 border-orange-200 dark:bg-orange-900/50 dark:text-orange-400 dark:border-orange-700"
-                                : "bg-gray-100 text-gray-800 border-gray-200 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-700"
-                            }
-                          >
-                            {settledPercent}% settled
-                          </Badge> */}
                         </div>
                         <div className="flex flex-wrap items-center gap-2">
                           <Badge
                             variant="outline"
-                            className="border-blue-200 bg-blue-50 text-blue-700 dark:border-blue-800 dark:bg-blue-900/50 dark:text-blue-400"
+                            className="border-border bg-transparent text-muted-foreground"
                           >
                             Paid by {expense.paidBy.name}
                           </Badge>
                         </div>
                       </div>
                       <div className="space-y-1 text-right">
-                        <p className="text-2xl font-bold text-gray-900 transition-colors group-hover:text-green-600 dark:text-gray-100 dark:group-hover:text-green-400">
+                        <p className="text-2xl font-semibold text-foreground">
                           ₹{expense.amount.toFixed(2)}
                         </p>
-                        <div className="flex items-center gap-1 text-sm text-gray-600 dark:text-gray-400">
+                        <div className="flex items-center gap-1 text-sm text-muted-foreground">
                           <span>Split {expense.shares.length} ways</span>
                         </div>
                       </div>
@@ -189,16 +175,13 @@ export function ExpensesList({ group, onExpenseDeleted }: ExpensesListProps) {
                         <Button
                           variant="ghost"
                           size="icon"
-                          className="absolute top-2 right-2 opacity-0 group-focus-within:opacity-100 group-hover:opacity-100 hover:bg-gray-100 dark:hover:bg-gray-700"
+                          className="absolute top-2 right-2 opacity-0 group-focus-within:opacity-100 group-hover:opacity-100"
                         >
                           <MoreVertical className="h-4 w-4" />
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
-                        <DropdownMenuItem
-                          className="text-red-600 focus:text-red-600 dark:text-red-500 dark:focus:text-red-500"
-                          onClick={() => setExpenseToDelete(expense.id)}
-                        >
+                        <DropdownMenuItem onClick={() => setExpenseToDelete(expense.id)}>
                           <Trash2 className="mr-2 h-4 w-4" />
                           Delete
                         </DropdownMenuItem>

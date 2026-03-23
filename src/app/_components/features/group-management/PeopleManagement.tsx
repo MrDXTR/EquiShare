@@ -109,13 +109,13 @@ export function PeopleManagement({ group }: PeopleManagementProps) {
       animate={{ opacity: 1, x: 0 }}
       transition={{ delay: 0.2 }}
     >
-      <Card className="h-full border-0 bg-white/80 shadow-xl shadow-blue-100/50 backdrop-blur-sm transition-all duration-300 hover:shadow-2xl hover:shadow-blue-200/60 dark:bg-gray-800/80 dark:shadow-none dark:hover:shadow-none">
+      <Card className="h-full border border-border bg-background">
         <CardHeader className="pb-4">
           <CardTitle className="flex items-center gap-3 text-2xl">
-            <div className="rounded-lg bg-blue-600 p-2">
-              <Users className="h-6 w-6 text-white" />
+            <div className="rounded-lg border border-border p-2">
+              <Users className="h-6 w-6 text-foreground" />
             </div>
-            <span className="text-gray-900 dark:text-gray-100">People</span>
+            <span className="text-foreground">People</span>
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-6">
@@ -131,12 +131,11 @@ export function PeopleManagement({ group }: PeopleManagementProps) {
                   value={newPersonName}
                   onChange={(e) => setNewPersonName(e.target.value)}
                   placeholder="Enter name"
-                  className="flex-1 dark:border-gray-700 dark:bg-gray-800"
+                  className="flex-1"
                 />
                 <Button
                   type="submit"
                   disabled={!newPersonName.trim() || addPerson.isPending}
-                  className="bg-blue-600 text-white hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600"
                 >
                   {addPerson.isPending ? (
                     <Loader2 className="h-4 w-4 animate-spin" />
@@ -162,20 +161,20 @@ export function PeopleManagement({ group }: PeopleManagementProps) {
                   key={person.id}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="group flex items-center justify-between rounded-lg border border-gray-200 bg-white p-3 transition-all duration-200 hover:border-blue-200 hover:shadow-sm dark:border-gray-700 dark:bg-gray-800 dark:hover:border-blue-700"
+                  className="group flex items-center justify-between rounded-lg border border-border bg-background p-3 transition-colors duration-200 hover:border-foreground/20"
                 >
                   <div className="flex items-center gap-3">
-                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-100 text-blue-600 dark:bg-blue-900 dark:text-blue-400">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-full border border-border text-sm text-foreground">
                       {person.name?.[0]?.toUpperCase() ?? "?"}
                     </div>
-                    <span className="font-medium text-gray-700 dark:text-gray-200">
+                    <span className="font-medium text-foreground">
                       {person.name}
                     </span>
                   </div>
                   <Button
                     variant="ghost"
                     size="icon"
-                    className="opacity-100 transition-opacity group-hover:opacity-100 hover:bg-red-50 hover:text-red-600 md:opacity-0 dark:hover:bg-red-900/30 dark:hover:text-red-400"
+                    className="opacity-100 transition-opacity group-hover:opacity-100 md:opacity-0"
                     onClick={() => setPersonToDelete(person.id)}
                   >
                     <UserMinus className="h-4 w-4" />

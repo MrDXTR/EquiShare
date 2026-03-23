@@ -175,25 +175,9 @@ export const expenseRouter = createTRPCRouter({
       }
 
       await ctx.db.$transaction(async (tx) => {
-        const fallbackExpense = await tx.expense.findFirst({
-          where: {
-            groupId: expense.groupId,
-            id: { not: input },
-          },
-          orderBy: { createdAt: "desc" },
-          select: { id: true },
+        await tx.settlement.deleteMany({
+          where: { expenseId: input },
         });
-
-        if (fallbackExpense) {
-          await tx.settlement.updateMany({
-            where: { expenseId: input },
-            data: { expenseId: fallbackExpense.id },
-          });
-        } else {
-          await tx.settlement.deleteMany({
-            where: { expenseId: input },
-          });
-        }
 
         await tx.expense.delete({
           where: {

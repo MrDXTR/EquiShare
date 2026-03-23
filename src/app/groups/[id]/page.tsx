@@ -40,7 +40,7 @@ export default function GroupDetailPage({
 
   if (isLoadingGroup) {
     return (
-      <div className="min-h-screen bg-gray-50/50 p-4 md:p-8 dark:bg-black">
+      <div className="min-h-screen bg-background p-4 md:p-8">
         <div className="container mx-auto max-w-7xl space-y-8">
           <motion.div
             initial={{ opacity: 0, y: -20 }}
@@ -58,7 +58,7 @@ export default function GroupDetailPage({
           </motion.div>
 
           <div className="grid grid-cols-1 gap-8 xl:grid-cols-2">
-            <Card className="h-full border-0 bg-white/80 shadow-xl backdrop-blur-sm dark:bg-gray-800/80 dark:shadow-gray-900/30">
+            <Card className="h-full border border-border bg-background">
               <CardHeader className="pb-4">
                 <Skeleton className="h-8 w-48 dark:bg-gray-700" />
               </CardHeader>
@@ -72,7 +72,7 @@ export default function GroupDetailPage({
               </CardContent>
             </Card>
 
-            <Card className="h-full border-0 bg-white/80 shadow-xl backdrop-blur-sm dark:bg-gray-800/80 dark:shadow-gray-900/30">
+            <Card className="h-full border border-border bg-background">
               <CardHeader className="pb-4">
                 <Skeleton className="h-8 w-48 dark:bg-gray-700" />
               </CardHeader>
@@ -94,7 +94,7 @@ export default function GroupDetailPage({
   if (!group) return null;
 
   return (
-    <div className="min-h-screen bg-gray-50/50 p-4 md:p-8 dark:bg-black">
+    <div className="min-h-screen bg-background p-4 md:p-8">
       <div className="container mx-auto max-w-7xl space-y-8">
         {/* Main Content */}
         <motion.div

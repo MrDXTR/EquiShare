@@ -85,14 +85,14 @@ export function CreateGroupDialog() {
     >
       <DialogTrigger asChild>
         <Button
-          className="w-full bg-blue-600 text-white shadow-lg transition-all duration-200 hover:bg-blue-700 hover:shadow-xl sm:w-auto"
+          className="w-full sm:w-auto"
           size="lg"
         >
           <Plus className="mr-2 h-4 w-4" />
           Create New Group
         </Button>
       </DialogTrigger>
-      <DialogContent className="mx-4 max-w-md sm:max-w-lg">
+      <DialogContent className="mx-4 max-w-md border sm:max-w-lg">
         <form onSubmit={handleSubmit}>
           <DialogHeader className="text-left">
             <DialogTitle className="text-xl">Create New Group</DialogTitle>
@@ -124,9 +124,9 @@ export function CreateGroupDialog() {
             {/* Add People Section */}
             <div className="space-y-4">
               <div className="flex items-center gap-2">
-                <Users className="h-4 w-4 text-gray-600" />
+                <Users className="h-4 w-4 text-muted-foreground" />
                 <Label className="text-sm font-medium">Add People</Label>
-                <span className="text-xs text-gray-500">(Optional)</span>
+                <span className="text-xs text-muted-foreground">(Optional)</span>
               </div>
 
               <div className="flex gap-2">
@@ -152,7 +152,7 @@ export function CreateGroupDialog() {
 
               {people.length > 0 && (
                 <div className="space-y-3">
-                  <div className="text-xs text-gray-600">
+                  <div className="text-xs text-muted-foreground">
                     {people.length} {people.length === 1 ? "person" : "people"}{" "}
                     added
                   </div>
@@ -161,13 +161,13 @@ export function CreateGroupDialog() {
                       <Badge
                         key={person}
                         variant="secondary"
-                        className="flex items-center gap-1 bg-blue-50 px-2 py-1 text-blue-700 hover:bg-blue-100"
+                        className="flex items-center gap-1 border border-border bg-transparent px-2 py-1 text-foreground"
                       >
                         <span className="text-sm">{person}</span>
                         <button
                           type="button"
                           onClick={() => handleRemovePerson(person)}
-                          className="ml-1 rounded-full p-0.5 transition-colors hover:bg-blue-200"
+                          className="ml-1 rounded-full p-0.5 transition-colors hover:bg-muted"
                         >
                           <X className="h-3 w-3" />
                         </button>
@@ -192,7 +192,7 @@ export function CreateGroupDialog() {
             <Button
               type="submit"
               disabled={createGroup.isPending || !name.trim()}
-              className="w-full bg-blue-600 text-white hover:bg-blue-700 sm:w-auto"
+              className="w-full sm:w-auto"
             >
               {createGroup.isPending ? (
                 <div className="flex items-center gap-2">

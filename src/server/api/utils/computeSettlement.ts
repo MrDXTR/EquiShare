@@ -1,11 +1,5 @@
 import { TRPCError } from "@trpc/server";
-import type {
-  PrismaClient,
-  Person,
-  Expense,
-  Share,
-  Settlement,
-} from "@prisma/client";
+import type { PrismaClient, Person, Expense, Share, Settlement } from "@prisma/client";
 
 type Ctx = {
   db: PrismaClient;
@@ -18,7 +12,7 @@ type ExpenseWithShares = Pick<Expense, "id" | "amount" | "paidById"> & {
 
 type SettlementLedgerEntry = Pick<
   Settlement,
-  "amount" | "fromId" | "toId" | "settled"
+  "amount" | "fromId" | "toId" | "settled" | "expenseId"
 >;
 
 function toCents(amount: number) {
@@ -64,7 +58,6 @@ export function buildGroupBalances(
         (balances.get(settlement.toId) ?? 0) - amountInCents,
       );
     });
-
   return balances;
 }
 
@@ -93,6 +86,23 @@ function minTx(
     if (c.bal === 0) j++;
   }
   return tx;
+}
+
+function buildPairAnchors(expenses: ExpenseWithShares[]) {
+  const pairToLatestExpense = new Map<string, string>();
+
+  expenses.forEach((expense) => {
+    expense.shares.forEach((share) => {
+      if (share.personId === expense.paidById) {
+        return;
+      }
+
+      pairToLatestExpense.set(`${share.personId}-${expense.paidById}`, expense.id);
+      pairToLatestExpense.set(`${expense.paidById}-${share.personId}`, expense.id);
+    });
+  });
+
+  return pairToLatestExpense;
 }
 
 export async function computeAndUpsertSettlements(ctx: Ctx, groupId: string) {
@@ -132,19 +142,19 @@ export async function computeAndUpsertSettlements(ctx: Ctx, groupId: string) {
     g.expenses as ExpenseWithShares[],
     g.settlements,
   );
-
   const rows = Array.from(balances.entries())
-    .filter(([, v]) => v !== 0)
-    .map(([id, v]) => ({
+    .filter(([, value]) => value !== 0)
+    .map(([id, value]) => ({
       id,
-      name: g.people.find((p) => p.id === id)!.name,
-      bal: v,
+      name: g.people.find((person) => person.id === id)?.name ?? "",
+      bal: value,
     }));
 
   const newTx = minTx(rows);
-  const anchorExpenseId = g.expenses[g.expenses.length - 1]?.id;
+  const pairAnchors = buildPairAnchors(g.expenses as ExpenseWithShares[]);
+  const fallbackExpenseId = g.expenses[g.expenses.length - 1]?.id;
 
-  if (newTx.length > 0 && !anchorExpenseId) {
+  if (newTx.length > 0 && !fallbackExpenseId) {
     throw new TRPCError({
       code: "INTERNAL_SERVER_ERROR",
       message: "Could not find an expense to anchor settlements",
@@ -154,7 +164,7 @@ export async function computeAndUpsertSettlements(ctx: Ctx, groupId: string) {
   await ctx.db.$transaction(async (tx) => {
     await tx.settlement.deleteMany({ where: { groupId, settled: false } });
 
-    if (newTx.length && anchorExpenseId) {
+    if (newTx.length && fallbackExpenseId) {
       await tx.settlement.createMany({
         data: newTx.map((transfer) => ({
           groupId,
@@ -162,7 +172,9 @@ export async function computeAndUpsertSettlements(ctx: Ctx, groupId: string) {
           toId: transfer.toId,
           amount: transfer.amount,
           settled: false,
-          expenseId: anchorExpenseId,
+          expenseId:
+            pairAnchors.get(`${transfer.fromId}-${transfer.toId}`) ??
+            fallbackExpenseId,
         })),
       });
     }
