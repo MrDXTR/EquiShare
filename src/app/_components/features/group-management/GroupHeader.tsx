@@ -134,7 +134,7 @@ export function GroupHeader({
               <DropdownMenuSeparator />
               <DropdownMenuItem
                 onClick={() =>
-                  setShowMembersDialog && setShowMembersDialog(true)
+                  setShowMembersDialog?.(true)
                 }
               >
                 <span className="text-blue-600 dark:text-blue-400">

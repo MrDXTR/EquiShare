@@ -231,7 +231,7 @@ export const groupRouter = createTRPCRouter({
         select: { id: true, groupId: true },
       });
 
-      if (!person || person.groupId !== input.groupId) {
+      if (person?.groupId !== input.groupId) {
         throw new TRPCError({
           code: "NOT_FOUND",
           message: "Person not found in this group",
