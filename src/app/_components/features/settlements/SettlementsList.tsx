@@ -94,7 +94,7 @@ export function SettlementsList({
         <CardHeader className="pb-4">
           <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between md:gap-0">
             <CardTitle className="flex flex-wrap items-center gap-3 text-2xl">
-              <div className="rounded-lg bg-indigo-600 p-2">
+              <div className="rounded-lg border border-border p-2">
                 <ArrowRight className="h-6 w-6 text-foreground" />
               </div>
               <div className="flex items-center gap-2">
@@ -161,8 +161,8 @@ export function SettlementsList({
                 exit={{ opacity: 0, scale: 0.8 }}
                 className="py-12 text-center"
               >
-                <div className="mb-4 inline-flex h-20 w-20 items-center justify-center rounded-full border border-border">
-                  <CheckCircle2 className="h-10 w-10 text-foreground" />
+                <div className="mb-4 inline-flex h-20 w-20 items-center justify-center rounded-full border border-emerald-500/60 bg-emerald-500/10">
+                  <CheckCircle2 className="h-10 w-10 text-emerald-600 dark:text-emerald-400" />
                 </div>
                 <h3 className="mb-2 text-2xl font-bold text-foreground">
                   All Settled Up!
@@ -183,8 +183,10 @@ export function SettlementsList({
                       animate={{ opacity: 1, y: 0, scale: 1 }}
                       exit={{ opacity: 0, y: -20, scale: 0.95 }}
                       transition={{ delay: idx * 0.1 }}
-                      className={`group relative overflow-hidden rounded-xl border bg-background p-4 transition-colors duration-200 hover:border-foreground/20 ${
-                        isSettled ? "border-l-4 border-l-emerald-500" : "border-l-4 border-l-amber-500"
+                      className={`group relative overflow-hidden rounded-xl border bg-background p-4 shadow-sm transition-[box-shadow,border-color] duration-200 hover:border-foreground/20 ${
+                        isSettled
+                          ? "shadow-emerald-500/10 hover:shadow-[0_0_0_1px_rgba(16,185,129,0.18),0_10px_30px_rgba(16,185,129,0.10)]"
+                          : "shadow-amber-500/10 hover:shadow-[0_0_0_1px_rgba(34,197,94,0.18),0_10px_30px_rgba(34,197,94,0.12)]"
                       }`}
                     >
                       <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">

@@ -49,7 +49,7 @@ export function GroupCard({ group, onDelete, index }: GroupCardProps) {
       className="group relative"
     >
       <Card
-        className={`h-full cursor-pointer border bg-background transition-colors duration-200 hover:border-foreground/20 active:scale-[0.99] ${
+        className={`h-full cursor-pointer border bg-background shadow-sm transition-[box-shadow,border-color] duration-200 hover:border-foreground/20 hover:shadow-md active:scale-[0.99] ${
           isSharedGroup
             ? "border-l-4 border-l-blue-500"
             : "border-l-4 border-l-border"

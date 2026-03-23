@@ -70,7 +70,7 @@ export function GroupHeader({
           {!isOwner && (
             <Badge
               variant="outline"
-              className="ml-2 border-blue-200 bg-blue-50 text-blue-700 dark:border-blue-800 dark:bg-blue-900/50 dark:text-blue-400"
+              className="ml-2 border-border bg-transparent text-muted-foreground"
             >
               <Share2 className="mr-1 h-3 w-3" />
               Shared

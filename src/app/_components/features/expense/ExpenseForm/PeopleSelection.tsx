@@ -83,9 +83,9 @@ export function PeopleSelection({
             >
               <div className="flex items-center gap-2">
                 <div
-                  className={`relative flex h-8 w-8 items-center justify-center rounded-full text-xs font-bold text-white ${
+                  className={`relative flex h-8 w-8 items-center justify-center rounded-full text-xs font-bold ${
                     isSelected
-                      ? "border border-foreground bg-foreground"
+                      ? "border border-foreground bg-foreground text-background"
                       : "border border-border bg-background text-foreground"
                   } `}
                 >

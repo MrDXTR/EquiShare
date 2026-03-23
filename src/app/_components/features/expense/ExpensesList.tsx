@@ -96,8 +96,8 @@ export function ExpensesList({ group, onExpenseDeleted }: ExpensesListProps) {
         <CardHeader className="pb-4">
           <div className="flex flex-col items-start justify-between gap-3 md:flex-row md:items-center md:gap-0">
             <CardTitle className="flex items-center gap-3 text-2xl">
-              <div className="rounded-lg bg-indigo-600 p-2">
-                <Receipt className="h-6 w-6 text-white" />
+              <div className="rounded-lg border border-border p-2">
+                <Receipt className="h-6 w-6 text-foreground" />
               </div>
               <span className="text-gray-900 dark:text-gray-100">Expenses</span>
             </CardTitle>
