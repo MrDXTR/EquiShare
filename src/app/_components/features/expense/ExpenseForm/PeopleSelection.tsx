@@ -6,6 +6,7 @@ import { Check, UserCheck } from "lucide-react";
 import {
   type Person,
   togglePersonSelection,
+  generateShareValues,
   getPersonInitials,
 } from "~/app/_components/features/group-management/utils";
 
@@ -24,6 +25,8 @@ export function PeopleSelection({
   amount,
   updateFormState,
 }: PeopleSelectionProps) {
+  const allSelected = people.length > 0 && selectedPersonIds.length === people.length;
+
   const handlePersonToggle = (personId: string) => {
     const { newSelection, newShareValues } = togglePersonSelection(
       personId,
@@ -39,24 +42,52 @@ export function PeopleSelection({
     });
   };
 
+  const handleSelectAll = () => {
+    const allIds = people.map((p) => p.id);
+    const newShareValues = generateShareValues(
+      splitMode,
+      allIds,
+      parseFloat(amount) || 0,
+    );
+
+    updateFormState({
+      selectedPersonIds: allIds,
+      shareValues: newShareValues,
+      formErrors: null,
+    });
+  };
+
   return (
     <div className="space-y-3 pb-4">
       <div className="flex items-center justify-between">
         <Label className="flex items-center gap-2">
-          <UserCheck className="h-4 w-4 text-muted-foreground" />
+          <UserCheck className="h-4 w-4 text-violet-500" />
           Split Between ({selectedPersonIds.length} selected)
         </Label>
-        {selectedPersonIds.length > 0 && (
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            onClick={() => updateFormState({ selectedPersonIds: [] })}
-            className="text-muted-foreground"
-          >
-            Clear
-          </Button>
-        )}
+        <div className="flex items-center gap-1">
+          {!allSelected && (
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={handleSelectAll}
+              className="text-muted-foreground"
+            >
+              All
+            </Button>
+          )}
+          {selectedPersonIds.length > 0 && (
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={() => updateFormState({ selectedPersonIds: [] })}
+              className="text-muted-foreground"
+            >
+              Clear
+            </Button>
+          )}
+        </div>
       </div>
 
       <div

@@ -155,7 +155,7 @@ export function ExpensesList({ group, onExpenseDeleted }: ExpensesListProps) {
                         <div className="flex flex-wrap items-center gap-2">
                           <Badge
                             variant="outline"
-                            className="border-border bg-transparent text-muted-foreground"
+                              className="border-blue-200 bg-blue-50 text-blue-700 dark:border-blue-800 dark:bg-blue-900/50 dark:text-blue-400"
                           >
                             Paid by {expense.paidBy.name}
                           </Badge>

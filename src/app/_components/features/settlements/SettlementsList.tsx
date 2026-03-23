@@ -183,7 +183,7 @@ export function SettlementsList({
                       animate={{ opacity: 1, y: 0, scale: 1 }}
                       exit={{ opacity: 0, y: -20, scale: 0.95 }}
                       transition={{ delay: idx * 0.1 }}
-                      className={`group relative overflow-hidden rounded-xl border bg-background p-4 shadow-sm transition-[box-shadow,border-color] duration-200 hover:border-foreground/20 ${
+                      className={`group relative overflow-hidden rounded-xl border bg-background p-4 shadow-lg transition-[box-shadow,border-color] duration-200 hover:border-foreground/20 ${
                         isSettled
                           ? "shadow-emerald-500/10 hover:shadow-[0_0_0_1px_rgba(16,185,129,0.18),0_10px_30px_rgba(16,185,129,0.10)]"
                           : "shadow-amber-500/10 hover:shadow-[0_0_0_1px_rgba(34,197,94,0.18),0_10px_30px_rgba(34,197,94,0.12)]"
@@ -203,7 +203,7 @@ export function SettlementsList({
                           {isSettled && (
                             <Badge
                               variant="outline"
-                              className="ml-2 border-border bg-transparent font-semibold text-muted-foreground"
+                             className="ml-2 border-green-300 bg-green-50 font-semibold text-green-800 dark:border-green-700 dark:bg-green-900/30 dark:text-green-300"
                             >
                               <CheckCircle2 className="mr-1 h-3 w-3" />
                               Settled

@@ -38,7 +38,7 @@ export function ExpenseDetails({
       {/* Description */}
       <div className="space-y-2">
         <Label className="flex items-center gap-2">
-          <Receipt className="h-4 w-4 text-muted-foreground" />
+          <Receipt className="h-4 w-4 text-violet-500" />
           Description
         </Label>
         <Input
@@ -54,7 +54,7 @@ export function ExpenseDetails({
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <div className="space-y-2">
           <Label className="flex items-center gap-2">
-            <IndianRupee className="h-4 w-4 text-muted-foreground" />
+            <IndianRupee className="h-4 w-4 text-violet-500" />
             Amount
           </Label>
           <div className="relative">
@@ -73,7 +73,7 @@ export function ExpenseDetails({
 
         <div className="space-y-2">
           <Label className="flex items-center gap-2">
-            <Users className="h-4 w-4 text-muted-foreground" />
+            <Users className="h-4 w-4 text-violet-500" />
             Paid By
           </Label>
           <Select
