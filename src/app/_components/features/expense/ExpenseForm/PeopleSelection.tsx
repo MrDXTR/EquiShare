@@ -25,7 +25,8 @@ export function PeopleSelection({
   amount,
   updateFormState,
 }: PeopleSelectionProps) {
-  const allSelected = people.length > 0 && selectedPersonIds.length === people.length;
+  const allSelected =
+    people.length > 0 && selectedPersonIds.length === people.length;
 
   const handlePersonToggle = (personId: string) => {
     const { newSelection, newShareValues } = togglePersonSelection(
@@ -116,14 +117,14 @@ export function PeopleSelection({
                 <div
                   className={`relative flex h-8 w-8 items-center justify-center rounded-full text-xs font-bold ${
                     isSelected
-                      ? "border border-foreground bg-foreground text-background"
-                      : "border border-border bg-background text-foreground"
+                      ? "border-foreground bg-foreground text-background border"
+                      : "border-border bg-background text-foreground border"
                   } `}
                 >
                   {getPersonInitials(person.name)}
                   {isSelected && (
-                    <div className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full border border-border bg-background">
-                      <Check className="h-2 w-2 text-foreground" />
+                    <div className="border-border bg-background absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full border">
+                      <Check className="text-foreground h-2 w-2" />
                     </div>
                   )}
                 </div>

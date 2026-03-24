@@ -109,11 +109,11 @@ export function PeopleManagement({ group }: PeopleManagementProps) {
       animate={{ opacity: 1, x: 0 }}
       transition={{ delay: 0.2 }}
     >
-      <Card className="h-full border border-border bg-background">
+      <Card className="border-border bg-background h-full border">
         <CardHeader className="pb-4">
           <CardTitle className="flex items-center gap-3 text-2xl">
-            <div className="rounded-lg border border-border p-2">
-              <Users className="h-6 w-6 text-foreground" />
+            <div className="border-border rounded-lg border p-2">
+              <Users className="text-foreground h-6 w-6" />
             </div>
             <span className="text-foreground">People</span>
           </CardTitle>
@@ -161,13 +161,13 @@ export function PeopleManagement({ group }: PeopleManagementProps) {
                   key={person.id}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="group flex items-center justify-between rounded-lg border border-border bg-background p-3 transition-colors duration-200 hover:border-foreground/20"
+                  className="group border-border bg-background hover:border-foreground/20 flex items-center justify-between rounded-lg border p-3 transition-colors duration-200"
                 >
                   <div className="flex items-center gap-3">
-                    <div className="flex h-8 w-8 items-center justify-center rounded-full border border-border text-sm text-foreground">
+                    <div className="border-border text-foreground flex h-8 w-8 items-center justify-center rounded-full border text-sm">
                       {person.name?.[0]?.toUpperCase() ?? "?"}
                     </div>
-                    <span className="font-medium text-foreground">
+                    <span className="text-foreground font-medium">
                       {person.name}
                     </span>
                   </div>

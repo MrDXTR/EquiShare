@@ -84,10 +84,7 @@ export function CreateGroupDialog() {
       }}
     >
       <DialogTrigger asChild>
-        <Button
-          className="w-full sm:w-auto"
-          size="lg"
-        >
+        <Button className="w-full sm:w-auto" size="lg">
           <Plus className="mr-2 h-4 w-4" />
           Create New Group
         </Button>
@@ -124,9 +121,11 @@ export function CreateGroupDialog() {
             {/* Add People Section */}
             <div className="space-y-4">
               <div className="flex items-center gap-2">
-                <Users className="h-4 w-4 text-muted-foreground" />
+                <Users className="text-muted-foreground h-4 w-4" />
                 <Label className="text-sm font-medium">Add People</Label>
-                <span className="text-xs text-muted-foreground">(Optional)</span>
+                <span className="text-muted-foreground text-xs">
+                  (Optional)
+                </span>
               </div>
 
               <div className="flex gap-2">
@@ -152,7 +151,7 @@ export function CreateGroupDialog() {
 
               {people.length > 0 && (
                 <div className="space-y-3">
-                  <div className="text-xs text-muted-foreground">
+                  <div className="text-muted-foreground text-xs">
                     {people.length} {people.length === 1 ? "person" : "people"}{" "}
                     added
                   </div>
@@ -161,13 +160,13 @@ export function CreateGroupDialog() {
                       <Badge
                         key={person}
                         variant="secondary"
-                        className="flex items-center gap-1 border border-border bg-transparent px-2 py-1 text-foreground"
+                        className="border-border text-foreground flex items-center gap-1 border bg-transparent px-2 py-1"
                       >
                         <span className="text-sm">{person}</span>
                         <button
                           type="button"
                           onClick={() => handleRemovePerson(person)}
-                          className="ml-1 rounded-full p-0.5 transition-colors hover:bg-muted"
+                          className="hover:bg-muted ml-1 rounded-full p-0.5 transition-colors"
                         >
                           <X className="h-3 w-3" />
                         </button>

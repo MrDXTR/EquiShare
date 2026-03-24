@@ -111,7 +111,7 @@ export function SplitConfiguration({
       {/* Split Mode Selection */}
       <div className="space-y-3">
         <Label className="flex items-center gap-2">
-          <Calculator className="h-4 w-4 text-muted-foreground" />
+          <Calculator className="text-muted-foreground h-4 w-4" />
           Split Method
         </Label>
 
@@ -136,8 +136,8 @@ export function SplitConfiguration({
                   <div
                     className={`flex h-10 w-10 items-center justify-center rounded-lg ${
                       isSelected
-                        ? "border border-foreground bg-foreground text-background"
-                        : "border border-border bg-background text-muted-foreground"
+                        ? "border-foreground bg-foreground text-background border"
+                        : "border-border bg-background text-muted-foreground border"
                     } `}
                   >
                     <Icon className="h-5 w-5" />
@@ -149,8 +149,8 @@ export function SplitConfiguration({
                   </span>
                 </div>
                 {isSelected && (
-                  <div className="absolute top-2 right-2 flex h-5 w-5 items-center justify-center rounded-full border border-border bg-background">
-                    <Check className="h-3 w-3 text-foreground" />
+                  <div className="border-border bg-background absolute top-2 right-2 flex h-5 w-5 items-center justify-center rounded-full border">
+                    <Check className="text-foreground h-3 w-3" />
                   </div>
                 )}
               </motion.button>
@@ -161,7 +161,7 @@ export function SplitConfiguration({
 
       {/* Error Display */}
       {formErrors && (
-        <div className="flex items-center gap-2 rounded-lg border border-border bg-muted/30 p-3 text-foreground">
+        <div className="border-border bg-muted/30 text-foreground flex items-center gap-2 rounded-lg border p-3">
           <AlertTriangle className="h-4 w-4" />
           <span className="text-sm">{formErrors}</span>
         </div>
@@ -169,21 +169,19 @@ export function SplitConfiguration({
 
       {/* Split Configuration */}
       {splitMode === "EQUAL" ? (
-        <div className="rounded-lg border border-border bg-muted/20 p-4 text-center">
-          <div className="mb-1 text-2xl font-semibold text-foreground">
+        <div className="border-border bg-muted/20 rounded-lg border p-4 text-center">
+          <div className="text-foreground mb-1 text-2xl font-semibold">
             ₹{(parsedAmount / selectedPersonIds.length).toFixed(2)}
           </div>
-          <div className="text-sm text-muted-foreground">
+          <div className="text-muted-foreground text-sm">
             per person ({selectedPersonIds.length} people)
           </div>
         </div>
       ) : (
         <div className="space-y-4">
           {/* Total Display & Auto Balance */}
-          <div className="flex items-center justify-between rounded-lg border border-border bg-muted/20 p-3">
-            <div
-              className="text-sm font-medium text-foreground"
-            >
+          <div className="border-border bg-muted/20 flex items-center justify-between rounded-lg border p-3">
+            <div className="text-foreground text-sm font-medium">
               {splitMode === "PERCENT"
                 ? `${percentTotal.toFixed(1)}% / 100%`
                 : `₹${exactTotal.toFixed(2)} / ₹${parsedAmount.toFixed(2)}`}
@@ -212,16 +210,16 @@ export function SplitConfiguration({
               return (
                 <div
                   key={personId}
-                  className="rounded-lg border border-border bg-muted/20 p-3"
+                  className="border-border bg-muted/20 rounded-lg border p-3"
                 >
                   <div className="mb-2 flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      <div className="flex h-8 w-8 items-center justify-center rounded-full border border-border text-xs font-bold text-foreground">
+                      <div className="border-border text-foreground flex h-8 w-8 items-center justify-center rounded-full border text-xs font-bold">
                         {getPersonInitials(person.name)}
                       </div>
                       <span className="font-medium">{person.name}</span>
                     </div>
-                    <span className="font-semibold text-foreground">
+                    <span className="text-foreground font-semibold">
                       {splitMode === "PERCENT"
                         ? `${currentValue.toFixed(1)}%`
                         : `₹${currentValue.toFixed(2)}`}

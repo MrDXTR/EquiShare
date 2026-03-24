@@ -1,5 +1,11 @@
 import { TRPCError } from "@trpc/server";
-import type { PrismaClient, Person, Expense, Share, Settlement } from "@prisma/client";
+import type {
+  PrismaClient,
+  Person,
+  Expense,
+  Share,
+  Settlement,
+} from "@prisma/client";
 
 type Ctx = {
   db: PrismaClient;
@@ -97,8 +103,14 @@ function buildPairAnchors(expenses: ExpenseWithShares[]) {
         return;
       }
 
-      pairToLatestExpense.set(`${share.personId}-${expense.paidById}`, expense.id);
-      pairToLatestExpense.set(`${expense.paidById}-${share.personId}`, expense.id);
+      pairToLatestExpense.set(
+        `${share.personId}-${expense.paidById}`,
+        expense.id,
+      );
+      pairToLatestExpense.set(
+        `${expense.paidById}-${share.personId}`,
+        expense.id,
+      );
     });
   });
 

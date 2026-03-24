@@ -1,6 +1,5 @@
 "use client";
 
-import { motion } from "framer-motion";
 import {
   Users,
   Receipt,
@@ -22,14 +21,16 @@ type Group = RouterOutputs["group"]["getAll"][number];
 interface GroupCardProps {
   group: Group;
   onDelete: (id: string) => void;
-  index: number;
 }
 
-export function GroupCard({ group, onDelete, index }: GroupCardProps) {
+export function GroupCard({ group, onDelete }: GroupCardProps) {
   const router = useRouter();
   const { data: session } = useSession();
   const totalExpenses =
-    group.expenses?.reduce((sum, expense) => sum + expense.amount, 0) || 0;
+    group.expenses?.reduce(
+      (sum: number, expense: any) => sum + expense.amount,
+      0,
+    ) || 0;
   const recentActivity =
     group.expenses?.length > 0
       ? new Date(
@@ -41,19 +42,9 @@ export function GroupCard({ group, onDelete, index }: GroupCardProps) {
   const isSharedGroup = group.createdById !== session?.user?.id;
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20, scale: 0.9 }}
-      animate={{ opacity: 1, y: 0, scale: 1 }}
-      transition={{ delay: index * 0.1, duration: 0.1 }}
-      whileHover={{ y: -2 }}
-      className="group relative"
-    >
+    <div className="group relative">
       <Card
-        className={`h-full cursor-pointer border bg-background shadow-sm transition-[box-shadow,border-color] duration-200 hover:border-foreground/20 hover:shadow-md active:scale-[0.99] ${
-          isSharedGroup
-            ? "border-l-4 border-l-blue-500"
-            : "border-l-4 border-l-border"
-        }`}
+        className="border-border bg-background relative top-0 h-full cursor-pointer border shadow-none transition-[top,box-shadow,border-color] duration-200 hover:-top-0.5 hover:border-blue-500 hover:shadow-lg hover:shadow-blue-500/25"
         onClick={() => router.push(`/groups/${group.id}`)}
       >
         <CardHeader className="pb-3">
@@ -67,7 +58,7 @@ export function GroupCard({ group, onDelete, index }: GroupCardProps) {
                 <div className="mt-1">
                   <Badge
                     variant="outline"
-                    className="border-border bg-transparent text-xs text-muted-foreground"
+                    className="border-border text-muted-foreground bg-transparent text-xs"
                   >
                     <Share2 className="mr-1 h-3 w-3" />
                     Shared with you
@@ -96,17 +87,17 @@ export function GroupCard({ group, onDelete, index }: GroupCardProps) {
           {/* Members and Status */}
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <div className="rounded-full border border-border p-1.5">
-                <Users className="h-3.5 w-3.5 text-muted-foreground" />
+              <div className="border-border rounded-full border p-1.5">
+                <Users className="text-muted-foreground h-3.5 w-3.5" />
               </div>
-              <span className="text-sm font-medium text-foreground">
+              <span className="text-foreground text-sm font-medium">
                 {group.people.length}{" "}
                 {group.people.length === 1 ? "member" : "members"}
               </span>
             </div>
             <Badge
               variant="outline"
-              className="border-border bg-transparent text-xs text-muted-foreground"
+              className="border-border text-muted-foreground bg-transparent text-xs"
             >
               Active
             </Badge>
@@ -119,16 +110,16 @@ export function GroupCard({ group, onDelete, index }: GroupCardProps) {
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <div className="rounded-full border border-border p-1.5">
-                      <Receipt className="h-3.5 w-3.5 text-muted-foreground" />
+                    <div className="border-border rounded-full border p-1.5">
+                      <Receipt className="text-muted-foreground h-3.5 w-3.5" />
                     </div>
-                    <span className="text-sm font-medium text-foreground">
+                    <span className="text-foreground text-sm font-medium">
                       {group.expenses.length}{" "}
                       {group.expenses.length === 1 ? "expense" : "expenses"}
                     </span>
                   </div>
                   <div className="text-right">
-                    <div className="text-lg font-semibold text-foreground">
+                    <div className="text-foreground text-lg font-semibold">
                       ₹
                       {totalExpenses.toLocaleString("en-IN", {
                         maximumFractionDigits: 0,
@@ -137,7 +128,7 @@ export function GroupCard({ group, onDelete, index }: GroupCardProps) {
                   </div>
                 </div>
 
-                <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                <div className="text-muted-foreground flex items-center gap-2 text-xs">
                   <Calendar className="h-3.5 w-3.5" />
                   <span>Last: {recentActivity}</span>
                 </div>
@@ -147,13 +138,13 @@ export function GroupCard({ group, onDelete, index }: GroupCardProps) {
             <>
               <Separator />
               <div className="flex flex-col items-center justify-center py-4 text-center">
-                <div className="mb-2 rounded-full border border-border p-3">
-                  <Receipt className="h-5 w-5 text-muted-foreground" />
+                <div className="border-border mb-2 rounded-full border p-3">
+                  <Receipt className="text-muted-foreground h-5 w-5" />
                 </div>
-                <p className="text-sm font-medium text-muted-foreground">
+                <p className="text-muted-foreground text-sm font-medium">
                   No expenses yet
                 </p>
-                <p className="mt-1 text-xs text-muted-foreground">
+                <p className="text-muted-foreground mt-1 text-xs">
                   Tap to add your first expense
                 </p>
               </div>
@@ -162,13 +153,13 @@ export function GroupCard({ group, onDelete, index }: GroupCardProps) {
 
           {/* View Details Arrow */}
           <div className="flex items-center justify-end pt-2">
-            <div className="flex items-center gap-1 text-xs text-muted-foreground opacity-70 transition-opacity group-hover:opacity-100">
+            <div className="text-muted-foreground flex items-center gap-1 text-xs opacity-70 transition-opacity group-hover:opacity-100">
               <span>View details</span>
               <ChevronRight className="h-3 w-3" />
             </div>
           </div>
         </CardContent>
       </Card>
-    </motion.div>
+    </div>
   );
 }

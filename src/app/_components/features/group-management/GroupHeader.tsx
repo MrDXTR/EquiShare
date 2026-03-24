@@ -70,7 +70,7 @@ export function GroupHeader({
           {!isOwner && (
             <Badge
               variant="outline"
-              className="ml-2 border-border bg-transparent text-muted-foreground"
+              className="border-border text-muted-foreground ml-2 bg-transparent"
             >
               <Share2 className="mr-1 h-3 w-3" />
               Shared
@@ -132,11 +132,7 @@ export function GroupHeader({
                 ))}
 
               <DropdownMenuSeparator />
-              <DropdownMenuItem
-                onClick={() =>
-                  setShowMembersDialog?.(true)
-                }
-              >
+              <DropdownMenuItem onClick={() => setShowMembersDialog?.(true)}>
                 <span className="text-blue-600 dark:text-blue-400">
                   View all members
                 </span>
@@ -163,32 +159,32 @@ export function GroupHeader({
 
       {/* Stats Overview */}
       <div className="mt-6 flex flex-wrap justify-center gap-4 sm:gap-6">
-        <div className="flex items-center gap-2 rounded-full border border-border bg-background px-4 py-2">
-          <TrendingUp className="h-5 w-5 text-muted-foreground" />
-          <span className="font-semibold text-foreground">
+        <div className="border-border bg-background flex items-center gap-2 rounded-full border px-4 py-2">
+          <TrendingUp className="text-muted-foreground h-5 w-5" />
+          <span className="text-foreground font-semibold">
             Total: ₹{totalExpenses.toFixed(2)}
           </span>
         </div>
-        <div className="flex items-center gap-2 rounded-full border border-border bg-background px-4 py-2">
-          <Receipt className="h-5 w-5 text-muted-foreground" />
-          <span className="font-semibold text-foreground">
+        <div className="border-border bg-background flex items-center gap-2 rounded-full border px-4 py-2">
+          <Receipt className="text-muted-foreground h-5 w-5" />
+          <span className="text-foreground font-semibold">
             {group.expenses.length} Expenses
           </span>
         </div>
-        <div className="flex items-center gap-2 rounded-full border border-border bg-background px-4 py-2">
+        <div className="border-border bg-background flex items-center gap-2 rounded-full border px-4 py-2">
           {isLoadingBalances ? (
             <Skeleton className="h-5 w-24" />
           ) : showAllSettled ? (
             <>
-              <CheckCircle2 className="h-5 w-5 text-foreground" />
-              <span className="font-semibold text-foreground">
+              <CheckCircle2 className="text-foreground h-5 w-5" />
+              <span className="text-foreground font-semibold">
                 All Settled!
               </span>
             </>
           ) : (
             <>
-              <AlertCircle className="h-5 w-5 text-foreground" />
-              <span className="font-semibold text-foreground">
+              <AlertCircle className="text-foreground h-5 w-5" />
+              <span className="text-foreground font-semibold">
                 {pendingSettlements} Pending
               </span>
             </>
@@ -197,9 +193,9 @@ export function GroupHeader({
 
         {isOwner && (
           <InviteDialog groupId={group.id}>
-            <div className="flex cursor-pointer items-center gap-2 rounded-full border border-border bg-background px-4 py-2 transition-colors hover:bg-muted/40">
-              <UserPlus className="h-5 w-5 text-foreground" />
-              <span className="font-semibold text-foreground">
+            <div className="border-border bg-background hover:bg-muted/40 flex cursor-pointer items-center gap-2 rounded-full border px-4 py-2 transition-colors">
+              <UserPlus className="text-foreground h-5 w-5" />
+              <span className="text-foreground font-semibold">
                 Invite Members
               </span>
             </div>

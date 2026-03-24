@@ -87,7 +87,7 @@ export function ExpenseDetails({
               {people.map((person) => (
                 <SelectItem key={person.id} value={person.id}>
                   <div className="flex items-center gap-2">
-                    <div className="flex h-6 w-6 items-center justify-center rounded-full border border-border text-xs font-semibold text-foreground">
+                    <div className="border-border text-foreground flex h-6 w-6 items-center justify-center rounded-full border text-xs font-semibold">
                       {getPersonInitials(person.name)}
                     </div>
                     {person.name}

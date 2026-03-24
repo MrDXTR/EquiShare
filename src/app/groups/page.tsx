@@ -90,7 +90,7 @@ export default function GroupsPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-background">
+      <div className="bg-background min-h-screen">
         <div className="container mx-auto px-4 py-6 sm:py-8">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
@@ -110,7 +110,7 @@ export default function GroupsPage() {
               {[1, 2, 3, 4].map((i) => (
                 <div
                   key={i}
-                  className="h-48 animate-pulse rounded-xl border bg-muted/30"
+                  className="bg-muted/30 h-48 animate-pulse rounded-xl border"
                 />
               ))}
             </div>
@@ -121,7 +121,7 @@ export default function GroupsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="bg-background min-h-screen">
       <div className="container mx-auto px-4 py-6 sm:py-8">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
@@ -146,9 +146,9 @@ export default function GroupsPage() {
               animate={{ opacity: 1, y: 0 }}
               className="flex flex-col items-center justify-center py-12 sm:py-16"
             >
-              <div className="mb-4 rounded-full border border-border p-6">
+              <div className="border-border mb-4 rounded-full border p-6">
                 <svg
-                  className="h-12 w-12 text-muted-foreground"
+                  className="text-muted-foreground h-12 w-12"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -164,7 +164,7 @@ export default function GroupsPage() {
               <h3 className="mb-2 text-lg font-semibold text-gray-900 dark:text-gray-100">
                 No groups yet
               </h3>
-              <p className="mb-6 max-w-md text-center text-muted-foreground">
+              <p className="text-muted-foreground mb-6 max-w-md text-center">
                 Create your first group to start splitting expenses with
                 friends, family, or colleagues.
               </p>
@@ -172,12 +172,11 @@ export default function GroupsPage() {
             </motion.div>
           ) : (
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-              {groups?.map((group, index) => (
+              {groups?.map((group: any) => (
                 <GroupCard
                   key={group.id}
                   group={group}
                   onDelete={() => setGroupToDelete(group.id)}
-                  index={index}
                 />
               ))}
             </div>

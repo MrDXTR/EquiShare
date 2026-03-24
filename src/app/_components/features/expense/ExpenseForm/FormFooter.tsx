@@ -21,7 +21,7 @@ export function FormFooter({
   onSubmit,
 }: FormFooterProps) {
   return (
-    <div className="rounded-b-lg border-t bg-background p-6">
+    <div className="bg-background rounded-b-lg border-t p-6">
       <div className="flex justify-between gap-3">
         <Button
           type="button"

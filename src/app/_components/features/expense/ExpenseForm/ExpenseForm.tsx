@@ -131,9 +131,9 @@ export function ExpenseForm({
     return currentStep === 1
       ? Boolean(
           formState.description.trim() &&
-            formState.amount &&
-            formState.paidById &&
-            formState.selectedPersonIds.length > 0,
+          formState.amount &&
+          formState.paidById &&
+          formState.selectedPersonIds.length > 0,
         )
       : formIsValid;
   };

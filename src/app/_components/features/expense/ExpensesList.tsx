@@ -92,12 +92,12 @@ export function ExpensesList({ group, onExpenseDeleted }: ExpensesListProps) {
       animate={{ opacity: 1, x: 0 }}
       transition={{ delay: 0.4 }}
     >
-      <Card className="h-full border border-border bg-background">
+      <Card className="border-border bg-background h-full border">
         <CardHeader className="pb-4">
           <div className="flex flex-col items-start justify-between gap-3 md:flex-row md:items-center md:gap-0">
             <CardTitle className="flex items-center gap-3 text-2xl">
-              <div className="rounded-lg border border-border p-2">
-                <Receipt className="h-6 w-6 text-foreground" />
+              <div className="border-border rounded-lg border p-2">
+                <Receipt className="text-foreground h-6 w-6" />
               </div>
               <span className="text-gray-900 dark:text-gray-100">Expenses</span>
             </CardTitle>
@@ -107,10 +107,7 @@ export function ExpensesList({ group, onExpenseDeleted }: ExpensesListProps) {
                 people={group.people}
                 onSuccess={handleExpenseCreated}
                 trigger={
-                  <Button
-                    size="sm"
-                    variant="outline"
-                  >
+                  <Button size="sm" variant="outline">
                     <Plus className="mr-2 h-4 w-4" />
                     Add Expense
                   </Button>
@@ -143,29 +140,29 @@ export function ExpensesList({ group, onExpenseDeleted }: ExpensesListProps) {
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: index * 0.1 }}
-                    className="group relative overflow-hidden rounded-xl border border-border bg-background p-5 transition-colors duration-200 hover:border-foreground/20"
+                    className="group border-border bg-background hover:border-foreground/20 relative overflow-hidden rounded-xl border p-5 transition-colors duration-200"
                   >
                     <div className="relative flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                       <div className="space-y-2">
                         <div className="flex flex-wrap items-center gap-2">
-                          <h3 className="text-lg font-semibold text-foreground">
+                          <h3 className="text-foreground text-lg font-semibold">
                             {expense.description}
                           </h3>
                         </div>
                         <div className="flex flex-wrap items-center gap-2">
                           <Badge
                             variant="outline"
-                              className="border-blue-200 bg-blue-50 text-blue-700 dark:border-blue-800 dark:bg-blue-900/50 dark:text-blue-400"
+                            className="border-blue-200 bg-blue-50 text-blue-700 dark:border-blue-800 dark:bg-blue-900/50 dark:text-blue-400"
                           >
                             Paid by {expense.paidBy.name}
                           </Badge>
                         </div>
                       </div>
                       <div className="space-y-1 text-right">
-                        <p className="text-2xl font-semibold text-foreground">
+                        <p className="text-foreground text-2xl font-semibold">
                           ₹{expense.amount.toFixed(2)}
                         </p>
-                        <div className="flex items-center gap-1 text-sm text-muted-foreground">
+                        <div className="text-muted-foreground flex items-center gap-1 text-sm">
                           <span>Split {expense.shares.length} ways</span>
                         </div>
                       </div>
@@ -181,7 +178,9 @@ export function ExpensesList({ group, onExpenseDeleted }: ExpensesListProps) {
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
-                        <DropdownMenuItem onClick={() => setExpenseToDelete(expense.id)}>
+                        <DropdownMenuItem
+                          onClick={() => setExpenseToDelete(expense.id)}
+                        >
                           <Trash2 className="mr-2 h-4 w-4" />
                           Delete
                         </DropdownMenuItem>
