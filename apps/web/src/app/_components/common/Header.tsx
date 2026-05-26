@@ -14,7 +14,7 @@ import {
 } from "~/components/ui/dropdown-menu";
 import { LogOut, User } from "lucide-react";
 import Image from "next/image";
-import { ThemeToggle } from "./ThemeToggle";
+import { AnimatedThemeToggler } from "~/components/ui/animated-theme-toggler";
 
 export function Header() {
   const { data: session, status } = useSession();
@@ -51,7 +51,7 @@ export function Header() {
                 </Button>
               </Link>
 
-              <ThemeToggle />
+              <AnimatedThemeToggler className="h-9 w-9 rounded-full border border-border/60 bg-background/80 p-2 shadow-sm transition hover:border-primary/60 hover:bg-background/90" />
 
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
@@ -98,10 +98,11 @@ export function Header() {
             </div>
           ) : (
             <div className="flex items-center gap-4">
-              <ThemeToggle />
+              <AnimatedThemeToggler className="h-9 w-9 rounded-full border border-border/60 bg-background/80 p-2 shadow-sm transition hover:border-primary/60 hover:bg-background/90" />
               <Button
                 onClick={() => router.push("/signin")}
-                className="cursor-pointer font-medium"
+                variant="default"
+                size="sm"
               >
                 Sign In
               </Button>

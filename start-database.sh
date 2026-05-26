@@ -11,9 +11,17 @@
 
 # On Linux and macOS you can run this script directly - `./start-database.sh`
 
-# import env variables from .env
+# import env variables from the web app workspace
+APP_DIR="apps/web"
+ENV_FILE="$APP_DIR/.env"
+
+if [ ! -f "$ENV_FILE" ]; then
+  echo "Missing $ENV_FILE. Create it from $APP_DIR/.env.example and try again."
+  exit 1
+fi
+
 set -a
-source .env
+source "$ENV_FILE"
 
 DB_PASSWORD=$(echo "$DATABASE_URL" | awk -F':' '{print $3}' | awk -F'@' '{print $1}')
 DB_PORT=$(echo "$DATABASE_URL" | awk -F':' '{print $4}' | awk -F'\/' '{print $1}')
@@ -66,12 +74,12 @@ if [ "$DB_PASSWORD" = "password" ]; then
   echo "You are using the default database password"
   read -p "Should we generate a random password for you? [y/N]: " -r REPLY
   if ! [[ $REPLY =~ ^[Yy]$ ]]; then
-    echo "Please change the default password in the .env file and try again"
+    echo "Please change the default password in $ENV_FILE and try again"
     exit 1
   fi
   # Generate a random URL-safe password
   DB_PASSWORD=$(openssl rand -base64 12 | tr '+/' '-_')
-  sed -i '' "s#:password@#:$DB_PASSWORD@#" .env
+  sed -i '' "s#:password@#:$DB_PASSWORD@#" "$ENV_FILE"
 fi
 
 $DOCKER_CMD run -d \
