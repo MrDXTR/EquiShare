@@ -1,9 +1,28 @@
 {
   "$schema": "https://turbo.build/schema.json",
+  "globalEnv": [
+    "NODE_ENV",
+    "AUTH_SECRET",
+    "AUTH_GOOGLE_ID",
+    "AUTH_GOOGLE_SECRET",
+    "DATABASE_URL"
+  ],
   "tasks": {
     "build": {
       "dependsOn": [
         "^build"
+      ],
+      "env": [
+        "AUTH_SECRET",
+        "AUTH_GOOGLE_ID",
+        "AUTH_GOOGLE_SECRET",
+        "DATABASE_URL"
+      ],
+      "passThroughEnv": [
+        "AUTH_SECRET",
+        "AUTH_GOOGLE_ID",
+        "AUTH_GOOGLE_SECRET",
+        "DATABASE_URL"
       ],
       "outputs": [
         ".next/**",

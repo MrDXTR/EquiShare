@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 
 export function LoadingScreen() {
   return (
-    <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-white/80 backdrop-blur-sm dark:bg-gray-950/80">
+    <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-background/80 backdrop-blur-sm">
       <motion.div
         className="flex items-center justify-center"
         initial={{ opacity: 0, scale: 0.8 }}
@@ -14,7 +14,7 @@ export function LoadingScreen() {
         <div className="relative">
           {/* Outer circle */}
           <motion.div
-            className="h-16 w-16 rounded-full border-2 border-blue-200 dark:border-gray-700"
+            className="h-16 w-16 rounded-full border-2 border-border/60"
             animate={{ rotate: 360 }}
             transition={{
               duration: 2,
@@ -45,12 +45,12 @@ export function LoadingScreen() {
           />
 
           {/* Center white circle for contrast */}
-          <div className="absolute top-1/2 left-1/2 h-6 w-6 -translate-x-1/2 -translate-y-1/2 rounded-full bg-white dark:bg-gray-900" />
+          <div className="absolute top-1/2 left-1/2 h-6 w-6 -translate-x-1/2 -translate-y-1/2 rounded-full bg-background" />
         </div>
       </motion.div>
 
       <motion.p
-        className="mt-6 text-sm font-medium text-gray-600 dark:text-gray-300"
+        className="mt-6 text-sm font-medium text-muted-foreground"
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.2, duration: 0.3 }}
