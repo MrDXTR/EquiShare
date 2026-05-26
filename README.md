@@ -2,6 +2,10 @@
 
 EquiShare is a modern expense splitting application built with the T3 Stack. It helps groups of people track shared expenses and balances, making it easy to split bills and settle debts.
 
+## Monorepo Layout
+
+This repository now uses Turborepo with the application living in `apps/web`.
+
 ## Features
 
 - 🔐 Secure authentication with NextAuth.js
@@ -31,12 +35,12 @@ This project is built using the [T3 Stack](https://create.t3.gg/):
    ```
 3. Set up your environment variables:
    ```bash
-   cp .env.example .env
+   cp apps/web/.env.example apps/web/.env
    ```
 4. Run the development server:
    ```bash
-   npm run dev
-   ```
+    npm run dev
+    ```
 
 ## Deployment
 
