@@ -31,8 +31,8 @@ const useMorphingText = (texts: string[]) => {
       )}px)`
       current1.style.opacity = `${Math.pow(invertedFraction, 0.4) * 100}%`
 
-      current1.textContent = texts[textIndexRef.current % texts.length]
-      current2.textContent = texts[(textIndexRef.current + 1) % texts.length]
+      current1.textContent = texts[textIndexRef.current % texts.length] ?? ""
+      current2.textContent = texts[(textIndexRef.current + 1) % texts.length] ?? ""
     },
     [texts]
   )

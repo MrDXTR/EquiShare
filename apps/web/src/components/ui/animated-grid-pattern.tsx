@@ -93,33 +93,26 @@ export function AnimatedGridPattern({
 
   useEffect(() => {
     const element = containerRef.current
-    let resizeObserver: ResizeObserver | null = null
+    if (!element) return
 
-    if (element) {
-      resizeObserver = new ResizeObserver((entries) => {
-        for (const entry of entries) {
-          setDimensions((currentDimensions) => {
-            const nextWidth = entry.contentRect.width
-            const nextHeight = entry.contentRect.height
-            if (
-              currentDimensions.width === nextWidth &&
-              currentDimensions.height === nextHeight
-            ) {
-              return currentDimensions
-            }
-            return { width: nextWidth, height: nextHeight }
-          })
-        }
-      })
-
-      resizeObserver.observe(element)
-    }
-
-    return () => {
-      if (resizeObserver) {
-        resizeObserver.disconnect()
+    const resizeObserver = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        setDimensions((currentDimensions) => {
+          const nextWidth = entry.contentRect.width
+          const nextHeight = entry.contentRect.height
+          if (
+            currentDimensions.width === nextWidth &&
+            currentDimensions.height === nextHeight
+          ) {
+            return currentDimensions
+          }
+          return { width: nextWidth, height: nextHeight }
+        })
       }
-    }
+    })
+
+    resizeObserver.observe(element)
+    return () => resizeObserver.disconnect()
   }, [])
 
   return (

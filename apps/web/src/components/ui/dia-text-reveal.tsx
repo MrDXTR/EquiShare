@@ -179,11 +179,13 @@ export function DiaTextReveal({
 
   const isInView = useInView(spanRef, { once, amount: 0.1 })
 
+  const textKey = Array.isArray(text) ? text.join("\0") : text
   useEffect(() => {
     const el = spanRef.current
     if (!el || !isMulti) return
     setMeasuredWidths(measureWidths(el, texts))
-  }, [Array.isArray(text) ? text.join("\0") : text])
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [textKey, isMulti])
 
   playRef.current = () => {
     const { duration, delay, repeat, repeatDelay, texts } = optsRef.current
@@ -239,7 +241,6 @@ export function DiaTextReveal({
       ref={spanRef}
       className={cn("align-bottom leading-[100%] text-inherit", className)}
       style={{
-        transform: "translateY(-2px)",
         color: "transparent",
         backgroundClip: "text",
         WebkitBackgroundClip: "text",
@@ -249,7 +250,7 @@ export function DiaTextReveal({
           display: "inline-block",
           overflow: "hidden",
           whiteSpace: "nowrap",
-          verticalAlign: "text-center",
+          verticalAlign: "middle",
           ...(fixedW != null && { width: fixedW }),
         }),
       }}

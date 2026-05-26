@@ -14,6 +14,7 @@ import {
 import { AnimatedGridPattern } from "~/components/ui/animated-grid-pattern";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
+import { DiaTextReveal } from "~/components/ui/dia-text-reveal";
 import { LayoutTextFlip } from "~/components/ui/layout-text-flip";
 import { MorphingText } from "~/components/ui/morphing-text";
 import { GlowingEffect } from "~/components/ui/glowing-effect";
@@ -51,28 +52,28 @@ export default function LandingPage() {
       title: "Easy expense tracking",
       description:
         "Add expenses in seconds. Split equally, by percentage, or custom amounts.",
-      area: "md:[grid-area:1/7/2/13] xl:[grid-area:2/1/3/5]",
+      area: "md:[grid-area:2/1/3/7] xl:[grid-area:2/1/3/5]",
     },
     {
       icon: TrendingUp,
       title: "Smart calculations",
       description:
         "Automatically minimize the number of transactions needed to settle all debts.",
-      area: "md:[grid-area:2/1/3/7] xl:[grid-area:1/5/3/8]",
+      area: "md:[grid-area:1/7/3/13] xl:[grid-area:1/5/2/9]",
     },
     {
       icon: CheckCircle2,
       title: "Settlement tracking",
       description:
         "Record payments, track who's settled, and keep a full history of every transaction.",
-      area: "md:[grid-area:2/7/3/13] xl:[grid-area:1/8/2/13]",
+      area: "md:[grid-area:3/1/4/7] xl:[grid-area:1/9/2/13]",
     },
     {
       icon: Sparkles,
       title: "Always free, no ads",
       description:
         "EquiShare is built to be fair — no paywalls, no distractions, just clarity.",
-      area: "md:[grid-area:3/1/4/13] xl:[grid-area:2/8/3/13]",
+      area: "md:[grid-area:3/7/4/13] xl:[grid-area:2/5/3/13]",
     },
   ];
 
@@ -98,16 +99,28 @@ export default function LandingPage() {
               The smart way to split bills
             </Badge>
 
-            <div className="flex flex-col items-center gap-4 text-balance">
+            <div className="flex flex-col items-center gap-3">
               <LayoutTextFlip
                 text="Split expenses"
                 words={["fairly", "instantly", "without awkwardness", "with friends"]}
                 duration={2800}
+                className="text-3xl md:text-5xl"
               />
               <p className="mx-auto max-w-xl text-base leading-relaxed text-muted-foreground sm:text-lg">
                 EquiShare keeps every shared bill transparent and fair — from
                 weekend getaways to monthly household costs.
               </p>
+              {/* DiaTextReveal in its own fixed-height line — no reflow */}
+              <div className="flex items-center justify-center gap-1.5 text-base text-muted-foreground sm:text-lg">
+                <span>Perfect for</span>
+                <DiaTextReveal
+                  text={["trips", "roommates", "team events", "daily bills"]}
+                  repeat
+                  repeatDelay={1.4}
+                  duration={1.1}
+                  className="font-semibold text-foreground"
+                />
+              </div>
             </div>
 
             <div className="flex flex-col items-center justify-center gap-3 sm:flex-row">
@@ -130,14 +143,13 @@ export default function LandingPage() {
             </div>
           </div>
         </div>
+        {/* Gradient fade — blends grid into the next section */}
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-background via-background/80 to-transparent" />
       </section>
 
       {/* Features Section */}
-      <section
-        id="features"
-        className="mx-auto max-w-6xl px-4 pb-8"
-      >
-        {/* Morphing text as section intro — merged with "everything" heading */}
+      <section id="features" className="mx-auto max-w-6xl px-4 pb-8 pt-20">
+        {/* Morphing text merged as section heading */}
         <div className="mb-3 flex flex-col items-center gap-2 text-center">
           <p className="text-sm font-medium uppercase tracking-widest text-muted-foreground">
             Everything you need for
@@ -153,7 +165,7 @@ export default function LandingPage() {
 
         {/* Glowing bento-style feature grid */}
         <div className="mt-10">
-          <ul className="grid grid-cols-1 grid-rows-none gap-4 md:grid-cols-12 md:grid-rows-3 lg:gap-4 xl:max-h-[34rem] xl:grid-rows-2">
+          <ul className="grid grid-cols-1 grid-rows-none gap-4 md:grid-cols-12 md:grid-rows-3 lg:gap-4 xl:grid-cols-12 xl:grid-rows-2">
             {features.map((feature) => {
               const Icon = feature.icon;
               return (

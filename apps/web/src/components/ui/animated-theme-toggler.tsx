@@ -216,28 +216,25 @@ export const AnimatedThemeToggler = ({
       flushSync(applyTheme)
     })
     if (typeof transition?.finished?.finally === "function") {
-      transition.finished.finally(cleanup)
+      void transition.finished.finally(cleanup)
     } else {
       cleanup()
     }
 
-    const ready = transition?.ready
-    if (ready && typeof ready.then === "function") {
-      ready.then(() => {
-        document.documentElement.animate(
-          {
-            clipPath,
-          },
-          {
-            duration,
-            // Star: linear avoids easing overshoot that fights polygon interpolation at t→1; VT group duration is synced above.
-            easing: shape === "star" ? "linear" : "ease-in-out",
-            fill: "forwards",
-            pseudoElement: "::view-transition-new(root)",
-          }
-        )
-      })
-    }
+    void transition.ready.then(() => {
+      document.documentElement.animate(
+        {
+          clipPath,
+        },
+        {
+          duration,
+          // Star: linear avoids easing overshoot that fights polygon interpolation at t→1; VT group duration is synced above.
+          easing: shape === "star" ? "linear" : "ease-in-out",
+          fill: "forwards",
+          pseudoElement: "::view-transition-new(root)",
+        }
+      )
+    })
   }, [shape, fromCenter, duration, isDark])
 
   return (
@@ -245,10 +242,10 @@ export const AnimatedThemeToggler = ({
       type="button"
       ref={buttonRef}
       onClick={toggleTheme}
-      className={cn(className)}
+      className={cn("inline-flex items-center justify-center", className)}
       {...props}
     >
-      {isDark ? <Sun /> : <Moon />}
+      {isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
       <span className="sr-only">Toggle theme</span>
     </button>
   )
