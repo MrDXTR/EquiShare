@@ -13,10 +13,11 @@ import {
 } from "lucide-react";
 import { AnimatedGridPattern } from "~/components/ui/animated-grid-pattern";
 import { Badge } from "~/components/ui/badge";
-import { BentoGrid } from "~/components/ui/bento-grid";
 import { Button } from "~/components/ui/button";
-import { Card, CardContent } from "~/components/ui/card";
+import { LayoutTextFlip } from "~/components/ui/layout-text-flip";
 import { MorphingText } from "~/components/ui/morphing-text";
+import { GlowingEffect } from "~/components/ui/glowing-effect";
+import { ShineBorder } from "~/components/ui/shine-border";
 import { LoadingScreen } from "./_components/common/LoadingScreen";
 
 export default function LandingPage() {
@@ -42,23 +43,36 @@ export default function LandingPage() {
       icon: Users,
       title: "Group management",
       description:
-        "Create groups for trips, households, or any shared expenses.",
+        "Create groups for trips, households, or any shared expenses. Everyone stays in the loop.",
+      area: "md:[grid-area:1/1/2/7] xl:[grid-area:1/1/2/5]",
     },
     {
       icon: Receipt,
       title: "Easy expense tracking",
-      description: "Add expenses quickly and split them with confidence.",
+      description:
+        "Add expenses in seconds. Split equally, by percentage, or custom amounts.",
+      area: "md:[grid-area:1/7/2/13] xl:[grid-area:2/1/3/5]",
     },
     {
       icon: TrendingUp,
       title: "Smart calculations",
       description:
-        "Automatically calculate who owes what with minimal transactions.",
+        "Automatically minimize the number of transactions needed to settle all debts.",
+      area: "md:[grid-area:2/1/3/7] xl:[grid-area:1/5/3/8]",
     },
     {
       icon: CheckCircle2,
       title: "Settlement tracking",
-      description: "Keep payments organized and settle debts effortlessly.",
+      description:
+        "Record payments, track who's settled, and keep a full history of every transaction.",
+      area: "md:[grid-area:2/7/3/13] xl:[grid-area:1/8/2/13]",
+    },
+    {
+      icon: Sparkles,
+      title: "Always free, no ads",
+      description:
+        "EquiShare is built to be fair — no paywalls, no distractions, just clarity.",
+      area: "md:[grid-area:3/1/4/13] xl:[grid-area:2/8/3/13]",
     },
   ];
 
@@ -74,55 +88,45 @@ export default function LandingPage() {
           repeatDelay={1}
         />
 
-        <div className="relative mx-auto flex min-h-[calc(100vh-8rem)] max-w-6xl flex-col items-center justify-center px-4 py-10 text-center">
-          <div className="space-y-6">
+        <div className="relative mx-auto flex min-h-[calc(100vh-4rem)] max-w-6xl flex-col items-center justify-center px-4 py-16 text-center">
+          <div className="flex flex-col items-center gap-6">
             <Badge
               variant="secondary"
               className="border-border/60 bg-secondary/50"
             >
-              <Sparkles className="mr-2 h-4 w-4" />
+              <Sparkles className="mr-2 h-3.5 w-3.5" />
               The smart way to split bills
             </Badge>
 
-            <div className="space-y-3">
-              <h1 className="text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl">
-                Split Expenses <span className="text-primary">Smarter.</span>
-              </h1>
-
-              <MorphingText
-                texts={["Smarter", "Simpler", "Faster"]}
-                className="mt-2 h-14 max-w-xl text-[2.2rem] md:h-14 md:text-[2.6rem] lg:text-[3rem]"
+            <div className="flex flex-col items-center gap-4 text-balance">
+              <LayoutTextFlip
+                text="Split expenses"
+                words={["fairly", "instantly", "without awkwardness", "with friends"]}
+                duration={2800}
               />
+              <p className="mx-auto max-w-xl text-base leading-relaxed text-muted-foreground sm:text-lg">
+                EquiShare keeps every shared bill transparent and fair — from
+                weekend getaways to monthly household costs.
+              </p>
             </div>
-
-            <p className="mx-auto max-w-2xl text-base leading-relaxed text-muted-foreground sm:text-lg">
-              Split bills, track expenses, and settle up with friends and family.
-            </p>
 
             <div className="flex flex-col items-center justify-center gap-3 sm:flex-row">
               <Button size="lg" onClick={() => router.push("/signin")}>
                 Start splitting
-                <ArrowRight className="ml-2 h-5 w-5" />
+                <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
-
               <Button asChild variant="outline" size="lg">
-                <a href="#features">View how it works</a>
+                <a href="#features">See how it works</a>
               </Button>
             </div>
 
             <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm text-muted-foreground">
-              <span className="inline-flex items-center gap-2">
-                <span className="h-1.5 w-1.5 rounded-full bg-primary/70" />
-                Free to use
-              </span>
-              <span className="inline-flex items-center gap-2">
-                <span className="h-1.5 w-1.5 rounded-full bg-primary/70" />
-                No ads
-              </span>
-              <span className="inline-flex items-center gap-2">
-                <span className="h-1.5 w-1.5 rounded-full bg-primary/70" />
-                Instant calculations
-              </span>
+              {["Free to use", "No ads", "Instant calculations"].map((item) => (
+                <span key={item} className="inline-flex items-center gap-2">
+                  <span className="h-1.5 w-1.5 rounded-full bg-primary/70" />
+                  {item}
+                </span>
+              ))}
             </div>
           </div>
         </div>
@@ -131,59 +135,83 @@ export default function LandingPage() {
       {/* Features Section */}
       <section
         id="features"
-        className="mx-auto max-w-6xl px-4 py-16 text-center"
+        className="mx-auto max-w-6xl px-4 pb-8"
       >
-        <div className="space-y-3">
-          <h2 className="text-3xl font-semibold tracking-tight">
-            Everything you need to manage expenses
-          </h2>
-          <p className="mx-auto max-w-2xl text-muted-foreground">
-            Powerful features designed to make splitting as simple as possible.
+        {/* Morphing text as section intro — merged with "everything" heading */}
+        <div className="mb-3 flex flex-col items-center gap-2 text-center">
+          <p className="text-sm font-medium uppercase tracking-widest text-muted-foreground">
+            Everything you need for
+          </p>
+          <MorphingText
+            texts={["Trips", "Shared apartments", "Team events", "Everyday bills"]}
+            className="mx-auto h-14 max-w-3xl text-[2.2rem] md:h-18 md:text-[2.8rem] lg:text-[3.2rem]"
+          />
+          <p className="mt-1 max-w-lg text-muted-foreground">
+            Powerful features designed to make splitting as painless as possible.
           </p>
         </div>
 
+        {/* Glowing bento-style feature grid */}
         <div className="mt-10">
-          <BentoGrid className="auto-rows-min grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
+          <ul className="grid grid-cols-1 grid-rows-none gap-4 md:grid-cols-12 md:grid-rows-3 lg:gap-4 xl:max-h-[34rem] xl:grid-rows-2">
             {features.map((feature) => {
               const Icon = feature.icon;
               return (
-                <div
+                <li
                   key={feature.title}
-                  className="rounded-xl border border-border/60 bg-card/50 p-6 text-left transition-colors hover:bg-card"
+                  className={`min-h-[13rem] list-none ${feature.area}`}
                 >
-                  <div className="flex h-11 w-11 items-center justify-center rounded-lg bg-muted">
-                    <Icon className="h-5 w-5 text-primary" />
+                  <div className="relative h-full rounded-2xl border p-2 md:rounded-3xl md:p-3">
+                    <GlowingEffect
+                      spread={40}
+                      glow={true}
+                      disabled={false}
+                      proximity={64}
+                      inactiveZone={0.01}
+                    />
+                    <div className="border-0.75 relative flex h-full flex-col justify-between gap-6 overflow-hidden rounded-xl bg-card/60 p-6 dark:shadow-[0px_0px_27px_0px_#2D2D2D]">
+                      <div className="relative flex flex-1 flex-col justify-between gap-3 text-left">
+                        <div className="w-fit rounded-lg border border-gray-600 p-2">
+                          <Icon className="h-5 w-5 text-primary" />
+                        </div>
+                        <div className="space-y-2">
+                          <h3 className="-tracking-4 pt-0.5 font-sans text-xl font-semibold text-balance md:text-2xl">
+                            {feature.title}
+                          </h3>
+                          <p className="font-sans text-sm text-muted-foreground md:text-base">
+                            {feature.description}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
                   </div>
-                  <h3 className="mt-4 text-base font-semibold">
-                    {feature.title}
-                  </h3>
-                  <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-                    {feature.description}
-                  </p>
-                </div>
+                </li>
               );
             })}
-          </BentoGrid>
+          </ul>
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="mx-auto max-w-5xl px-4 pb-20">
-        <Card className="border-border/60 bg-card/50 shadow-none">
-          <CardContent className="flex flex-col items-center gap-4 py-10 text-center">
-            <h2 className="text-2xl font-semibold tracking-tight">
-              Ready to get started?
-            </h2>
-            <p className="max-w-2xl text-muted-foreground">
-              Join thousands of users who have simplified their expense
-              sharing experience.
-            </p>
-            <Button size="lg" onClick={() => router.push("/signin")}>
-              Get started now
-              <ArrowRight className="ml-2 h-5 w-5" />
-            </Button>
-          </CardContent>
-        </Card>
+      {/* CTA Section — ShineBorder */}
+      <section className="mx-auto max-w-6xl px-4 py-16">
+        <div className="relative flex flex-col items-center gap-5 overflow-hidden rounded-2xl bg-card/60 py-14 text-center">
+          <ShineBorder
+            shineColor={["#9E7AFF", "#FE8BBB", "#60a5fa"]}
+            borderWidth={1.5}
+            duration={10}
+          />
+          <h2 className="text-2xl font-semibold tracking-tight sm:text-3xl">
+            Ready to get started?
+          </h2>
+          <p className="max-w-md text-muted-foreground">
+            Create a group, add your first expense, and let EquiShare handle the
+            rest.
+          </p>
+          <Button size="lg" onClick={() => router.push("/signin")}>
+            Get started — it&apos;s free
+            <ArrowRight className="ml-2 h-4 w-4" />
+          </Button>
+        </div>
       </section>
     </div>
   );

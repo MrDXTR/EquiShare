@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { Button } from "~/components/ui/button";
 import { Card, CardContent } from "~/components/ui/card";
+import { MagicCard } from "~/components/ui/magic-card";
 
 export default function SignInPage() {
   const [isLoading, setIsLoading] = useState(false);
@@ -28,8 +29,9 @@ export default function SignInPage() {
   return (
     <div className="flex min-h-[calc(100vh-8rem)] items-center justify-center bg-background p-4">
       <div className="w-full max-w-md">
-        <Card className="border-border/60 bg-card/50 shadow-none">
-          <CardContent className="space-y-6">
+        <MagicCard className="rounded-2xl">
+          <Card className="border-border/60 bg-card/60 shadow-none">
+            <CardContent className="space-y-6">
             {/* Logo/Brand */}
             <div className="text-center">
               <div className="mx-auto flex size-12 items-center justify-center rounded-lg bg-muted">
@@ -109,8 +111,9 @@ export default function SignInPage() {
                 agreement
               </p>
             </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        </MagicCard>
       </div>
     </div>
   );
