@@ -31,9 +31,9 @@ export default function LandingPage() {
     }
   }, [session, status, router]);
 
-  if (status === "loading") {
-    return <LoadingScreen />;
-  }
+  // if (status === "loading") {
+  //   return <LoadingScreen />;
+  // }
 
   if (status === "authenticated") {
     return null;
