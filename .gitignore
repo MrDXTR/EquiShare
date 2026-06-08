@@ -52,3 +52,8 @@ apps/*/.env*.local
 
 .cursorignore
 /.vscode/
+
+# custom configurations and documentation
+DESIGN.md
+.agents/
+skills-lock.json
