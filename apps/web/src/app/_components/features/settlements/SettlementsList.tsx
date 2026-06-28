@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { ArrowRight, CheckCircle2, Loader2, Eye, EyeOff } from "lucide-react";
+import { ArrowRight, CheckCircle2, Loader2, Eye, EyeOff, TableProperties } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { Badge } from "~/components/ui/badge";
 import { Skeleton } from "~/components/ui/skeleton";
@@ -11,19 +11,30 @@ import { toast } from "sonner";
 import { Switch } from "~/components/ui/switch";
 import { Label } from "~/components/ui/label";
 import { SettleAllConfirmationDialog } from "./SettleAllConfirmationDialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "~/components/ui/dialog";
+import { NetSettlementTable } from "./NetSettlementTable";
+import type { Group } from "../group-management/utils";
 
 interface SettlementsListProps {
   groupId: string;
   exportButton?: React.ReactNode;
+  group?: Group;
 }
 
 export function SettlementsList({
   groupId,
   exportButton,
+  group,
 }: SettlementsListProps) {
   const [settlingId, setSettlingId] = useState<string | null>(null);
   const [hoveredSettleId, setHoveredSettleId] = useState<string | null>(null);
   const [showSettled, setShowSettled] = useState(false);
+  const [showDetailsDialog, setShowDetailsDialog] = useState(false);
   const utils = api.useUtils();
 
   // Query all settlements (the API doesn't filter by settled status anymore)
@@ -89,23 +100,16 @@ export function SettlementsList({
     <div>
       <Card className="border-border bg-background h-full border">
         <CardHeader className="pb-4">
-          <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between md:gap-0">
+          <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
             <CardTitle className="flex flex-wrap items-center gap-3 text-2xl">
               <div className="border-border rounded-lg border p-2">
                 <ArrowRight className="text-foreground h-6 w-6" />
               </div>
-              <div className="flex items-center gap-2">
-                <span className="text-gray-900 dark:text-gray-100">
-                  Settlements
-                </span>
-                {exportButton && (
-                  <div className="flex items-center md:hidden">
-                    {exportButton}
-                  </div>
-                )}
-              </div>
+              <span className="text-gray-900 dark:text-gray-100">
+                Settlements
+              </span>
             </CardTitle>
-            <div className="flex items-center gap-4">
+            <div className="flex flex-wrap items-center gap-2">
               <div className="flex items-center gap-2">
                 <Switch
                   id="show-settled"
@@ -127,8 +131,18 @@ export function SettlementsList({
                 </Label>
               </div>
 
-              {exportButton && (
-                <div className="hidden md:flex">{exportButton}</div>
+              {exportButton}
+
+              {group && group.expenses.length > 0 && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setShowDetailsDialog(true)}
+                  className="gap-1.5"
+                >
+                  <TableProperties className="h-3.5 w-3.5" />
+                  More Details
+                </Button>
               )}
 
               {activeSettlements.length > 0 && (
@@ -171,11 +185,10 @@ export function SettlementsList({
                 return (
                   <div
                     key={settlement.id}
-                    className={`bg-background relative top-0 overflow-hidden rounded-xl border p-4 shadow-none transition-[top,box-shadow,border-color] duration-200 hover:-top-0.5 ${
-                      isSettled || isSettleHovered
-                        ? "border-green-500 shadow-lg shadow-green-500/25"
-                        : "border-border hover:border-yellow-500 hover:shadow-lg hover:shadow-yellow-500/25"
-                    }`}
+                    className={`bg-background relative top-0 overflow-hidden rounded-xl border p-4 shadow-none transition-[top,box-shadow,border-color] duration-200 hover:-top-0.5 ${isSettled || isSettleHovered
+                      ? "border-green-500 shadow-lg shadow-green-500/25"
+                      : "border-border hover:border-yellow-500 hover:shadow-lg hover:shadow-yellow-500/25"
+                      }`}
                   >
                     <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
                       <div className="flex flex-wrap items-center gap-2">
@@ -236,6 +249,27 @@ export function SettlementsList({
           )}
         </CardContent>
       </Card>
+
+      {/* Net Settlement Details Dialog */}
+      {group && (
+        <Dialog open={showDetailsDialog} onOpenChange={setShowDetailsDialog}>
+          <DialogContent className="flex max-h-[85vh] max-w-[80vw] flex-col gap-0 overflow-hidden p-0 sm:max-w-4xl">
+            <DialogHeader className="border-border shrink-0 border-b p-4 sm:p-6">
+              <DialogTitle className="flex items-center gap-2">
+                <TableProperties className="h-5 w-5 shrink-0" />
+                Net Settlement Breakdown
+              </DialogTitle>
+              <p className="text-muted-foreground text-sm">
+                Each person&apos;s share per expense, total owed, amount paid,
+                and net balance.
+              </p>
+            </DialogHeader>
+            <div className="min-h-0 flex-1 overflow-auto p-4 sm:p-6">
+              <NetSettlementTable group={group} />
+            </div>
+          </DialogContent>
+        </Dialog>
+      )}
     </div>
   );
 }

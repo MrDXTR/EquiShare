@@ -50,7 +50,7 @@ export function GroupDataExport({ group }: GroupDataExportProps) {
         downloadCSV(csvData, `${filename}.csv`);
         toast.success("CSV file downloaded!");
       } else if (type === "pdf") {
-        const pdfBlob = await generatePDF(csvData, group.name);
+        const pdfBlob = await generatePDF(csvData, group.name, group);
         const url = URL.createObjectURL(pdfBlob);
         const link = document.createElement("a");
         link.href = url;

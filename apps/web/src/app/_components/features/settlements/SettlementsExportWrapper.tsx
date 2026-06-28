@@ -22,6 +22,7 @@ export function SettlementsExportWrapper({
       <div ref={contentRef}>
         <SettlementsList
           groupId={groupId}
+          group={group}
           exportButton={
             <SettlementsImageExport
               groupName={groupName}
