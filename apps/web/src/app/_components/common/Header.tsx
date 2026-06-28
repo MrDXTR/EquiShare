@@ -103,6 +103,7 @@ export function Header() {
                 onClick={() => router.push("/signin")}
                 variant="default"
                 size="sm"
+                className="cursor-pointer hover:bg-accent-foreground"
               >
                 Sign In
               </Button>

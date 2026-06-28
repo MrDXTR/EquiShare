@@ -1,4 +1,5 @@
 import type { Group } from "./utils";
+import { computeNetSettlementData } from "../settlements/NetSettlementTable";
 
 interface Person {
   name: string | null;
@@ -138,6 +139,7 @@ export function downloadCSV(data: string, filename: string) {
 export async function generatePDF(
   csvData: string,
   title: string,
+  group?: Group,
 ): Promise<Blob> {
   const { jsPDF } = await import("jspdf");
   const { default: autoTable } = await import("jspdf-autotable");
@@ -216,6 +218,63 @@ export async function generatePDF(
       startY: currentY,
       theme: "striped",
       headStyles: { fillColor: [100, 100, 255] },
+    });
+    const lastY2 = (doc as any).lastAutoTable?.finalY;
+    currentY = lastY2 ? lastY2 + 10 : currentY + 10;
+  }
+
+  // Add Net Settlement Breakdown if group data is provided
+  if (group && group.expenses.length > 0) {
+    const { rows, expenses } = computeNetSettlementData(group);
+
+    // Check if we need a new page
+    if (currentY > 200) {
+      doc.addPage();
+      currentY = 20;
+    }
+
+    doc.setFontSize(14);
+    doc.text("NET SETTLEMENT BREAKDOWN", 14, currentY);
+    currentY += 8;
+
+    // Build table headers: Person + each expense description + Total Owes + Paid + Net
+    const netTableHead = [
+      "Person",
+      ...expenses.map((e) =>
+        e.description.length > 12
+          ? e.description.slice(0, 12) + "..."
+          : e.description,
+      ),
+      "Total Owes",
+      "Paid",
+      "Net",
+    ];
+
+    const netTableBody = rows.map((row) => [
+      row.personName,
+      ...expenses.map((e) => {
+        const amt = row.expenseShares[e.id] ?? 0;
+        return amt > 0 ? `Rs.${amt.toFixed(0)}` : "Rs.0";
+      }),
+      row.totalOwes > 0 ? `Rs.${row.totalOwes.toFixed(0)}` : "Rs.0",
+      row.paid > 0 ? `Rs.${row.paid.toFixed(0)}` : "Rs.0",
+      row.net > 0
+        ? `Receives Rs.${row.net.toFixed(0)}`
+        : row.net < 0
+          ? `Owes Rs.${Math.abs(row.net).toFixed(0)}`
+          : "Settled",
+    ]);
+
+    autoTable(doc, {
+      head: [netTableHead],
+      body: netTableBody,
+      startY: currentY,
+      theme: "striped",
+      headStyles: { fillColor: [67, 56, 202] },
+      columnStyles: {
+        0: { fontStyle: "bold" },
+        [netTableHead.length - 1]: { fontStyle: "bold" },
+      },
     });
   }
 
