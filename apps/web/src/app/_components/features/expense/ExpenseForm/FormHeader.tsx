@@ -6,38 +6,38 @@ interface FormHeaderProps {
 
 export function FormHeader({ currentStep }: FormHeaderProps) {
   return (
-    <div className="bg-background rounded-t-lg border-b p-6">
-      <div className="mb-4 flex items-center justify-center">
+    <div className="border-b border-border/70 bg-card/60 px-6 py-5">
+      <div className="mb-3 flex items-center justify-center">
         {[1, 2].map((step) => (
           <div key={step} className="flex items-center">
             <div
-              className={`flex h-8 w-8 items-center justify-center rounded-full text-sm font-bold transition-all duration-200 ${
+              className={`flex size-7 items-center justify-center rounded-full text-xs font-semibold transition-all duration-200 ${
                 currentStep >= step
-                  ? "border-foreground bg-foreground text-background border"
-                  : "border-border bg-background text-muted-foreground border"
-              } `}
+                  ? "bg-primary text-primary-foreground shadow-2xs"
+                  : "border border-border/80 bg-background text-muted-foreground"
+              }`}
             >
-              {currentStep > step ? <CheckCircle2 className="h-4 w-4" /> : step}
+              {currentStep > step ? <CheckCircle2 className="size-4" /> : step}
             </div>
             {step < 2 && (
               <div
-                className={`mx-2 h-0.5 w-12 transition-all duration-200 ${
-                  currentStep > step ? "bg-foreground" : "bg-border"
-                } `}
+                className={`mx-2.5 h-0.5 w-12 transition-all duration-200 ${
+                  currentStep > step ? "bg-primary" : "bg-border/60"
+                }`}
               />
             )}
           </div>
         ))}
       </div>
 
-      <div className="text-center">
-        <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100">
+      <div className="text-center space-y-0.5">
+        <h2 className="text-lg font-bold tracking-tight text-foreground">
           {currentStep === 1 ? "Expense Details" : "Split Configuration"}
         </h2>
-        <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
+        <p className="text-xs text-muted-foreground">
           {currentStep === 1
-            ? "Enter expense info and select people"
-            : "Choose how to split the amount"}
+            ? "Enter what was spent and who participated"
+            : "Customize how the bill is divided"}
         </p>
       </div>
     </div>

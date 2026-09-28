@@ -9,11 +9,10 @@ import {
   DialogTrigger,
 } from "~/components/ui/dialog";
 import { Button } from "~/components/ui/button";
-import { Clipboard, ClipboardCheck, Loader2, UserPlus } from "lucide-react";
+import { Clipboard, Check, Loader2, UserPlus, AlertCircle } from "lucide-react";
 import { api } from "~/trpc/react";
 import { toast } from "sonner";
 import { format } from "date-fns";
-import { Card } from "~/components/ui/card";
 import { Input } from "~/components/ui/input";
 import {
   Select,
@@ -54,11 +53,10 @@ export function InviteDialog({ children, groupId }: InviteDialogProps) {
       setCopied(true);
       toast.success("Invite link copied to clipboard");
 
-      // store the timer id instead of forgetting it
       timeoutRef.current = setTimeout(() => setCopied(false), 2000);
     }
   };
-  // clear the timer on unmount / dialog close
+
   useEffect(() => {
     return () => {
       if (timeoutRef.current) {
@@ -66,6 +64,7 @@ export function InviteDialog({ children, groupId }: InviteDialogProps) {
       }
     };
   }, []);
+
   const formatExpiryDate = (expiresAt: Date) => {
     return format(new Date(expiresAt), "MMM d, yyyy");
   };
@@ -76,41 +75,39 @@ export function InviteDialog({ children, groupId }: InviteDialogProps) {
       onOpenChange={(v) => {
         setOpen(v);
         if (!v) {
-          createInvite.reset(); // reset to idle when the dialog closes
-          setMaxUses(10); // reset max uses
+          createInvite.reset();
+          setMaxUses(10);
+          setCopied(false);
         }
       }}
     >
       <DialogTrigger asChild>{children}</DialogTrigger>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-2 text-xl">
-            <div className="bg-muted rounded-lg border p-2">
-              <UserPlus className="text-foreground h-5 w-5" />
+          <DialogTitle className="flex items-center gap-2.5 text-xl">
+            <div className="bg-primary/10 text-primary flex size-8 items-center justify-center rounded-lg">
+              <UserPlus className="size-4" />
             </div>
-            <span className="text-gray-900 dark:text-gray-100">
-              Invite Members
-            </span>
+            <span>Invite Members</span>
           </DialogTitle>
         </DialogHeader>
 
         <div className="space-y-4 py-2">
           {!createInvite.data?.invite && !createInvite.isPending && (
-            <div className="flex flex-col items-center space-y-4">
-              <p className="text-center text-sm text-gray-500">
-                Generate an invite link to share with others. The link will be
-                valid for 7 days.
+            <div className="flex flex-col space-y-4">
+              <p className="text-muted-foreground text-sm leading-relaxed">
+                Generate an invite link to share with others. Anyone with the link can join this group. The link will be valid for 7 days.
               </p>
 
-              <div className="w-full space-y-2">
-                <Label htmlFor="max-uses">
-                  Number of people who can use this link
+              <div className="space-y-2">
+                <Label htmlFor="max-uses" className="text-sm font-medium">
+                  Maximum number of joins
                 </Label>
                 <Select
                   value={String(maxUses)}
                   onValueChange={(value) => setMaxUses(parseInt(value))}
                 >
-                  <SelectTrigger className="w-full">
+                  <SelectTrigger id="max-uses" className="h-10 w-full rounded-lg">
                     <SelectValue placeholder="Maximum uses" />
                   </SelectTrigger>
                   <SelectContent>
@@ -125,7 +122,7 @@ export function InviteDialog({ children, groupId }: InviteDialogProps) {
 
               <Button
                 onClick={handleGenerateInvite}
-                className="w-full"
+                className="h-10 w-full font-medium active:scale-[0.97] transition-transform duration-150"
               >
                 Generate Invite Link
               </Button>
@@ -133,82 +130,73 @@ export function InviteDialog({ children, groupId }: InviteDialogProps) {
           )}
 
           {createInvite.isPending && (
-            <div className="flex justify-center py-6">
-              <div className="relative flex h-10 w-10 items-center justify-center">
-                <div className="absolute inset-0 rounded-full border border-border/50" />
-                <Loader2 className="text-foreground/70 h-4 w-4 animate-spin" />
-              </div>
+            <div className="flex flex-col items-center justify-center py-8 gap-3">
+              <Loader2 className="text-primary size-7 animate-spin" />
+              <p className="text-muted-foreground text-sm">Creating secure invite link...</p>
             </div>
           )}
 
           {createInvite.isError && (
-            <Card className="border-red-200 bg-red-50 p-4">
-              <div className="flex">
-                <div className="flex-shrink-0">
-                  <svg
-                    className="h-5 w-5 text-red-400"
-                    viewBox="0 0 20 20"
-                    fill="currentColor"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
-                </div>
-                <div className="ml-3">
-                  <h3 className="text-sm font-medium text-red-800">
-                    Error creating invite
-                  </h3>
-                  <div className="mt-2 text-sm text-red-700">
-                    {createInvite.error?.message}
-                  </div>
-                </div>
+            <div className="flex items-start gap-3 rounded-xl border border-destructive/30 bg-destructive/10 p-3.5 text-destructive">
+              <AlertCircle className="size-5 shrink-0 mt-0.5" />
+              <div className="space-y-1 text-sm">
+                <p className="font-semibold">Error creating invite</p>
+                <p className="text-xs opacity-90">{createInvite.error?.message}</p>
               </div>
-            </Card>
+            </div>
           )}
 
           {createInvite.data?.invite && (
             <div className="space-y-4">
               <div className="space-y-2">
-                <p className="text-sm font-medium text-gray-700">Invite Link</p>
-                <div className="flex w-full max-w-sm items-center space-x-2">
+                <Label className="text-sm font-medium text-foreground">Invite Link</Label>
+                <div className="flex items-center gap-2">
                   <Input
                     readOnly
                     value={createInvite.data.inviteLink}
-                    className="h-9 truncate bg-gray-50 text-sm"
+                    className="h-10 font-mono text-xs sm:text-sm bg-muted/40 border-border/70 select-all"
                   />
                   <Button
-                    size="sm"
+                    size="icon"
                     variant="outline"
                     onClick={handleCopyToClipboard}
-                    className="h-9 px-3"
+                    className="size-10 shrink-0 border-border/80 active:scale-[0.96] transition-transform duration-150"
+                    aria-label="Copy invite link"
                   >
-                    {copied ? (
-                      <ClipboardCheck className="h-4 w-4 text-green-500" />
-                    ) : (
-                      <Clipboard className="text-foreground h-4 w-4" />
-                    )}
+                    <div className="relative size-4 flex items-center justify-center">
+                      <Check
+                        className={`size-4 text-emerald-600 dark:text-emerald-400 absolute transition-all duration-200 ease-out ${
+                          copied
+                            ? "scale-100 opacity-100 blur-0"
+                            : "scale-50 opacity-0 blur-[2px]"
+                        }`}
+                      />
+                      <Clipboard
+                        className={`size-4 text-muted-foreground absolute transition-all duration-200 ease-out ${
+                          copied
+                            ? "scale-50 opacity-0 blur-[2px]"
+                            : "scale-100 opacity-100 blur-0"
+                        }`}
+                      />
+                    </div>
                   </Button>
                 </div>
               </div>
 
-              <div className="space-y-1">
-                <p className="text-sm text-gray-500">
-                  Expires on{" "}
-                  {formatExpiryDate(createInvite.data.invite.expiresAt)}
+              <div className="rounded-lg bg-muted/30 border border-border/50 p-3 text-xs text-muted-foreground space-y-1">
+                <p>
+                  • Expires on <span className="font-medium text-foreground">{formatExpiryDate(createInvite.data.invite.expiresAt)}</span>
                 </p>
-                <p className="text-sm text-gray-500">
-                  Can be used by up to {createInvite.data.invite.maxUses}{" "}
-                  {createInvite.data.invite.maxUses === 1 ? "person" : "people"}
+                <p>
+                  • Can be used by up to <span className="font-medium text-foreground">{createInvite.data.invite.maxUses} {createInvite.data.invite.maxUses === 1 ? "person" : "people"}</span>
                 </p>
               </div>
 
               <div className="pt-2">
                 <Button
+                  variant="outline"
                   onClick={handleGenerateInvite}
-                  className="w-full"
+                  className="h-10 w-full active:scale-[0.97] transition-transform duration-150"
                 >
                   Generate New Link
                 </Button>

@@ -1,9 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { motion } from "framer-motion";
 import { api } from "~/trpc/react";
-import { Button } from "~/components/ui/button";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import {
@@ -34,7 +32,6 @@ export default function GroupsPage() {
   const acceptInvite = api.invite.acceptInvite.useMutation({
     onSuccess: (data) => {
       toast.success("You've successfully joined the group!");
-
       router.push(`/groups/${data.groupId}`);
     },
     onError: (error) => {
@@ -60,16 +57,11 @@ export default function GroupsPage() {
       await utils.group.getAll.invalidate();
       toast.success("Group deleted successfully", {
         id: "delete-group",
-        style: {
-          backgroundColor: "#fee2e2",
-          color: "#991b1b",
-          borderColor: "#fecaca",
-        },
       });
       setGroupToDelete(null);
     },
-    onError: () => {
-      toast.error("Failed to delete group", {
+    onError: (error) => {
+      toast.error(`Failed to delete group: ${error.message}`, {
         id: "delete-group",
       });
     },
@@ -80,8 +72,7 @@ export default function GroupsPage() {
       setIsDeleting(true);
       try {
         await deleteGroup.mutateAsync(groupToDelete);
-        // Wait for the data to be refetched
-        await new Promise((resolve) => setTimeout(resolve, 1000));
+        await new Promise((resolve) => setTimeout(resolve, 800));
       } finally {
         setIsDeleting(false);
         setGroupToDelete(null);
@@ -91,30 +82,30 @@ export default function GroupsPage() {
 
   if (isLoading) {
     return (
-      <div className="dark:bg-background min-h-screen bg-[#fafafa]">
-        <div className="container mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
+      <div className="min-h-screen bg-background transition-colors">
+        <div className="container mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-10 lg:px-8">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-            <div>
-              <p className="text-muted-foreground mb-3 font-mono text-xs tracking-[0.18em] uppercase">
-                Workspace / overview
+            <div className="space-y-1">
+              <p className="text-muted-foreground font-mono text-xs tracking-wider uppercase">
+                Workspace / Groups
               </p>
-              <h1 className="text-foreground text-3xl font-semibold tracking-[-0.04em] sm:text-4xl">
+              <h1 className="text-foreground text-3xl font-bold tracking-tight sm:text-4xl">
                 Keep every split in sync.
               </h1>
-              <p className="text-muted-foreground mt-2 text-sm sm:text-base">
-                Manage your expense groups
+              <p className="text-muted-foreground text-sm sm:text-base">
+                Manage your expense groups and shared balances
               </p>
             </div>
             <div className="w-full sm:w-auto">
               <CreateGroupDialog />
             </div>
           </div>
-          <div className="mt-6 sm:mt-8">
+          <div className="mt-8">
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
               {[1, 2, 3, 4].map((i) => (
                 <div
                   key={i}
-                  className="bg-muted/30 h-48 animate-pulse rounded-xl border"
+                  className="bg-card/50 h-52 animate-pulse rounded-2xl border border-border/60"
                 />
               ))}
             </div>
@@ -125,17 +116,17 @@ export default function GroupsPage() {
   }
 
   return (
-    <div className="dark:bg-background min-h-screen bg-[#fafafa]">
-      <div className="container mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-background transition-colors">
+      <div className="container mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-10 lg:px-8">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <p className="text-muted-foreground mb-3 font-mono text-xs tracking-[0.18em] uppercase">
-              Workspace / overview
+          <div className="space-y-1">
+            <p className="text-muted-foreground font-mono text-xs tracking-wider uppercase">
+              Workspace / Groups
             </p>
-            <h1 className="text-foreground text-3xl font-semibold tracking-[-0.04em] sm:text-4xl">
+            <h1 className="text-foreground text-3xl font-bold tracking-tight sm:text-4xl">
               Keep every split in sync.
             </h1>
-            <p className="text-muted-foreground mt-2 text-sm sm:text-base">
+            <p className="text-muted-foreground text-sm sm:text-base">
               {groups?.length === 0
                 ? "Start by creating your first group"
                 : `${groups?.length} ${groups?.length === 1 ? "group" : "groups"} total`}
@@ -146,25 +137,20 @@ export default function GroupsPage() {
           </div>
         </div>
 
-        <div className="border-border/70 mt-8 border-t pt-8 sm:mt-10 sm:pt-10">
+        <div className="border-border/60 mt-8 border-t pt-8">
           {groups?.length === 0 ? (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="border-border bg-background flex flex-col items-center justify-center rounded-lg border border-dashed py-16 sm:py-20"
-            >
-              <div className="dark:bg-primary dark:text-primary-foreground mb-5 flex size-14 items-center justify-center rounded-lg bg-[#171717] text-white shadow-[8px_8px_0_#d8ccf1]">
+            <div className="rounded-2xl border border-dashed border-border/80 bg-card/40 flex flex-col items-center justify-center py-16 px-4 text-center sm:py-20">
+              <div className="bg-primary/10 text-primary mb-4 flex size-12 items-center justify-center rounded-xl">
                 <Layers3 className="size-6" />
               </div>
-              <h3 className="text-foreground mb-2 text-xl font-semibold tracking-[-0.03em]">
+              <h3 className="text-foreground mb-1.5 text-lg font-bold tracking-tight">
                 No groups yet
               </h3>
-              <p className="text-muted-foreground mb-6 max-w-md text-center text-sm leading-6">
-                Create your first group to start splitting expenses with
-                friends, family, or colleagues.
+              <p className="text-muted-foreground mb-6 max-w-sm text-xs sm:text-sm leading-relaxed">
+                Create your first group to start organizing expenses and settling debts with friends or roommates.
               </p>
               <CreateGroupDialog />
-            </motion.div>
+            </div>
           ) : (
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
               {groups?.map((group: any) => (
@@ -187,31 +173,30 @@ export default function GroupsPage() {
             }
           }}
         >
-          <AlertDialogContent className="mx-4 max-w-md">
+          <AlertDialogContent className="max-w-md rounded-2xl border border-border/80 bg-card p-6 shadow-2xl">
             <AlertDialogHeader>
-              <AlertDialogTitle className="text-lg">
+              <AlertDialogTitle className="text-xl font-bold tracking-tight text-foreground">
                 Delete Group?
               </AlertDialogTitle>
-              <AlertDialogDescription className="text-sm">
-                This action cannot be undone. This will permanently delete the
-                group and all its expenses.
+              <AlertDialogDescription className="text-sm text-muted-foreground">
+                This action cannot be undone. This will permanently delete the group, its members, and all recorded expenses.
               </AlertDialogDescription>
             </AlertDialogHeader>
-            <AlertDialogFooter className="flex-col gap-2 sm:flex-row">
+            <AlertDialogFooter className="mt-4 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
               <AlertDialogCancel
                 disabled={isDeleting}
-                className="w-full sm:w-auto"
+                className="h-10 w-full sm:w-auto active:scale-[0.97] transition-transform duration-150 border-border/80"
               >
                 Cancel
               </AlertDialogCancel>
               <AlertDialogAction
                 onClick={handleDeleteGroup}
                 disabled={isDeleting}
-                className="w-full bg-red-600 hover:bg-red-700 focus:ring-red-600 sm:w-auto dark:bg-red-700 dark:text-white dark:hover:bg-red-800 dark:focus:ring-red-700"
+                className="h-10 w-full sm:w-auto bg-destructive text-white hover:bg-destructive/90 active:scale-[0.97] transition-transform duration-150 font-medium"
               >
                 {isDeleting ? (
                   <div className="flex items-center justify-center gap-2">
-                    <div className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />
+                    <div className="size-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />
                     Deleting...
                   </div>
                 ) : (

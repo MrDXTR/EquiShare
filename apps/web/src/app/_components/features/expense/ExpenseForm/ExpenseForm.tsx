@@ -53,14 +53,21 @@ export function ExpenseForm({
     onMutate: () => {
       toast.loading("Adding expense...", { id: "create-expense" });
     },
-    onSuccess: async () => {
-      resetForm();
-      await utils.group.getById.invalidate(groupId);
-      await utils.expense.getBalances.invalidate(groupId);
-      await utils.settlement.list.invalidate({ groupId });
+    onSuccess: () => {
+      // 1. Close modal immediately on success
+      setOpen(false);
       toast.success("Expense added!", { id: "create-expense" });
       onSuccess?.();
-      setOpen(false);
+
+      // 2. Refetch queries in background without delaying modal close
+      void utils.group.getById.invalidate(groupId);
+      void utils.expense.getBalances.invalidate(groupId);
+      void utils.settlement.list.invalidate({ groupId });
+
+      // 3. Reset form state after modal close animation completes
+      setTimeout(() => {
+        resetForm();
+      }, 250);
     },
     onError: (error) => {
       toast.error(`Failed: ${error.message}`, { id: "create-expense" });
@@ -143,19 +150,24 @@ export function ExpenseForm({
       open={open}
       onOpenChange={(isOpen) => {
         setOpen(isOpen);
-        if (!isOpen) resetForm();
+        if (!isOpen) {
+          setTimeout(() => {
+            resetForm();
+          }, 250);
+          onClose?.();
+        }
       }}
     >
       <DialogTrigger asChild>
         {trigger || (
-          <Button className="bg-blue-600 text-white hover:bg-blue-700">
-            <Plus className="mr-2 h-4 w-4" />
+          <Button className="h-9 px-4 font-medium active:scale-[0.97] transition-transform duration-150">
+            <Plus className="mr-1.5 size-4" />
             Add Expense
           </Button>
         )}
       </DialogTrigger>
 
-      <DialogContent className="flex max-h-[90vh] w-[95vw] max-w-2xl flex-col gap-0 border p-0">
+      <DialogContent className="flex max-h-[92vh] w-[95vw] max-w-xl flex-col gap-0 overflow-hidden rounded-2xl border border-border/80 bg-card p-0 shadow-2xl">
         <DialogHeader className="sr-only">
           <DialogTitle>Add Expense - Step {currentStep}</DialogTitle>
         </DialogHeader>
@@ -164,52 +176,50 @@ export function ExpenseForm({
         <FormHeader currentStep={currentStep} />
 
         {/* Content */}
-        <div className="flex-1 overflow-y-auto">
-          <div className="p-6 pb-8">
-            <form onSubmit={handleSubmit}>
-              <AnimatePresence mode="wait">
-                {currentStep === 1 && (
-                  <motion.div
-                    key="step1"
-                    initial={{ opacity: 0, x: 20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: -20 }}
-                    transition={{ duration: 0.2 }}
-                  >
-                    <ExpenseDetails
-                      people={people}
-                      description={formState.description}
-                      amount={formState.amount}
-                      paidById={formState.paidById}
-                      selectedPersonIds={formState.selectedPersonIds}
-                      splitMode={formState.splitMode}
-                      updateFormState={updateFormState}
-                    />
-                  </motion.div>
-                )}
+        <div className="flex-1 overflow-y-auto px-5 py-4 sm:px-6">
+          <form onSubmit={handleSubmit}>
+            <AnimatePresence mode="wait">
+              {currentStep === 1 && (
+                <motion.div
+                  key="step1"
+                  initial={{ opacity: 0, x: 12 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -12 }}
+                  transition={{ duration: 0.18, ease: [0.23, 1, 0.32, 1] }}
+                >
+                  <ExpenseDetails
+                    people={people}
+                    description={formState.description}
+                    amount={formState.amount}
+                    paidById={formState.paidById}
+                    selectedPersonIds={formState.selectedPersonIds}
+                    splitMode={formState.splitMode}
+                    updateFormState={updateFormState}
+                  />
+                </motion.div>
+              )}
 
-                {currentStep === 2 && (
-                  <motion.div
-                    key="step2"
-                    initial={{ opacity: 0, x: 20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: -20 }}
-                    transition={{ duration: 0.2 }}
-                  >
-                    <SplitConfiguration
-                      people={people}
-                      amount={formState.amount}
-                      splitMode={formState.splitMode}
-                      selectedPersonIds={formState.selectedPersonIds}
-                      shareValues={formState.shareValues}
-                      formErrors={formState.formErrors}
-                      updateFormState={updateFormState}
-                    />
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </form>
-          </div>
+              {currentStep === 2 && (
+                <motion.div
+                  key="step2"
+                  initial={{ opacity: 0, x: 12 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -12 }}
+                  transition={{ duration: 0.18, ease: [0.23, 1, 0.32, 1] }}
+                >
+                  <SplitConfiguration
+                    people={people}
+                    amount={formState.amount}
+                    splitMode={formState.splitMode}
+                    selectedPersonIds={formState.selectedPersonIds}
+                    shareValues={formState.shareValues}
+                    formErrors={formState.formErrors}
+                    updateFormState={updateFormState}
+                  />
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </form>
         </div>
 
         {/* Footer */}

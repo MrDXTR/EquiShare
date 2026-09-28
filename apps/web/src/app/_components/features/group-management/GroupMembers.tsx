@@ -2,8 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { motion } from "framer-motion";
-import { MoreVertical, UserMinus, LogOut } from "lucide-react";
+import { MoreVertical, UserMinus, LogOut, ShieldCheck, Users } from "lucide-react";
 import { toast } from "sonner";
 import { api } from "~/trpc/react";
 import { useSession } from "next-auth/react";
@@ -56,7 +55,6 @@ export function GroupMembers({ group, isOwner }: GroupMembersProps) {
     onSuccess: () => {
       toast.success("Member removed successfully");
       setMemberToRemove(null);
-      // Invalidate the group query to refresh the data
       void utils.group.getById.invalidate(group.id);
     },
     onError: (error) => {
@@ -76,46 +74,50 @@ export function GroupMembers({ group, isOwner }: GroupMembersProps) {
   };
 
   return (
-    <div className="space-y-4 py-4">
+    <div className="space-y-5 py-2">
       {/* Group Owner */}
-      <div className="space-y-3">
-        <h4 className="text-sm font-medium text-gray-500 dark:text-gray-400">
+      <div className="space-y-2.5">
+        <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
           Owner
         </h4>
-        <div className="flex items-center justify-between rounded-lg border border-gray-100 bg-gray-50 p-3 dark:border-gray-700 dark:bg-gray-800">
+        <div className="flex items-center justify-between rounded-xl border border-border/70 bg-card/60 p-3 shadow-2xs">
           <div className="flex items-center gap-3">
-            <Avatar className="h-8 w-8 border border-white shadow-sm dark:border-gray-700">
+            <Avatar className="size-9 border border-border/60 ring-1 ring-border/20">
               <AvatarImage src={group.createdBy.image || undefined} />
-              <AvatarFallback className="bg-blue-100 text-blue-600 dark:bg-blue-900 dark:text-blue-400">
-                {(group.createdBy.name || "U").charAt(0)}
+              <AvatarFallback className="bg-primary/10 text-primary font-semibold text-xs">
+                {(group.createdBy.name || "U").charAt(0).toUpperCase()}
               </AvatarFallback>
             </Avatar>
             <div>
-              <p className="text-sm font-medium dark:text-gray-200">
+              <p className="text-sm font-semibold text-foreground">
                 {group.createdBy.name}
               </p>
               <Badge
                 variant="outline"
-                className="mt-1 border-green-200 bg-green-50 text-green-700 dark:border-green-800 dark:bg-green-900/50 dark:text-green-400"
+                className="mt-1 gap-1 border-amber-500/30 bg-amber-500/10 text-[11px] text-amber-700 dark:text-amber-400"
               >
-                Owner
+                <ShieldCheck className="size-3" />
+                Group Owner
               </Badge>
             </div>
           </div>
-          {/* Only show leave option for non-owners who are viewing their own card */}
           {!isOwner && currentUserId === group.createdById && (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="h-8 w-8 p-0">
-                  <MoreVertical className="h-4 w-4" />
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="size-8 rounded-lg active:scale-[0.96]"
+                >
+                  <MoreVertical className="size-4" />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
                 <DropdownMenuItem
-                  className="text-red-600 dark:text-red-500"
+                  className="text-destructive focus:bg-destructive/10 focus:text-destructive"
                   onClick={() => setShowLeaveDialog(true)}
                 >
-                  <LogOut className="mr-2 h-4 w-4" />
+                  <LogOut className="mr-2 size-4" />
                   Leave Group
                 </DropdownMenuItem>
               </DropdownMenuContent>
@@ -126,51 +128,54 @@ export function GroupMembers({ group, isOwner }: GroupMembersProps) {
 
       {/* Members */}
       {group.members && group.members.length > 0 && (
-        <div className="space-y-3">
-          <h4 className="text-sm font-medium text-gray-500 dark:text-gray-400">
-            Members
+        <div className="space-y-2.5">
+          <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+            Members ({group.members.length})
           </h4>
-          <div className="max-h-60 space-y-2 overflow-y-auto">
+          <div className="max-h-60 space-y-2 overflow-y-auto pr-1">
             {group.members.map((member) => (
               <div
                 key={member.id}
-                className="flex items-center justify-between rounded-lg border border-gray-100 p-3 dark:border-gray-700"
+                className="flex items-center justify-between rounded-xl border border-border/60 bg-card/40 p-3 transition-colors hover:bg-accent/40"
               >
                 <div className="flex items-center gap-3">
-                  <Avatar className="h-8 w-8 border border-white shadow-sm dark:border-gray-700">
+                  <Avatar className="size-9 border border-border/60">
                     <AvatarImage src={member.image || undefined} />
-                    <AvatarFallback className="bg-blue-100 text-blue-600 dark:bg-blue-900 dark:text-blue-400">
-                      {(member.name || "U").charAt(0)}
+                    <AvatarFallback className="bg-muted text-muted-foreground font-semibold text-xs">
+                      {(member.name || "U").charAt(0).toUpperCase()}
                     </AvatarFallback>
                   </Avatar>
-                  <p className="text-sm font-medium dark:text-gray-200">
+                  <p className="text-sm font-medium text-foreground">
                     {member.name}
                   </p>
                 </div>
-                {/* Show dropdown for owner (to remove members) or for the current user (to leave) */}
                 {(isOwner || member.id === currentUserId) && (
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" className="h-8 w-8 p-0">
-                        <MoreVertical className="h-4 w-4" />
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="size-8 rounded-lg active:scale-[0.96]"
+                      >
+                        <MoreVertical className="size-4" />
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
                       {isOwner && member.id !== group.createdById && (
                         <DropdownMenuItem
-                          className="text-red-600 dark:text-red-500"
+                          className="text-destructive focus:bg-destructive/10 focus:text-destructive"
                           onClick={() => setMemberToRemove(member.id)}
                         >
-                          <UserMinus className="mr-2 h-4 w-4" />
+                          <UserMinus className="mr-2 size-4" />
                           Remove Member
                         </DropdownMenuItem>
                       )}
                       {!isOwner && member.id === currentUserId && (
                         <DropdownMenuItem
-                          className="text-red-600 dark:text-red-500"
+                          className="text-destructive focus:bg-destructive/10 focus:text-destructive"
                           onClick={() => setShowLeaveDialog(true)}
                         >
-                          <LogOut className="mr-2 h-4 w-4" />
+                          <LogOut className="mr-2 size-4" />
                           Leave Group
                         </DropdownMenuItem>
                       )}
@@ -184,20 +189,21 @@ export function GroupMembers({ group, isOwner }: GroupMembersProps) {
       )}
 
       {/* People in expenses */}
-      <div className="space-y-3">
-        <h4 className="text-sm font-medium text-gray-500 dark:text-gray-400">
-          People in Expenses
+      <div className="space-y-2.5">
+        <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-1.5">
+          <Users className="size-3.5" />
+          <span>Expense Participants ({group.people.length})</span>
         </h4>
-        <div className="max-h-60 space-y-2 overflow-y-auto">
+        <div className="max-h-52 space-y-1.5 overflow-y-auto pr-1">
           {group.people.map((person) => (
             <div
               key={person.id}
-              className="flex items-center gap-3 rounded-lg border border-gray-100 p-3 dark:border-gray-700"
+              className="flex items-center gap-3 rounded-lg border border-border/50 bg-background/50 p-2.5"
             >
-              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300">
-                {person.name.charAt(0)}
+              <div className="flex size-7 items-center justify-center rounded-full bg-primary/10 text-primary text-xs font-medium">
+                {person.name.charAt(0).toUpperCase()}
               </div>
-              <p className="text-sm font-medium dark:text-gray-200">
+              <p className="text-sm text-foreground">
                 {person.name}
               </p>
             </div>
@@ -219,9 +225,9 @@ export function GroupMembers({ group, isOwner }: GroupMembersProps) {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogCancel className="active:scale-[0.97]">Cancel</AlertDialogCancel>
             <AlertDialogAction
-              className="bg-red-600 text-white hover:bg-red-700 dark:bg-red-700 dark:hover:bg-red-800"
+              className="bg-destructive text-white hover:bg-destructive/90 active:scale-[0.97]"
               onClick={() =>
                 memberToRemove && handleRemoveMember(memberToRemove)
               }
@@ -243,9 +249,9 @@ export function GroupMembers({ group, isOwner }: GroupMembersProps) {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogCancel className="active:scale-[0.97]">Cancel</AlertDialogCancel>
             <AlertDialogAction
-              className="bg-red-600 text-white hover:bg-red-700 dark:bg-red-700 dark:hover:bg-red-800"
+              className="bg-destructive text-white hover:bg-destructive/90 active:scale-[0.97]"
               onClick={handleLeaveGroup}
             >
               Leave

@@ -1,6 +1,5 @@
 "use client";
 
-import { motion } from "framer-motion";
 import {
   Receipt,
   TrendingUp,
@@ -10,6 +9,7 @@ import {
   Plus,
   Users,
   Share2,
+  Crown,
 } from "lucide-react";
 import { Skeleton } from "~/components/ui/skeleton";
 import { Button } from "~/components/ui/button";
@@ -24,6 +24,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
+import { ExpenseForm } from "~/app/_components/features/expense/ExpenseForm/ExpenseForm";
 import type { Group } from "./utils";
 import { GroupDataExport } from "./GroupDataExport";
 
@@ -50,160 +51,280 @@ export function GroupHeader({
   onExpenseCreated,
   setShowMembersDialog,
 }: GroupHeaderProps) {
-  // If there are no unsettled expenses, show the all settled message
   const showAllSettled = isAllSettled || !hasUnsettledExpenses;
 
+  // Format currency with Indian grouping and tabular numbers
+  const formattedTotal = totalExpenses.toLocaleString("en-IN", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
+
+  const memberCount = (group.members?.length ?? 0) + 1; // members + owner
+  const previewMembers = [
+    group.createdBy,
+    ...(group.members || []),
+  ].slice(0, 4);
+
   return (
-    <div className="border-border/80 bg-background relative overflow-hidden rounded-lg border p-6 shadow-[0_1px_0_rgba(0,0,0,0.04)] sm:p-8">
-      <div className="pointer-events-none absolute -top-24 -right-20 size-64 rounded-full bg-gradient-to-br from-[#aaffec]/70 via-[#d3e5ff]/70 to-[#d8ccf1]/80 blur-3xl dark:from-[#00ffd0]/25 dark:via-[#6366f1]/30 dark:to-[#a855f7]/25" />
-      <div className="relative space-y-6">
-        <div className="flex flex-wrap items-center justify-between gap-4">
-          <div className="flex items-center gap-2">
-            <div className="flex items-center">
-              <h1 className="text-foreground text-3xl font-semibold tracking-[-0.05em] sm:text-4xl">
+    <div className="border-border/70 bg-card relative overflow-hidden rounded-2xl border p-5 shadow-[0_2px_12px_-4px_rgba(0,0,0,0.06)] backdrop-blur-xs transition-shadow sm:p-7">
+      {/* Subtle modern surface glow - contained and theme-adaptive */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute -top-20 -right-20 h-56 w-56 rounded-full bg-primary/10 blur-3xl dark:bg-primary/15"
+      />
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute -bottom-24 -left-24 h-48 w-48 rounded-full bg-blue-500/5 blur-2xl dark:bg-blue-500/10"
+      />
+
+      <div className="relative flex flex-col gap-6">
+        {/* Top bar: Identity & Actions */}
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          {/* Identity & Badges */}
+          <div className="space-y-1.5">
+            <div className="flex flex-wrap items-center gap-2.5">
+              <h1 className="text-foreground text-2xl font-bold tracking-tight sm:text-3xl md:text-4xl">
                 {group.name || "Group Expenses"}
               </h1>
 
-              <div className="ml-2 flex items-center">
-                <GroupDataExport group={group} />
-              </div>
+              {isOwner ? (
+                <Badge
+                  variant="outline"
+                  className="gap-1 border-amber-500/30 bg-amber-500/10 text-amber-700 dark:text-amber-400"
+                >
+                  <Crown className="size-3 text-amber-500" />
+                  Owner
+                </Badge>
+              ) : (
+                <Badge
+                  variant="outline"
+                  className="border-border/80 text-muted-foreground gap-1 bg-background/60"
+                >
+                  <Share2 className="size-3" />
+                  Shared
+                </Badge>
+              )}
             </div>
 
-            {!isOwner && (
-              <Badge
-                variant="outline"
-                className="border-border text-muted-foreground ml-2 bg-transparent"
-              >
-                <Share2 className="mr-1 h-3 w-3" />
-                Shared
-              </Badge>
-            )}
+            <p className="text-muted-foreground flex items-center gap-2 text-xs sm:text-sm">
+              <span>Created by {group.createdBy.name}</span>
+              <span className="text-muted-foreground/40">•</span>
+              <span>{group.people?.length || 0} participants</span>
+            </p>
           </div>
 
-          <div className="flex items-center gap-3">
+          {/* Action cluster */}
+          <div className="flex flex-wrap items-center gap-2 sm:self-center">
+            {/* Primary Action: Add Expense */}
+            <ExpenseForm
+              groupId={group.id}
+              people={group.people}
+              onSuccess={onExpenseCreated}
+              trigger={
+                <Button
+                  size="sm"
+                  className="active:scale-[0.97] transition-transform duration-150 h-9 font-medium shadow-xs"
+                >
+                  <Plus className="size-4" />
+                  <span>Add Expense</span>
+                </Button>
+              }
+            />
+
+            {/* Invite members button for owner */}
+            {isOwner && (
+              <InviteDialog groupId={group.id}>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="active:scale-[0.97] transition-transform duration-150 h-9 border-border/80 bg-background/80 hover:bg-accent"
+                >
+                  <UserPlus className="size-4 text-muted-foreground" />
+                  <span className="hidden xs:inline">Invite</span>
+                </Button>
+              </InviteDialog>
+            )}
+
+            {/* Members Dropdown / Modal Trigger */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
                   variant="outline"
                   size="sm"
-                  className="flex items-center gap-2"
+                  className="active:scale-[0.97] transition-transform duration-150 h-9 gap-1.5 border-border/80 bg-background/80 hover:bg-accent px-2.5"
                 >
-                  <Users className="h-4 w-4" />
-                  <span>Members</span>
+                  {/* Avatar stack preview */}
+                  <div className="flex -space-x-1.5 overflow-hidden">
+                    {previewMembers.map((m, idx) => (
+                      <Avatar
+                        key={idx}
+                        className="size-5 border-2 border-background ring-1 ring-border/20"
+                      >
+                        <AvatarImage src={m.image || undefined} />
+                        <AvatarFallback className="text-[9px] bg-primary/10 text-primary font-medium">
+                          {(m.name || "U").charAt(0).toUpperCase()}
+                        </AvatarFallback>
+                      </Avatar>
+                    ))}
+                  </div>
+                  <span className="text-xs font-medium tabular-nums ml-1">
+                    {memberCount}
+                  </span>
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-56">
-                <DropdownMenuLabel>Group Members</DropdownMenuLabel>
+
+              <DropdownMenuContent align="end" className="w-60 p-1.5">
+                <DropdownMenuLabel className="text-xs text-muted-foreground font-medium">
+                  Group Members ({memberCount})
+                </DropdownMenuLabel>
                 <DropdownMenuSeparator />
 
                 {/* Owner */}
-                <DropdownMenuItem className="flex items-center gap-2 py-2">
-                  <Avatar className="h-6 w-6">
+                <DropdownMenuItem className="flex items-center gap-2.5 py-2 rounded-lg">
+                  <Avatar className="size-7">
                     <AvatarImage src={group.createdBy.image || undefined} />
-                    <AvatarFallback className="bg-blue-100 text-xs text-blue-600 dark:bg-blue-900 dark:text-blue-400">
+                    <AvatarFallback className="bg-primary/10 text-xs text-primary font-medium">
                       {(group.createdBy.name || "U").charAt(0)}
                     </AvatarFallback>
                   </Avatar>
-                  <div className="flex flex-1 items-center justify-between">
-                    <span className="text-sm">{group.createdBy.name}</span>
+                  <div className="flex flex-1 items-center justify-between min-w-0">
+                    <span className="truncate text-sm font-medium">
+                      {group.createdBy.name}
+                    </span>
                     <Badge
                       variant="outline"
-                      className="ml-2 h-5 border-green-200 bg-green-50 text-xs text-green-700 dark:border-green-800 dark:bg-green-900/50 dark:text-green-400"
+                      className="ml-2 h-4.5 border-amber-500/30 bg-amber-500/10 text-[10px] text-amber-700 dark:text-amber-400 font-normal shrink-0"
                     >
                       Owner
                     </Badge>
                   </div>
                 </DropdownMenuItem>
 
-                {/* Members */}
+                {/* Other members */}
                 {group.members &&
-                  group.members.length > 0 &&
-                  group.members.map((member: any) => (
+                  group.members.slice(0, 5).map((member: any) => (
                     <DropdownMenuItem
                       key={member.id}
-                      className="flex items-center gap-2 py-2"
+                      className="flex items-center gap-2.5 py-2 rounded-lg"
                     >
-                      <Avatar className="h-6 w-6">
+                      <Avatar className="size-7">
                         <AvatarImage src={member.image || undefined} />
-                        <AvatarFallback className="bg-blue-100 text-xs text-blue-600 dark:bg-blue-900 dark:text-blue-400">
+                        <AvatarFallback className="bg-muted text-xs text-muted-foreground font-medium">
                           {(member.name || "U").charAt(0)}
                         </AvatarFallback>
                       </Avatar>
-                      <span className="text-sm">{member.name}</span>
+                      <span className="truncate text-sm">{member.name}</span>
                     </DropdownMenuItem>
                   ))}
 
                 <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={() => setShowMembersDialog?.(true)}>
-                  <span className="text-blue-600 dark:text-blue-400">
-                    View all members
-                  </span>
+                <DropdownMenuItem
+                  onClick={() => setShowMembersDialog?.(true)}
+                  className="cursor-pointer text-primary focus:text-primary font-medium text-xs justify-center py-2"
+                >
+                  Manage all members
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
 
-            {/* <ExpenseForm
-            groupId={group.id}
-            people={group.people}
-            onSuccess={onExpenseCreated}
-            trigger={
-              <Button
-                size="sm"
-                className="transform bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg transition-all duration-300 hover:scale-105 hover:from-blue-700 hover:to-indigo-700 hover:shadow-xl dark:from-blue-700 dark:to-indigo-700 dark:hover:from-blue-800 dark:hover:to-indigo-800"
-              >
-                <Plus className="mr-2 h-4 w-4" />
-                Add Expense
-              </Button>
-            }
-          /> */}
+            {/* Export data dropdown */}
+            <GroupDataExport group={group} />
           </div>
         </div>
-      </div>
 
-      {/* Stats Overview */}
-      <div className="mt-6 flex flex-wrap justify-center gap-4 sm:gap-6">
-        <div className="border-border bg-background flex items-center gap-2 rounded-full border px-4 py-2">
-          <TrendingUp className="text-muted-foreground h-5 w-5" />
-          <span className="text-foreground font-semibold">
-            Total: ₹{totalExpenses.toFixed(2)}
-          </span>
-        </div>
-        <div className="border-border bg-background flex items-center gap-2 rounded-full border px-4 py-2">
-          <Receipt className="text-muted-foreground h-5 w-5" />
-          <span className="text-foreground font-semibold">
-            {group.expenses.length} Expenses
-          </span>
-        </div>
-        <div className="border-border bg-background flex items-center gap-2 rounded-full border px-4 py-2">
-          {isLoadingBalances ? (
-            <Skeleton className="h-5 w-24" />
-          ) : showAllSettled ? (
-            <>
-              <CheckCircle2 className="text-foreground h-5 w-5" />
-              <span className="text-foreground font-semibold">
-                All Settled!
+        {/* Stats Grid: Concentric cards with optical alignment and tabular metrics */}
+        <div className="grid grid-cols-1 gap-3 pt-2 sm:grid-cols-3">
+          {/* Total Spent */}
+          <div className="group border-border/60 bg-background/50 hover:bg-background/80 hover:border-border rounded-xl border p-4 shadow-2xs transition-colors">
+            <div className="flex items-center justify-between text-muted-foreground mb-1">
+              <span className="text-xs font-medium uppercase tracking-wider">
+                Total Expenses
               </span>
-            </>
-          ) : (
-            <>
-              <AlertCircle className="text-foreground h-5 w-5" />
-              <span className="text-foreground font-semibold">
-                {pendingSettlements} Pending
-              </span>
-            </>
-          )}
-        </div>
-
-        {isOwner && (
-          <InviteDialog groupId={group.id}>
-            <div className="border-border bg-background hover:bg-muted/40 flex cursor-pointer items-center gap-2 rounded-full border px-4 py-2 transition-colors">
-              <UserPlus className="text-foreground h-5 w-5" />
-              <span className="text-foreground font-semibold">
-                Invite Members
+              <div className="size-7 rounded-lg bg-primary/10 text-primary flex items-center justify-center">
+                <TrendingUp className="size-4" />
+              </div>
+            </div>
+            <div className="flex items-baseline gap-1">
+              <span className="text-foreground text-2xl font-bold tracking-tight tabular-nums sm:text-3xl">
+                ₹{formattedTotal}
               </span>
             </div>
-          </InviteDialog>
-        )}
+            <p className="text-muted-foreground mt-1 text-xs">
+              Combined group spending
+            </p>
+          </div>
+
+          {/* Expense Count */}
+          <div className="group border-border/60 bg-background/50 hover:bg-background/80 hover:border-border rounded-xl border p-4 shadow-2xs transition-colors">
+            <div className="flex items-center justify-between text-muted-foreground mb-1">
+              <span className="text-xs font-medium uppercase tracking-wider">
+                Transactions
+              </span>
+              <div className="size-7 rounded-lg bg-blue-500/10 text-blue-600 dark:text-blue-400 flex items-center justify-center">
+                <Receipt className="size-4" />
+              </div>
+            </div>
+            <div className="flex items-baseline gap-1">
+              <span className="text-foreground text-2xl font-bold tracking-tight tabular-nums sm:text-3xl">
+                {group.expenses.length}
+              </span>
+              <span className="text-muted-foreground text-xs">entries</span>
+            </div>
+            <p className="text-muted-foreground mt-1 text-xs">
+              Across {group.people.length} participant{group.people.length === 1 ? "" : "s"}
+            </p>
+          </div>
+
+          {/* Settlement Status */}
+          <div className="group border-border/60 bg-background/50 hover:bg-background/80 hover:border-border rounded-xl border p-4 shadow-2xs transition-colors">
+            <div className="flex items-center justify-between text-muted-foreground mb-1">
+              <span className="text-xs font-medium uppercase tracking-wider">
+                Settlement Status
+              </span>
+              <div
+                className={`size-7 rounded-lg flex items-center justify-center ${
+                  isLoadingBalances
+                    ? "bg-muted text-muted-foreground"
+                    : showAllSettled
+                      ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
+                      : "bg-amber-500/10 text-amber-600 dark:text-amber-400"
+                }`}
+              >
+                {showAllSettled ? (
+                  <CheckCircle2 className="size-4" />
+                ) : (
+                  <AlertCircle className="size-4" />
+                )}
+              </div>
+            </div>
+            {isLoadingBalances ? (
+              <Skeleton className="my-1.5 h-7 w-28" />
+            ) : showAllSettled ? (
+              <>
+                <div className="text-emerald-600 dark:text-emerald-400 text-xl sm:text-2xl font-bold tracking-tight">
+                  All Settled
+                </div>
+                <p className="text-muted-foreground mt-1 text-xs">
+                  Zero outstanding debts
+                </p>
+              </>
+            ) : (
+              <>
+                <div className="flex items-baseline gap-1.5">
+                  <span className="text-foreground text-2xl font-bold tracking-tight tabular-nums sm:text-3xl">
+                    {pendingSettlements}
+                  </span>
+                  <span className="text-amber-600 dark:text-amber-400 text-xs font-medium">
+                    pending
+                  </span>
+                </div>
+                <p className="text-muted-foreground mt-1 text-xs">
+                  Transfers waiting to settle
+                </p>
+              </>
+            )}
+          </div>
+        </div>
       </div>
     </div>
   );

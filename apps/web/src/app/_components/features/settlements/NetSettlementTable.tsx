@@ -21,7 +21,7 @@ export function computeNetSettlementData(group: Group): {
   rows: NetSettlementRow[];
   expenses: { id: string; description: string }[];
 } {
-  const expenses = group.expenses.map((e) => ({
+  const expenses = group.expenses.map((e: any) => ({
     id: e.id,
     description: e.description,
   }));
@@ -76,7 +76,10 @@ export function computeNetSettlementData(group: Group): {
 }
 
 function fmt(amount: number) {
-  return `₹${amount.toFixed(0)}`;
+  return `₹${amount.toLocaleString("en-IN", {
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  })}`;
 }
 
 function MobileNetSettlement({
@@ -91,23 +94,23 @@ function MobileNetSettlement({
       {rows.map((row) => (
         <div
           key={row.personId}
-          className="border-border bg-background rounded-lg border p-3"
+          className="rounded-xl border border-border/70 bg-card/60 p-3.5 shadow-2xs space-y-2.5"
         >
           {/* Person name + net badge */}
-          <div className="mb-2.5 flex items-center justify-between">
+          <div className="flex items-center justify-between">
             <span className="text-foreground text-sm font-semibold">
               {row.personName}
             </span>
             {row.net > 0 ? (
-              <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-semibold text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-400">
+              <span className="rounded-full border border-emerald-500/20 bg-emerald-500/10 px-2.5 py-0.5 text-xs font-semibold text-emerald-600 dark:text-emerald-400 tabular-nums">
                 Receives {fmt(row.net)}
               </span>
             ) : row.net < 0 ? (
-              <span className="rounded-full bg-red-100 px-2 py-0.5 text-xs font-semibold text-red-700 dark:bg-red-900/40 dark:text-red-400">
+              <span className="rounded-full border border-destructive/20 bg-destructive/10 px-2.5 py-0.5 text-xs font-semibold text-destructive tabular-nums">
                 Owes {fmt(Math.abs(row.net))}
               </span>
             ) : (
-              <span className="text-muted-foreground rounded-full bg-gray-100 px-2 py-0.5 text-xs font-semibold dark:bg-gray-800">
+              <span className="rounded-full border border-border/60 bg-muted/40 px-2.5 py-0.5 text-xs font-medium text-muted-foreground">
                 Settled
               </span>
             )}
@@ -115,7 +118,7 @@ function MobileNetSettlement({
 
           {/* Per-expense breakdown */}
           {expenses.length > 0 && (
-            <div className="border-border mb-2.5 space-y-1 border-t pt-2">
+            <div className="space-y-1 border-t border-border/60 pt-2">
               {expenses.map((expense) => {
                 const amount = row.expenseShares[expense.id] ?? 0;
                 return (
@@ -123,10 +126,10 @@ function MobileNetSettlement({
                     key={expense.id}
                     className="flex items-center justify-between text-xs"
                   >
-                    <span className="text-muted-foreground max-w-[60%] truncate">
+                    <span className="text-muted-foreground max-w-[65%] truncate">
                       {expense.description}
                     </span>
-                    <span className="text-foreground">
+                    <span className="text-foreground tabular-nums font-medium">
                       {amount > 0 ? fmt(amount) : "₹0"}
                     </span>
                   </div>
@@ -136,17 +139,17 @@ function MobileNetSettlement({
           )}
 
           {/* Totals row */}
-          <div className="border-border flex items-center justify-between border-t pt-2 text-xs">
-            <div className="flex gap-3">
+          <div className="flex items-center justify-between border-t border-border/60 pt-2 text-xs">
+            <div className="flex gap-4">
               <span className="text-muted-foreground">
                 Total Owes:{" "}
-                <span className="text-foreground font-medium">
+                <span className="text-foreground font-semibold tabular-nums">
                   {fmt(row.totalOwes)}
                 </span>
               </span>
               <span className="text-muted-foreground">
                 Paid:{" "}
-                <span className="text-foreground font-medium">
+                <span className="text-foreground font-semibold tabular-nums">
                   {fmt(row.paid)}
                 </span>
               </span>
@@ -177,7 +180,7 @@ function buildColumns(
         id: `expense_${expense.id}`,
         header: () => (
           <div
-            className="max-w-[100px] truncate text-right text-xs"
+            className="max-w-30 truncate text-right text-xs font-medium"
             title={expense.description}
           >
             {expense.description}
@@ -229,13 +232,13 @@ function buildColumns(
         const net = row.original.net;
         if (net > 0) {
           return (
-            <div className="whitespace-nowrap text-right text-xs font-semibold text-emerald-600 dark:text-emerald-400">
+            <div className="whitespace-nowrap text-right text-xs font-semibold text-emerald-600 dark:text-emerald-400 tabular-nums">
               Should receive {fmt(net)}
             </div>
           );
         } else if (net < 0) {
           return (
-            <div className="text-foreground whitespace-nowrap text-right text-xs font-semibold">
+            <div className="whitespace-nowrap text-right text-xs font-semibold text-destructive tabular-nums">
               Owes {fmt(Math.abs(net))}
             </div>
           );

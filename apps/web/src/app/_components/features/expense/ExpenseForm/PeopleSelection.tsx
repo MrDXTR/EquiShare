@@ -1,8 +1,6 @@
-import { useState } from "react";
-import { motion } from "framer-motion";
 import { Button } from "~/components/ui/button";
 import { Label } from "~/components/ui/label";
-import { Check, UserCheck } from "lucide-react";
+import { Check, Users } from "lucide-react";
 import {
   type Person,
   togglePersonSelection,
@@ -59,11 +57,11 @@ export function PeopleSelection({
   };
 
   return (
-    <div className="space-y-3 pb-4">
+    <div className="space-y-2.5 pb-2">
       <div className="flex items-center justify-between">
-        <Label className="flex items-center gap-2">
-          <UserCheck className="h-4 w-4 text-violet-500" />
-          Split Between ({selectedPersonIds.length} selected)
+        <Label className="flex items-center gap-1.5 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+          <Users className="size-3.5 text-primary" />
+          Split Between ({selectedPersonIds.length}/{people.length})
         </Label>
         <div className="flex items-center gap-1">
           {!allSelected && (
@@ -72,9 +70,9 @@ export function PeopleSelection({
               variant="ghost"
               size="sm"
               onClick={handleSelectAll}
-              className="text-muted-foreground"
+              className="h-7 px-2 text-xs text-muted-foreground hover:text-foreground active:scale-[0.96]"
             >
-              All
+              Select All
             </Button>
           )}
           {selectedPersonIds.length > 0 && (
@@ -83,7 +81,7 @@ export function PeopleSelection({
               variant="ghost"
               size="sm"
               onClick={() => updateFormState({ selectedPersonIds: [] })}
-              className="text-muted-foreground"
+              className="h-7 px-2 text-xs text-muted-foreground hover:text-destructive active:scale-[0.96]"
             >
               Clear
             </Button>
@@ -91,50 +89,43 @@ export function PeopleSelection({
         </div>
       </div>
 
-      <div
-        className="grid grid-cols-2 gap-2 overflow-y-auto sm:grid-cols-3"
-        style={{
-          maxHeight: "calc(40vh - 20px)",
-          paddingRight: "4px", // Add padding for scrollbar
-        }}
-      >
+      <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 max-h-[36vh] overflow-y-auto pr-1">
         {people.map((person) => {
           const isSelected = selectedPersonIds.includes(person.id);
 
           return (
-            <motion.button
+            <button
               key={person.id}
               type="button"
-              whileTap={{ scale: 0.95 }}
               onClick={() => handlePersonToggle(person.id)}
-              className={`rounded-lg border-2 p-3 text-left transition-all duration-200 ${
-                isSelected
-                  ? "border-foreground/30 bg-muted/30"
-                  : "border-border hover:border-foreground/20"
-              } `}
+              className={`flex items-center justify-between rounded-xl border p-2.5 text-left transition-[transform,border-color,background-color] duration-150 active:scale-[0.97] cursor-pointer select-none ${isSelected
+                  ? "border-primary bg-primary/10 text-foreground shadow-2xs"
+                  : "border-border/70 bg-card/60 hover:bg-card hover:border-border text-muted-foreground"
+                }`}
             >
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 min-w-0">
                 <div
-                  className={`relative flex h-8 w-8 items-center justify-center rounded-full text-xs font-bold ${
-                    isSelected
-                      ? "border-foreground bg-foreground text-background border"
-                      : "border-border bg-background text-foreground border"
-                  } `}
+                  className={`flex size-7 shrink-0 items-center justify-center rounded-lg text-xs font-semibold ${isSelected
+                      ? "bg-primary text-primary-foreground"
+                      : "bg-muted text-muted-foreground"
+                    }`}
                 >
                   {getPersonInitials(person.name)}
-                  {isSelected && (
-                    <div className="border-border bg-background absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full border">
-                      <Check className="text-foreground h-2 w-2" />
-                    </div>
-                  )}
                 </div>
-                <span
-                  className={`truncate text-sm font-medium ${isSelected ? "text-foreground" : ""}`}
-                >
+                <span className="truncate text-xs sm:text-sm font-medium">
                   {person.name}
                 </span>
               </div>
-            </motion.button>
+
+              <div
+                className={`flex size-4.5 shrink-0 items-center justify-center rounded-md border transition-colors ${isSelected
+                    ? "border-primary bg-primary text-primary-foreground"
+                    : "border-border/80 bg-background"
+                  }`}
+              >
+                {isSelected && <Check className="size-3 stroke-[2.5]" />}
+              </div>
+            </button>
           );
         })}
       </div>

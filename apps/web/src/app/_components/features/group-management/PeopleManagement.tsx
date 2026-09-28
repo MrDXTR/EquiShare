@@ -1,15 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import { motion } from "framer-motion";
-import { Users, UserPlus, UserMinus, Loader2 } from "lucide-react";
+import { UserPlus, UserMinus, Users, Loader2 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
-import { toast } from "sonner";
-import { api } from "~/trpc/react";
-import type { Group } from "./utils";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -20,6 +16,10 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "~/components/ui/alert-dialog";
+import { Badge } from "~/components/ui/badge";
+import { api } from "~/trpc/react";
+import { toast } from "sonner";
+import type { Group } from "./utils";
 
 interface PeopleManagementProps {
   group: Group;
@@ -33,20 +33,16 @@ export function PeopleManagement({ group }: PeopleManagementProps) {
 
   const addPerson = api.group.addPerson.useMutation({
     onMutate: () => {
-      toast.loading("Adding person...", {
-        id: "add-person",
-      });
+      toast.loading("Adding person...", { id: "add-person" });
     },
     onSuccess: async () => {
-      setNewPersonName("");
       await utils.group.getById.invalidate(group.id);
       await utils.expense.getBalances.invalidate(group.id);
-      toast.success("Person added successfully", {
-        id: "add-person",
-      });
+      setNewPersonName("");
+      toast.success("Person added successfully", { id: "add-person" });
     },
-    onError: () => {
-      toast.error("Failed to add person", {
+    onError: (error) => {
+      toast.error(`Failed to add person: ${error.message}`, {
         id: "add-person",
       });
     },
@@ -54,25 +50,17 @@ export function PeopleManagement({ group }: PeopleManagementProps) {
 
   const deletePerson = api.group.deletePerson.useMutation({
     onMutate: () => {
-      toast.loading("Deleting person...", {
-        id: "delete-person",
-      });
+      toast.loading("Removing person...", { id: "delete-person" });
     },
     onSuccess: async () => {
       await utils.group.getById.invalidate(group.id);
       await utils.expense.getBalances.invalidate(group.id);
-      toast.success("Person deleted successfully", {
-        id: "delete-person",
-        style: {
-          backgroundColor: "#fee2e2",
-          color: "#991b1b",
-          borderColor: "#fecaca",
-        },
-      });
+      await utils.settlement.list.invalidate();
+      toast.success("Person removed successfully", { id: "delete-person" });
       setPersonToDelete(null);
     },
-    onError: () => {
-      toast.error("Failed to delete person", {
+    onError: (error) => {
+      toast.error(`Failed to remove person: ${error.message}`, {
         id: "delete-person",
       });
     },
@@ -80,11 +68,12 @@ export function PeopleManagement({ group }: PeopleManagementProps) {
 
   const handleAddPerson = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newPersonName.trim()) return;
-    addPerson.mutate({
-      groupId: group.id,
-      name: newPersonName.trim(),
-    });
+    if (newPersonName.trim()) {
+      addPerson.mutate({
+        name: newPersonName.trim(),
+        groupId: group.id,
+      });
+    }
   };
 
   const handleDeletePerson = async () => {
@@ -95,7 +84,6 @@ export function PeopleManagement({ group }: PeopleManagementProps) {
           groupId: group.id,
           personId: personToDelete,
         });
-        await new Promise((resolve) => setTimeout(resolve, 1000));
       } finally {
         setIsDeletingPerson(false);
         setPersonToDelete(null);
@@ -104,84 +92,88 @@ export function PeopleManagement({ group }: PeopleManagementProps) {
   };
 
   return (
-    <motion.div
-      initial={{ opacity: 0, x: -50 }}
-      animate={{ opacity: 1, x: 0 }}
-      transition={{ delay: 0.2 }}
-    >
-      <Card className="border-border bg-background h-full border">
-        <CardHeader className="pb-4">
-          <CardTitle className="flex items-center gap-3 text-2xl">
-            <div className="border-border rounded-lg border p-2">
-              <Users className="text-foreground h-6 w-6" />
-            </div>
-            <span className="text-foreground">People</span>
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          {/* Add Person Form */}
-          <form onSubmit={handleAddPerson} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="newPerson" className="dark:text-gray-300">
-                Add New Person
-              </Label>
-              <div className="flex gap-2">
-                <Input
-                  id="newPerson"
-                  value={newPersonName}
-                  onChange={(e) => setNewPersonName(e.target.value)}
-                  placeholder="Enter name"
-                  className="flex-1"
-                />
-                <Button
-                  type="submit"
-                  disabled={!newPersonName.trim() || addPerson.isPending}
-                >
-                  {addPerson.isPending ? (
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                  ) : (
-                    <UserPlus className="h-4 w-4" />
-                  )}
-                </Button>
+    <div>
+      <Card className="border-border/70 bg-card h-full rounded-2xl shadow-xs transition-shadow">
+        <CardHeader className="pb-3">
+          <div className="flex items-center justify-between">
+            <CardTitle className="flex items-center gap-3 text-xl font-bold tracking-tight">
+              <div className="bg-primary/10 text-primary flex size-8 items-center justify-center rounded-lg">
+                <Users className="size-4" />
               </div>
+              <div className="flex items-center gap-2">
+                <span>Participants</span>
+                <Badge
+                  variant="secondary"
+                  className="rounded-full px-2 py-0.5 text-xs font-semibold"
+                >
+                  {group.people.length}
+                </Badge>
+              </div>
+            </CardTitle>
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-5">
+          {/* Add Person Form */}
+          <form onSubmit={handleAddPerson} className="space-y-2">
+            <Label htmlFor="newPerson" className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+              Add Participant
+            </Label>
+            <div className="flex items-center gap-2">
+              <Input
+                id="newPerson"
+                value={newPersonName}
+                onChange={(e) => setNewPersonName(e.target.value)}
+                placeholder="e.g. Alex, Mom, John"
+                className="h-10 flex-1 rounded-lg border-border/80 bg-background/80"
+              />
+              <Button
+                type="submit"
+                disabled={!newPersonName.trim() || addPerson.isPending}
+                className="h-10 px-3.5 shrink-0 rounded-lg active:scale-[0.97] transition-transform duration-150 font-medium"
+              >
+                {addPerson.isPending ? (
+                  <Loader2 className="size-4 animate-spin" />
+                ) : (
+                  <UserPlus className="size-4" />
+                )}
+              </Button>
             </div>
           </form>
 
           {/* People List */}
-          <div className="space-y-3">
-            <div
-              className={`space-y-3 ${
-                group.people.length > 5
-                  ? "max-h-[320px] overflow-y-auto pr-1"
-                  : ""
-              }`}
-            >
-              {group.people.map((person) => (
-                <motion.div
-                  key={person.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="group border-border bg-background hover:border-foreground/20 flex items-center justify-between rounded-lg border p-3 transition-colors duration-200"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="border-border text-foreground flex h-8 w-8 items-center justify-center rounded-full border text-sm">
-                      {person.name?.[0]?.toUpperCase() ?? "?"}
-                    </div>
-                    <span className="text-foreground font-medium">
-                      {person.name}
-                    </span>
-                  </div>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="bg-background h-9 w-9 shrink-0 rounded-full border border-border opacity-100 transition-all group-hover:opacity-100 md:h-8 md:w-8 md:border-transparent md:opacity-0"
-                    onClick={() => setPersonToDelete(person.id)}
+          <div className="space-y-2">
+            {group.people.length === 0 ? (
+              <div className="rounded-xl border border-dashed border-border/70 p-6 text-center text-xs text-muted-foreground">
+                No participants yet. Add people to start splitting expenses.
+              </div>
+            ) : (
+              <div className="space-y-2 max-h-[350px] overflow-y-auto pr-1">
+                {group.people.map((person) => (
+                  <div
+                    key={person.id}
+                    className="group border-border/60 bg-background/50 hover:bg-card hover:border-border/90 flex items-center justify-between rounded-xl border p-2.5 transition-colors duration-150 shadow-2xs"
                   >
-                    <UserMinus className="h-4 w-4" />
-                  </Button>
-                </motion.div>
-              ))}
-            </div>
+                    <div className="flex items-center gap-2.5">
+                      <div className="bg-primary/10 text-primary flex size-8 items-center justify-center rounded-lg text-xs font-semibold">
+                        {person.name?.[0]?.toUpperCase() ?? "?"}
+                      </div>
+                      <span className="text-foreground text-sm font-medium">
+                        {person.name}
+                      </span>
+                    </div>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="size-8 rounded-lg text-muted-foreground hover:bg-destructive/10 hover:text-destructive active:scale-[0.96] transition-[transform,color,background-color] duration-150"
+                      onClick={() => setPersonToDelete(person.id)}
+                      aria-label={`Remove ${person.name}`}
+                    >
+                      <UserMinus className="size-4" />
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </CardContent>
       </Card>
@@ -197,24 +189,26 @@ export function PeopleManagement({ group }: PeopleManagementProps) {
       >
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+            <AlertDialogTitle>Remove Person</AlertDialogTitle>
             <AlertDialogDescription>
-              This action cannot be undone. This will permanently delete the
-              person and all their associated expenses.
+              Are you sure? This will permanently delete this person and their associated expense shares.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel disabled={isDeletingPerson}>
+            <AlertDialogCancel
+              disabled={isDeletingPerson}
+              className="active:scale-[0.97]"
+            >
               Cancel
             </AlertDialogCancel>
             <AlertDialogAction
               onClick={handleDeletePerson}
               disabled={isDeletingPerson}
-              className="bg-red-600 hover:bg-red-700 focus:ring-red-600 dark:bg-red-700 dark:text-white dark:hover:bg-red-800 dark:focus:ring-red-700"
+              className="bg-destructive text-white hover:bg-destructive/90 active:scale-[0.97]"
             >
               {isDeletingPerson ? (
                 <div className="flex items-center gap-2">
-                  <div className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />
+                  <Loader2 className="size-4 animate-spin" />
                   Deleting...
                 </div>
               ) : (
@@ -224,6 +218,6 @@ export function PeopleManagement({ group }: PeopleManagementProps) {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-    </motion.div>
+    </div>
   );
 }

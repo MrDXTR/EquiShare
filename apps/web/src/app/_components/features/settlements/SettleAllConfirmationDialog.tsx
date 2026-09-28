@@ -29,7 +29,6 @@ export function SettleAllConfirmationDialog({
   activeSettlementsCount,
   onHoverChange,
 }: SettleAllConfirmationDialogProps) {
-  // Maintain open state to handle closing after confirmation
   const [open, setOpen] = React.useState(false);
 
   const handleConfirm = () => {
@@ -44,49 +43,54 @@ export function SettleAllConfirmationDialog({
           size="sm"
           variant="outline"
           disabled={isPending || activeSettlementsCount === 0}
-          className="border-green-300/70 bg-green-50/70 text-green-700 transition-all duration-200 hover:border-green-500 hover:bg-green-100 hover:shadow-[0_0_0_1px_rgba(34,197,94,0.2)] dark:border-green-800 dark:bg-green-900/30 dark:text-green-400 dark:hover:bg-green-800/50"
+          className="h-9 gap-1.5 font-semibold text-xs border-emerald-500/40 bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 hover:bg-emerald-500/20 hover:border-emerald-500/60 active:scale-[0.96] transition-[transform,background-color,border-color] duration-150"
           onMouseEnter={() => onHoverChange?.(true)}
           onMouseLeave={() => onHoverChange?.(false)}
           onFocus={() => onHoverChange?.(true)}
           onBlur={() => onHoverChange?.(false)}
         >
           {isPending ? (
-            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            <Loader2 className="size-3.5 animate-spin" />
           ) : (
-            <CheckCircle2 className="mr-2 h-4 w-4" />
+            <CheckCircle2 className="size-3.5" />
           )}
-          <span>Settle All</span>
+          <span>Settle All ({activeSettlementsCount})</span>
         </Button>
       </AlertDialogTrigger>
-      <AlertDialogContent className="sm:max-w-md">
+      <AlertDialogContent className="max-w-md rounded-2xl border border-border/80 bg-card p-6 shadow-2xl">
         <AlertDialogHeader>
-          <AlertDialogTitle className="text-xl">
+          <AlertDialogTitle className="text-xl font-bold tracking-tight text-foreground">
             Confirm Settlement
           </AlertDialogTitle>
-          <AlertDialogDescription>
+          <AlertDialogDescription className="text-sm text-muted-foreground">
             Are you sure you want to mark all {activeSettlementsCount}{" "}
-            settlements as settled? This action cannot be undone.
+            active {activeSettlementsCount === 1 ? "settlement" : "settlements"} as settled? This action cannot be undone.
           </AlertDialogDescription>
         </AlertDialogHeader>
-        <AlertDialogFooter className="mt-4">
-          <AlertDialogCancel disabled={isPending}>Cancel</AlertDialogCancel>
+        <AlertDialogFooter className="mt-4 flex gap-2">
+          <AlertDialogCancel
+            disabled={isPending}
+            className="active:scale-[0.97] transition-transform duration-150 border-border/80"
+          >
+            Cancel
+          </AlertDialogCancel>
           <AlertDialogAction
             onClick={handleConfirm}
             disabled={isPending}
             className={cn(
-              "bg-green-600 text-white hover:bg-green-700 dark:bg-green-600 dark:hover:bg-green-700",
+              "bg-emerald-600 text-white hover:bg-emerald-700 dark:bg-emerald-600 dark:hover:bg-emerald-700 active:scale-[0.97] transition-transform duration-150 font-medium",
               isPending && "pointer-events-none opacity-50",
             )}
           >
             {isPending ? (
               <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                <Loader2 className="mr-1.5 size-4 animate-spin" />
                 <span>Settling...</span>
               </>
             ) : (
               <>
-                <CheckCircle2 className="mr-2 h-4 w-4" />
-                <span>Confirm</span>
+                <CheckCircle2 className="mr-1.5 size-4" />
+                <span>Confirm Settle All</span>
               </>
             )}
           </AlertDialogAction>

@@ -31,6 +31,7 @@ export function GroupCard({ group, onDelete }: GroupCardProps) {
       (sum: number, expense: any) => sum + expense.amount,
       0,
     ) || 0;
+
   const recentActivity =
     group.expenses?.length > 0
       ? new Date(
@@ -38,29 +39,28 @@ export function GroupCard({ group, onDelete }: GroupCardProps) {
         ).toLocaleDateString()
       : "No activity";
 
-  // Check if this is a shared group (user is not the creator)
   const isSharedGroup = group.createdById !== session?.user?.id;
 
   return (
-    <div className="group relative">
+    <div className="group relative h-full">
       <Card
-        className="border-border bg-background relative top-0 h-full cursor-pointer border shadow-none transition-[top,box-shadow,border-color] duration-200 hover:-top-0.5 hover:border-blue-500 hover:shadow-lg hover:shadow-blue-500/25"
+        className="border-border/70 bg-card relative h-full cursor-pointer rounded-2xl shadow-2xs transition-[transform,box-shadow,border-color] duration-150 ease-out hover:-translate-y-1 hover:border-border hover:shadow-md active:scale-[0.99]"
         onClick={() => router.push(`/groups/${group.id}`)}
       >
-        <CardHeader className="pb-3">
-          <div className="flex items-start justify-between">
-            <div>
-              <CardTitle className="line-clamp-2 text-lg font-bold text-gray-900 transition-colors group-hover:text-blue-700 sm:text-xl dark:text-gray-100 dark:group-hover:text-blue-400">
+        <CardHeader className="pb-2.5">
+          <div className="flex items-start justify-between gap-2">
+            <div className="space-y-1 min-w-0 flex-1">
+              <CardTitle className="line-clamp-2 text-lg font-bold tracking-tight text-foreground transition-colors group-hover:text-primary">
                 {group.name}
               </CardTitle>
 
               {isSharedGroup && (
-                <div className="mt-1">
+                <div>
                   <Badge
                     variant="outline"
-                    className="border-border text-muted-foreground bg-transparent text-xs"
+                    className="border-border/80 bg-background/60 text-muted-foreground text-[11px] gap-1"
                   >
-                    <Share2 className="mr-1 h-3 w-3" />
+                    <Share2 className="size-3" />
                     Shared with you
                   </Badge>
                 </div>
@@ -71,91 +71,79 @@ export function GroupCard({ group, onDelete }: GroupCardProps) {
               <Button
                 variant="ghost"
                 size="icon"
-                className="h-8 w-8 shrink-0 opacity-100 sm:opacity-0 sm:group-hover:opacity-100"
+                className="size-8 shrink-0 rounded-lg text-muted-foreground hover:bg-destructive/10 hover:text-destructive active:scale-[0.96] transition-[transform,color,background-color] duration-150"
                 onClick={(e) => {
                   e.stopPropagation();
                   onDelete(group.id);
                 }}
+                aria-label="Delete group"
               >
-                <Trash2 className="h-4 w-4" />
+                <Trash2 className="size-4" />
               </Button>
             )}
           </div>
         </CardHeader>
 
-        <CardContent className="space-y-4 pb-4">
+        <CardContent className="space-y-3.5 pb-4">
           {/* Members and Status */}
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <div className="border-border rounded-full border p-1.5">
-                <Users className="text-muted-foreground h-3.5 w-3.5" />
-              </div>
-              <span className="text-foreground text-sm font-medium">
+          <div className="flex items-center justify-between text-xs">
+            <div className="flex items-center gap-1.5 text-muted-foreground">
+              <Users className="size-3.5" />
+              <span className="font-medium text-foreground">
                 {group.people.length}{" "}
-                {group.people.length === 1 ? "member" : "members"}
+                {group.people.length === 1 ? "participant" : "participants"}
               </span>
             </div>
             <Badge
               variant="outline"
-              className="border-border text-muted-foreground bg-transparent text-xs"
+              className="border-border/60 bg-muted/30 text-muted-foreground text-[10px] font-normal"
             >
               Active
             </Badge>
           </div>
 
+          <Separator className="bg-border/60" />
+
           {/* Expenses Summary */}
           {group.expenses && group.expenses.length > 0 ? (
-            <>
-              <Separator />
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <div className="border-border rounded-full border p-1.5">
-                      <Receipt className="text-muted-foreground h-3.5 w-3.5" />
-                    </div>
-                    <span className="text-foreground text-sm font-medium">
-                      {group.expenses.length}{" "}
-                      {group.expenses.length === 1 ? "expense" : "expenses"}
-                    </span>
-                  </div>
-                  <div className="text-right">
-                    <div className="text-foreground text-lg font-semibold">
-                      ₹
-                      {totalExpenses.toLocaleString("en-IN", {
-                        maximumFractionDigits: 0,
-                      })}
-                    </div>
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                  <Receipt className="size-3.5" />
+                  <span className="font-medium">
+                    {group.expenses.length}{" "}
+                    {group.expenses.length === 1 ? "expense" : "expenses"}
+                  </span>
+                </div>
+                <div className="text-right">
+                  <div className="text-foreground text-lg font-bold tracking-tight tabular-nums">
+                    ₹{totalExpenses.toLocaleString("en-IN", {
+                      minimumFractionDigits: 0,
+                      maximumFractionDigits: 0,
+                    })}
                   </div>
                 </div>
+              </div>
 
-                <div className="text-muted-foreground flex items-center gap-2 text-xs">
-                  <Calendar className="h-3.5 w-3.5" />
-                  <span>Last: {recentActivity}</span>
-                </div>
+              <div className="text-muted-foreground/80 flex items-center gap-1.5 text-[11px]">
+                <Calendar className="size-3" />
+                <span>Last activity: {recentActivity}</span>
               </div>
-            </>
+            </div>
           ) : (
-            <>
-              <Separator />
-              <div className="flex flex-col items-center justify-center py-4 text-center">
-                <div className="border-border mb-2 rounded-full border p-3">
-                  <Receipt className="text-muted-foreground h-5 w-5" />
-                </div>
-                <p className="text-muted-foreground text-sm font-medium">
-                  No expenses yet
-                </p>
-                <p className="text-muted-foreground mt-1 text-xs">
-                  Tap to add your first expense
-                </p>
-              </div>
-            </>
+            <div className="flex flex-col items-center justify-center py-3 text-center">
+              <Receipt className="mb-1 size-6 text-muted-foreground/30" />
+              <p className="text-muted-foreground text-xs font-medium">
+                No expenses yet
+              </p>
+            </div>
           )}
 
           {/* View Details Arrow */}
-          <div className="flex items-center justify-end pt-2">
-            <div className="text-muted-foreground flex items-center gap-1 text-xs opacity-70 transition-opacity group-hover:opacity-100">
-              <span>View details</span>
-              <ChevronRight className="h-3 w-3" />
+          <div className="flex items-center justify-end pt-1">
+            <div className="text-muted-foreground group-hover:text-primary flex items-center gap-0.5 text-xs font-medium transition-colors">
+              <span>View group</span>
+              <ChevronRight className="size-3.5 transition-transform group-hover:translate-x-0.5" />
             </div>
           </div>
         </CardContent>

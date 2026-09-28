@@ -21,15 +21,15 @@ export function FormFooter({
   onSubmit,
 }: FormFooterProps) {
   return (
-    <div className="bg-background rounded-b-lg border-t p-6">
-      <div className="flex justify-between gap-3">
+    <div className="border-t border-border/70 bg-card/60 px-6 py-4">
+      <div className="flex items-center justify-between gap-3">
         <Button
           type="button"
           variant="outline"
           onClick={onBack}
-          className="h-10 px-4"
+          className="h-10 px-4 active:scale-[0.97] transition-transform duration-150 border-border/80"
         >
-          <ChevronLeft className="mr-1 h-4 w-4" />
+          <ChevronLeft className="mr-1 size-4" />
           {currentStep === 1 ? "Cancel" : "Back"}
         </Button>
 
@@ -38,27 +38,27 @@ export function FormFooter({
             type="button"
             onClick={onContinue}
             disabled={!canContinue}
-            className="h-10 px-4"
+            className="h-10 px-5 font-medium active:scale-[0.97] transition-transform duration-150"
           >
-            Continue
-            <ArrowRight className="ml-1 h-4 w-4" />
+            <span>Continue</span>
+            <ArrowRight className="ml-1.5 size-4" />
           </Button>
         ) : (
           <Button
             type="submit"
             onClick={onSubmit}
             disabled={!formIsValid || isPending}
-            className="h-10 px-4"
+            className="h-10 px-5 font-medium active:scale-[0.97] transition-transform duration-150"
           >
             {isPending ? (
               <>
-                <Loader2 className="mr-1 h-4 w-4 animate-spin" />
+                <Loader2 className="mr-1.5 size-4 animate-spin" />
                 Saving...
               </>
             ) : (
               <>
-                <CheckCircle2 className="mr-1 h-4 w-4" />
-                Add Expense
+                <CheckCircle2 className="mr-1.5 size-4" />
+                Save Expense
               </>
             )}
           </Button>
