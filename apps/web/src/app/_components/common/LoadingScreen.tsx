@@ -18,13 +18,13 @@ export function LoadingScreen() {
         transition={{ duration: 0.3, ease: "easeOut" }}
         aria-hidden="true"
       >
-        <div className="relative flex h-12 w-12 items-center justify-center">
-          <div className="absolute inset-0 rounded-full border-2 border-border/40" />
+        <div className="relative flex h-10 w-10 items-center justify-center">
+          <div className="absolute inset-0 rounded-full border border-border/50" />
           <motion.div
-            className="absolute inset-0 rounded-full border-2 border-transparent border-t-[#007cf0] border-r-[#00dfd8]"
+            className="absolute inset-0 rounded-full border border-transparent border-t-foreground/70"
             animate={{ rotate: 360 }}
             transition={{
-              duration: 1.2,
+              duration: 0.9,
               ease: "linear",
               repeat: Infinity,
             }}
@@ -44,4 +44,3 @@ export function LoadingScreen() {
     </div>
   );
 }
-

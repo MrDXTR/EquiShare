@@ -19,6 +19,7 @@ import {
 import { toast } from "sonner";
 import { GroupCard } from "../_components/features/group-management/groups/GroupCard";
 import { CreateGroupDialog } from "../_components/features/group-management/groups/CreateGroupDialog";
+import { Layers3 } from "lucide-react";
 
 export default function GroupsPage() {
   const router = useRouter();
@@ -90,14 +91,17 @@ export default function GroupsPage() {
 
   if (isLoading) {
     return (
-      <div className="bg-background min-h-screen">
-        <div className="container mx-auto px-4 py-6 sm:py-8">
+      <div className="dark:bg-background min-h-screen bg-[#fafafa]">
+        <div className="container mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <h1 className="text-2xl font-bold text-gray-900 sm:text-3xl dark:text-gray-100">
-                Your Groups
+              <p className="text-muted-foreground mb-3 font-mono text-xs tracking-[0.18em] uppercase">
+                Workspace / overview
+              </p>
+              <h1 className="text-foreground text-3xl font-semibold tracking-[-0.04em] sm:text-4xl">
+                Keep every split in sync.
               </h1>
-              <p className="mt-1 text-sm text-gray-600 sm:text-base dark:text-gray-300">
+              <p className="text-muted-foreground mt-2 text-sm sm:text-base">
                 Manage your expense groups
               </p>
             </div>
@@ -121,14 +125,17 @@ export default function GroupsPage() {
   }
 
   return (
-    <div className="bg-background min-h-screen">
-      <div className="container mx-auto px-4 py-6 sm:py-8">
+    <div className="dark:bg-background min-h-screen bg-[#fafafa]">
+      <div className="container mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900 sm:text-3xl dark:text-gray-100">
-              Your Groups
+            <p className="text-muted-foreground mb-3 font-mono text-xs tracking-[0.18em] uppercase">
+              Workspace / overview
+            </p>
+            <h1 className="text-foreground text-3xl font-semibold tracking-[-0.04em] sm:text-4xl">
+              Keep every split in sync.
             </h1>
-            <p className="mt-1 text-sm text-gray-600 sm:text-base dark:text-gray-300">
+            <p className="text-muted-foreground mt-2 text-sm sm:text-base">
               {groups?.length === 0
                 ? "Start by creating your first group"
                 : `${groups?.length} ${groups?.length === 1 ? "group" : "groups"} total`}
@@ -139,32 +146,20 @@ export default function GroupsPage() {
           </div>
         </div>
 
-        <div className="mt-6 sm:mt-8">
+        <div className="border-border/70 mt-8 border-t pt-8 sm:mt-10 sm:pt-10">
           {groups?.length === 0 ? (
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="flex flex-col items-center justify-center py-12 sm:py-16"
+              className="border-border bg-background flex flex-col items-center justify-center rounded-lg border border-dashed py-16 sm:py-20"
             >
-              <div className="border-border mb-4 rounded-full border p-6">
-                <svg
-                  className="text-muted-foreground h-12 w-12"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={1.5}
-                    d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
-                  />
-                </svg>
+              <div className="dark:bg-primary dark:text-primary-foreground mb-5 flex size-14 items-center justify-center rounded-lg bg-[#171717] text-white shadow-[8px_8px_0_#d8ccf1]">
+                <Layers3 className="size-6" />
               </div>
-              <h3 className="mb-2 text-lg font-semibold text-gray-900 dark:text-gray-100">
+              <h3 className="text-foreground mb-2 text-xl font-semibold tracking-[-0.03em]">
                 No groups yet
               </h3>
-              <p className="text-muted-foreground mb-6 max-w-md text-center">
+              <p className="text-muted-foreground mb-6 max-w-md text-center text-sm leading-6">
                 Create your first group to start splitting expenses with
                 friends, family, or colleagues.
               </p>

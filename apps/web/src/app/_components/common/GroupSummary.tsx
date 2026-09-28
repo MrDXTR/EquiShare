@@ -174,7 +174,7 @@ export function GroupSummary({
   const pendingSettlements = settlements?.filter((s) => !s.settled).length ?? 0;
 
   return (
-    <div className="min-h-screen p-4 md:p-8">
+    <div className="dark:bg-background min-h-screen bg-[#fafafa] p-4 md:p-8">
       <div className="container mx-auto max-w-7xl space-y-8">
         <GroupHeader
           group={group}

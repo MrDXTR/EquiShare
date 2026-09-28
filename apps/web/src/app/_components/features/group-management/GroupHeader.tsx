@@ -54,93 +54,95 @@ export function GroupHeader({
   const showAllSettled = isAllSettled || !hasUnsettledExpenses;
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-wrap items-center justify-between gap-4">
-        <div className="flex items-center gap-2">
-          <div className="flex items-center">
-            <h1 className="text-3xl font-bold text-gray-900 sm:text-4xl dark:text-gray-100">
-              {group.name || "Group Expenses"}
-            </h1>
+    <div className="border-border/80 bg-background relative overflow-hidden rounded-lg border p-6 shadow-[0_1px_0_rgba(0,0,0,0.04)] sm:p-8">
+      <div className="pointer-events-none absolute -top-24 -right-20 size-64 rounded-full bg-gradient-to-br from-[#aaffec]/70 via-[#d3e5ff]/70 to-[#d8ccf1]/80 blur-3xl dark:from-[#00ffd0]/25 dark:via-[#6366f1]/30 dark:to-[#a855f7]/25" />
+      <div className="relative space-y-6">
+        <div className="flex flex-wrap items-center justify-between gap-4">
+          <div className="flex items-center gap-2">
+            <div className="flex items-center">
+              <h1 className="text-foreground text-3xl font-semibold tracking-[-0.05em] sm:text-4xl">
+                {group.name || "Group Expenses"}
+              </h1>
 
-            <div className="ml-2 flex items-center">
-              <GroupDataExport group={group} />
+              <div className="ml-2 flex items-center">
+                <GroupDataExport group={group} />
+              </div>
             </div>
+
+            {!isOwner && (
+              <Badge
+                variant="outline"
+                className="border-border text-muted-foreground ml-2 bg-transparent"
+              >
+                <Share2 className="mr-1 h-3 w-3" />
+                Shared
+              </Badge>
+            )}
           </div>
 
-          {!isOwner && (
-            <Badge
-              variant="outline"
-              className="border-border text-muted-foreground ml-2 bg-transparent"
-            >
-              <Share2 className="mr-1 h-3 w-3" />
-              Shared
-            </Badge>
-          )}
-        </div>
+          <div className="flex items-center gap-3">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="flex items-center gap-2"
+                >
+                  <Users className="h-4 w-4" />
+                  <span>Members</span>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-56">
+                <DropdownMenuLabel>Group Members</DropdownMenuLabel>
+                <DropdownMenuSeparator />
 
-        <div className="flex items-center gap-3">
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                variant="outline"
-                size="sm"
-                className="flex items-center gap-2"
-              >
-                <Users className="h-4 w-4" />
-                <span>Members</span>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-56">
-              <DropdownMenuLabel>Group Members</DropdownMenuLabel>
-              <DropdownMenuSeparator />
+                {/* Owner */}
+                <DropdownMenuItem className="flex items-center gap-2 py-2">
+                  <Avatar className="h-6 w-6">
+                    <AvatarImage src={group.createdBy.image || undefined} />
+                    <AvatarFallback className="bg-blue-100 text-xs text-blue-600 dark:bg-blue-900 dark:text-blue-400">
+                      {(group.createdBy.name || "U").charAt(0)}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="flex flex-1 items-center justify-between">
+                    <span className="text-sm">{group.createdBy.name}</span>
+                    <Badge
+                      variant="outline"
+                      className="ml-2 h-5 border-green-200 bg-green-50 text-xs text-green-700 dark:border-green-800 dark:bg-green-900/50 dark:text-green-400"
+                    >
+                      Owner
+                    </Badge>
+                  </div>
+                </DropdownMenuItem>
 
-              {/* Owner */}
-              <DropdownMenuItem className="flex items-center gap-2 py-2">
-                <Avatar className="h-6 w-6">
-                  <AvatarImage src={group.createdBy.image || undefined} />
-                  <AvatarFallback className="bg-blue-100 text-xs text-blue-600 dark:bg-blue-900 dark:text-blue-400">
-                    {(group.createdBy.name || "U").charAt(0)}
-                  </AvatarFallback>
-                </Avatar>
-                <div className="flex flex-1 items-center justify-between">
-                  <span className="text-sm">{group.createdBy.name}</span>
-                  <Badge
-                    variant="outline"
-                    className="ml-2 h-5 border-green-200 bg-green-50 text-xs text-green-700 dark:border-green-800 dark:bg-green-900/50 dark:text-green-400"
-                  >
-                    Owner
-                  </Badge>
-                </div>
-              </DropdownMenuItem>
+                {/* Members */}
+                {group.members &&
+                  group.members.length > 0 &&
+                  group.members.map((member: any) => (
+                    <DropdownMenuItem
+                      key={member.id}
+                      className="flex items-center gap-2 py-2"
+                    >
+                      <Avatar className="h-6 w-6">
+                        <AvatarImage src={member.image || undefined} />
+                        <AvatarFallback className="bg-blue-100 text-xs text-blue-600 dark:bg-blue-900 dark:text-blue-400">
+                          {(member.name || "U").charAt(0)}
+                        </AvatarFallback>
+                      </Avatar>
+                      <span className="text-sm">{member.name}</span>
+                    </DropdownMenuItem>
+                  ))}
 
-              {/* Members */}
-              {group.members &&
-                group.members.length > 0 &&
-                group.members.map((member) => (
-                  <DropdownMenuItem
-                    key={member.id}
-                    className="flex items-center gap-2 py-2"
-                  >
-                    <Avatar className="h-6 w-6">
-                      <AvatarImage src={member.image || undefined} />
-                      <AvatarFallback className="bg-blue-100 text-xs text-blue-600 dark:bg-blue-900 dark:text-blue-400">
-                        {(member.name || "U").charAt(0)}
-                      </AvatarFallback>
-                    </Avatar>
-                    <span className="text-sm">{member.name}</span>
-                  </DropdownMenuItem>
-                ))}
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={() => setShowMembersDialog?.(true)}>
+                  <span className="text-blue-600 dark:text-blue-400">
+                    View all members
+                  </span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
 
-              <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={() => setShowMembersDialog?.(true)}>
-                <span className="text-blue-600 dark:text-blue-400">
-                  View all members
-                </span>
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-
-          {/* <ExpenseForm
+            {/* <ExpenseForm
             groupId={group.id}
             people={group.people}
             onSuccess={onExpenseCreated}
@@ -154,6 +156,7 @@ export function GroupHeader({
               </Button>
             }
           /> */}
+          </div>
         </div>
       </div>
 

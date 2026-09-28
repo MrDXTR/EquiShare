@@ -158,7 +158,7 @@ export function ExpensesList({ group, onExpenseDeleted }: ExpensesListProps) {
                           </Badge>
                         </div>
                       </div>
-                      <div className="space-y-1 text-right">
+                      <div className="space-y-1 pr-12 text-right sm:pr-10">
                         <p className="text-foreground text-2xl font-semibold">
                           ₹{expense.amount.toFixed(2)}
                         </p>
@@ -172,7 +172,7 @@ export function ExpensesList({ group, onExpenseDeleted }: ExpensesListProps) {
                         <Button
                           variant="ghost"
                           size="icon"
-                          className="absolute top-2 right-2 opacity-0 group-focus-within:opacity-100 group-hover:opacity-100"
+                          className="bg-background/90 absolute top-3 right-3 h-9 w-9 rounded-full border border-border opacity-100 shadow-sm transition-colors group-focus-within:opacity-100 group-hover:opacity-100 sm:top-2 sm:right-2 sm:border-transparent sm:bg-transparent sm:shadow-none sm:opacity-0"
                         >
                           <MoreVertical className="h-4 w-4" />
                         </Button>

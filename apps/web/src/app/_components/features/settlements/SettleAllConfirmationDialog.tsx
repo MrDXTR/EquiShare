@@ -20,12 +20,14 @@ interface SettleAllConfirmationDialogProps {
   onConfirm: () => void;
   isPending: boolean;
   activeSettlementsCount: number;
+  onHoverChange?: (hovered: boolean) => void;
 }
 
 export function SettleAllConfirmationDialog({
   onConfirm,
   isPending,
   activeSettlementsCount,
+  onHoverChange,
 }: SettleAllConfirmationDialogProps) {
   // Maintain open state to handle closing after confirmation
   const [open, setOpen] = React.useState(false);
@@ -42,7 +44,11 @@ export function SettleAllConfirmationDialog({
           size="sm"
           variant="outline"
           disabled={isPending || activeSettlementsCount === 0}
-          className="border-green-200 bg-green-50 text-green-700 hover:bg-green-100 dark:border-green-800 dark:bg-green-900/30 dark:text-green-400 dark:hover:bg-green-800/50"
+          className="border-green-300/70 bg-green-50/70 text-green-700 transition-all duration-200 hover:border-green-500 hover:bg-green-100 hover:shadow-[0_0_0_1px_rgba(34,197,94,0.2)] dark:border-green-800 dark:bg-green-900/30 dark:text-green-400 dark:hover:bg-green-800/50"
+          onMouseEnter={() => onHoverChange?.(true)}
+          onMouseLeave={() => onHoverChange?.(false)}
+          onFocus={() => onHoverChange?.(true)}
+          onBlur={() => onHoverChange?.(false)}
         >
           {isPending ? (
             <Loader2 className="mr-2 h-4 w-4 animate-spin" />

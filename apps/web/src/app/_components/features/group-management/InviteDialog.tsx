@@ -85,8 +85,8 @@ export function InviteDialog({ children, groupId }: InviteDialogProps) {
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-xl">
-            <div className="rounded-lg bg-indigo-600 p-2">
-              <UserPlus className="h-5 w-5 text-white" />
+            <div className="bg-muted rounded-lg border p-2">
+              <UserPlus className="text-foreground h-5 w-5" />
             </div>
             <span className="text-gray-900 dark:text-gray-100">
               Invite Members
@@ -125,7 +125,7 @@ export function InviteDialog({ children, groupId }: InviteDialogProps) {
 
               <Button
                 onClick={handleGenerateInvite}
-                className="w-full bg-indigo-600 text-white hover:bg-indigo-700"
+                className="w-full"
               >
                 Generate Invite Link
               </Button>
@@ -134,7 +134,10 @@ export function InviteDialog({ children, groupId }: InviteDialogProps) {
 
           {createInvite.isPending && (
             <div className="flex justify-center py-6">
-              <Loader2 className="h-6 w-6 animate-spin text-indigo-500" />
+              <div className="relative flex h-10 w-10 items-center justify-center">
+                <div className="absolute inset-0 rounded-full border border-border/50" />
+                <Loader2 className="text-foreground/70 h-4 w-4 animate-spin" />
+              </div>
             </div>
           )}
 
@@ -180,12 +183,12 @@ export function InviteDialog({ children, groupId }: InviteDialogProps) {
                     size="sm"
                     variant="outline"
                     onClick={handleCopyToClipboard}
-                    className="h-9 border-indigo-200 px-3 hover:bg-indigo-50"
+                    className="h-9 px-3"
                   >
                     {copied ? (
                       <ClipboardCheck className="h-4 w-4 text-green-500" />
                     ) : (
-                      <Clipboard className="h-4 w-4 text-indigo-500" />
+                      <Clipboard className="text-foreground h-4 w-4" />
                     )}
                   </Button>
                 </div>
@@ -205,7 +208,7 @@ export function InviteDialog({ children, groupId }: InviteDialogProps) {
               <div className="pt-2">
                 <Button
                   onClick={handleGenerateInvite}
-                  className="w-full bg-indigo-600 text-white hover:bg-indigo-700"
+                  className="w-full"
                 >
                   Generate New Link
                 </Button>

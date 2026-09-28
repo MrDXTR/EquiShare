@@ -33,6 +33,7 @@ export function SettlementsList({
 }: SettlementsListProps) {
   const [settlingId, setSettlingId] = useState<string | null>(null);
   const [hoveredSettleId, setHoveredSettleId] = useState<string | null>(null);
+  const [isSettleAllHovered, setIsSettleAllHovered] = useState(false);
   const [showSettled, setShowSettled] = useState(false);
   const [showDetailsDialog, setShowDetailsDialog] = useState(false);
   const utils = api.useUtils();
@@ -150,6 +151,7 @@ export function SettlementsList({
                   onConfirm={handleSettleAll}
                   isPending={settleAllTransactions.isPending}
                   activeSettlementsCount={activeSettlements.length}
+                  onHoverChange={setIsSettleAllHovered}
                 />
               )}
             </div>
@@ -181,14 +183,17 @@ export function SettlementsList({
               {settlements.map((settlement: any) => {
                 const isSettled = settlement.settled;
                 const isSettleHovered = hoveredSettleId === settlement.id;
+                const highlightRow =
+                  isSettled || isSettleHovered || isSettleAllHovered;
 
                 return (
                   <div
                     key={settlement.id}
-                    className={`bg-background relative top-0 overflow-hidden rounded-xl border p-4 shadow-none transition-[top,box-shadow,border-color] duration-200 hover:-top-0.5 ${isSettled || isSettleHovered
-                      ? "border-green-500 shadow-lg shadow-green-500/25"
-                      : "border-border hover:border-yellow-500 hover:shadow-lg hover:shadow-yellow-500/25"
-                      }`}
+                    className={`bg-background relative top-0 overflow-hidden rounded-xl border p-4 shadow-none transition-[top,box-shadow,border-color,background-color] duration-200 hover:-top-0.5 ${
+                      highlightRow
+                        ? "border-green-500 bg-green-500/[0.03] shadow-lg shadow-green-500/20"
+                        : "border-border hover:border-yellow-500 hover:shadow-lg hover:shadow-yellow-500/20"
+                    }`}
                   >
                     <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
                       <div className="flex flex-wrap items-center gap-2">
@@ -227,6 +232,11 @@ export function SettlementsList({
                             onFocus={() => setHoveredSettleId(settlement.id)}
                             onBlur={() => setHoveredSettleId(null)}
                             disabled={settlingId === settlement.id}
+                            className={`min-w-[96px] transition-all duration-200 ${
+                              isSettleHovered
+                                ? "border-green-500 bg-green-50 text-green-700 shadow-[0_0_0_1px_rgba(34,197,94,0.18)] dark:bg-green-950/40 dark:text-green-300"
+                                : "hover:border-green-400 hover:text-green-700 dark:hover:text-green-300"
+                            }`}
                           >
                             {settlingId === settlement.id ? (
                               <Loader2 className="h-4 w-4 animate-spin" />
