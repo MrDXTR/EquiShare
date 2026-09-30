@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Plus, X, Users } from "lucide-react";
+import { Plus, X, Users, Loader2 } from "lucide-react";
 import { Button } from "~/components/ui/button";
 import {
   Dialog,
@@ -84,57 +84,63 @@ export function CreateGroupDialog() {
       }}
     >
       <DialogTrigger asChild>
-        <Button className="w-full sm:w-auto" size="lg">
-          <Plus className="mr-2 h-4 w-4" />
+        <Button
+          className="h-10 w-full px-4 font-semibold active:scale-[0.97] transition-transform duration-150 sm:w-auto shadow-xs"
+        >
+          <Plus className="mr-1.5 size-4" />
           Create New Group
         </Button>
       </DialogTrigger>
-      <DialogContent className="mx-4 max-w-md border sm:max-w-lg">
-        <form onSubmit={handleSubmit}>
-          <DialogHeader className="text-left">
-            <DialogTitle className="text-xl">Create New Group</DialogTitle>
-            <DialogDescription className="text-sm">
-              Create a group to start splitting expenses with friends, family,
-              or colleagues.
+
+      <DialogContent className="max-w-md rounded-2xl border border-border/80 bg-card p-5 sm:p-6 shadow-2xl sm:max-w-lg">
+        <form onSubmit={handleSubmit} className="space-y-5">
+          <DialogHeader className="text-left space-y-1">
+            <DialogTitle className="text-xl font-bold tracking-tight text-foreground">
+              Create New Group
+            </DialogTitle>
+            <DialogDescription className="text-xs sm:text-sm text-muted-foreground">
+              Create a group to start splitting expenses with friends, family, or colleagues.
             </DialogDescription>
           </DialogHeader>
 
-          <div className="grid gap-6 py-6">
+          <div className="space-y-4">
             {/* Group Name */}
-            <div className="space-y-2">
-              <Label htmlFor="name" className="text-sm font-medium">
-                Group Name <span className="text-red-500">*</span>
+            <div className="space-y-1.5">
+              <Label htmlFor="name" className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                Group Name <span className="text-destructive">*</span>
               </Label>
               <Input
                 id="name"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                placeholder="e.g., Weekend Trip, House Expenses"
-                className="h-11"
+                placeholder="e.g. Weekend Trip, Apartment 4B, Goa Vacation"
+                className="h-10.5 rounded-lg border-border/80 bg-background/80"
                 required
                 autoFocus
               />
             </div>
 
-            <Separator />
+            <Separator className="bg-border/60" />
 
             {/* Add People Section */}
-            <div className="space-y-4">
-              <div className="flex items-center gap-2">
-                <Users className="text-muted-foreground h-4 w-4" />
-                <Label className="text-sm font-medium">Add People</Label>
-                <span className="text-muted-foreground text-xs">
+            <div className="space-y-3">
+              <div className="flex items-center gap-1.5">
+                <Users className="size-3.5 text-primary" />
+                <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                  Initial Participants
+                </Label>
+                <span className="text-muted-foreground text-xs font-normal">
                   (Optional)
                 </span>
               </div>
 
-              <div className="flex gap-2">
+              <div className="flex items-center gap-2">
                 <Input
                   value={newPerson}
                   onChange={(e) => setNewPerson(e.target.value)}
                   onKeyDown={handleKeyDown}
-                  placeholder="Enter person's name"
-                  className="h-10 flex-1"
+                  placeholder="Enter name and press enter"
+                  className="h-10 flex-1 rounded-lg border-border/80 bg-background/80"
                 />
                 <Button
                   type="button"
@@ -142,33 +148,34 @@ export function CreateGroupDialog() {
                   disabled={
                     !newPerson.trim() || people.includes(newPerson.trim())
                   }
-                  className="h-10 px-3"
+                  className="h-10 px-3.5 shrink-0 rounded-lg active:scale-[0.97] transition-transform duration-150"
                   variant="outline"
+                  aria-label="Add person"
                 >
-                  <Plus className="h-4 w-4" />
+                  <Plus className="size-4" />
                 </Button>
               </div>
 
               {people.length > 0 && (
-                <div className="space-y-3">
-                  <div className="text-muted-foreground text-xs">
-                    {people.length} {people.length === 1 ? "person" : "people"}{" "}
-                    added
+                <div className="space-y-2 pt-1">
+                  <div className="text-xs text-muted-foreground">
+                    {people.length} {people.length === 1 ? "participant" : "participants"} added:
                   </div>
-                  <div className="flex flex-wrap gap-2">
+                  <div className="flex flex-wrap gap-1.5 max-h-28 overflow-y-auto">
                     {people.map((person) => (
                       <Badge
                         key={person}
                         variant="secondary"
-                        className="border-border text-foreground flex items-center gap-1 border bg-transparent px-2 py-1"
+                        className="rounded-lg border border-border/70 bg-muted/50 px-2.5 py-1 text-xs text-foreground flex items-center gap-1.5"
                       >
-                        <span className="text-sm">{person}</span>
+                        <span>{person}</span>
                         <button
                           type="button"
                           onClick={() => handleRemovePerson(person)}
-                          className="hover:bg-muted ml-1 rounded-full p-0.5 transition-colors"
+                          className="hover:bg-destructive/10 hover:text-destructive active:scale-[0.9] rounded-full p-0.5 transition-colors cursor-pointer"
+                          aria-label={`Remove ${person}`}
                         >
-                          <X className="h-3 w-3" />
+                          <X className="size-3" />
                         </button>
                       </Badge>
                     ))}
@@ -178,12 +185,12 @@ export function CreateGroupDialog() {
             </div>
           </div>
 
-          <DialogFooter className="flex flex-col gap-2 sm:flex-row">
+          <DialogFooter className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end pt-3">
             <Button
               type="button"
               variant="outline"
               onClick={() => setOpen(false)}
-              className="w-full sm:w-auto"
+              className="h-10 w-full sm:w-auto active:scale-[0.97] transition-transform duration-150 border-border/80"
               disabled={createGroup.isPending}
             >
               Cancel
@@ -191,11 +198,11 @@ export function CreateGroupDialog() {
             <Button
               type="submit"
               disabled={createGroup.isPending || !name.trim()}
-              className="w-full sm:w-auto"
+              className="h-10 w-full sm:w-auto font-medium active:scale-[0.97] transition-transform duration-150"
             >
               {createGroup.isPending ? (
                 <div className="flex items-center gap-2">
-                  <div className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />
+                  <Loader2 className="size-4 animate-spin" />
                   Creating...
                 </div>
               ) : (

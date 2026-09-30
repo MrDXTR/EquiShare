@@ -19,7 +19,6 @@ import { LayoutTextFlip } from "~/components/ui/layout-text-flip";
 import { MorphingText } from "~/components/ui/morphing-text";
 import { GlowingEffect } from "~/components/ui/glowing-effect";
 import { ShineBorder } from "~/components/ui/shine-border";
-import { LoadingScreen } from "./_components/common/LoadingScreen";
 
 export default function LandingPage() {
   const { data: session, status } = useSession();
@@ -30,10 +29,6 @@ export default function LandingPage() {
       router.push("/groups");
     }
   }, [session, status, router]);
-
-  // if (status === "loading") {
-  //   return <LoadingScreen />;
-  // }
 
   if (status === "authenticated") {
     return null;
@@ -78,7 +73,7 @@ export default function LandingPage() {
   ];
 
   return (
-    <div className="bg-background text-foreground">
+    <div className="bg-background text-foreground transition-colors">
       {/* Hero Section */}
       <section className="relative overflow-hidden">
         <AnimatedGridPattern
@@ -93,9 +88,9 @@ export default function LandingPage() {
           <div className="flex flex-col items-center gap-6">
             <Badge
               variant="secondary"
-              className="border-border/60 bg-secondary/50"
+              className="border-border/60 bg-secondary/50 px-3 py-1 font-medium"
             >
-              <Sparkles className="mr-2 h-3.5 w-3.5" />
+              <Sparkles className="mr-1.5 size-3.5 text-primary" />
               The smart way to split bills
             </Badge>
 
@@ -104,7 +99,7 @@ export default function LandingPage() {
                 text="Split expenses"
                 words={["fairly", "instantly", "without awkwardness", "with friends"]}
                 duration={2800}
-                className="text-3xl md:text-5xl"
+                className="text-3xl font-extrabold tracking-tight md:text-5xl"
               />
               <p className="mx-auto max-w-xl text-base leading-relaxed text-muted-foreground sm:text-lg">
                 EquiShare keeps every shared bill transparent and fair — from
@@ -123,20 +118,29 @@ export default function LandingPage() {
               </div>
             </div>
 
-            <div className="flex flex-col items-center justify-center gap-3 sm:flex-row">
-              <Button size="lg" onClick={() => router.push("/signin")}>
+            <div className="flex flex-col items-center justify-center gap-3 sm:flex-row w-full sm:w-auto">
+              <Button
+                size="lg"
+                onClick={() => router.push("/signin")}
+                className="h-11 w-full sm:w-auto px-6 font-semibold active:scale-[0.97] transition-transform duration-150"
+              >
                 Start splitting
-                <ArrowRight className="ml-2 h-4 w-4" />
+                <ArrowRight className="ml-2 size-4" />
               </Button>
-              <Button asChild variant="outline" size="lg">
+              <Button
+                asChild
+                variant="outline"
+                size="lg"
+                className="h-11 w-full sm:w-auto px-6 font-medium active:scale-[0.97] transition-transform duration-150 border-border/80"
+              >
                 <a href="#features">See how it works</a>
               </Button>
             </div>
 
-            <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm text-muted-foreground">
+            <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-xs sm:text-sm text-muted-foreground">
               {["Free to use", "No ads", "Instant calculations"].map((item) => (
                 <span key={item} className="inline-flex items-center gap-2">
-                  <span className="h-1.5 w-1.5 rounded-full bg-primary/70" />
+                  <span className="size-1.5 rounded-full bg-primary/70" />
                   {item}
                 </span>
               ))}
@@ -149,16 +153,15 @@ export default function LandingPage() {
 
       {/* Features Section */}
       <section id="features" className="mx-auto max-w-6xl px-4 pb-8 pt-20">
-        {/* Morphing text merged as section heading */}
         <div className="mb-3 flex flex-col items-center gap-2 text-center">
-          <p className="text-sm font-medium uppercase tracking-widest text-muted-foreground">
+          <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
             Everything you need for
           </p>
           <MorphingText
             texts={["Trips", "Shared apartments", "Team events", "Everyday bills"]}
             className="mx-auto h-14 max-w-3xl text-[2.2rem] md:h-18 md:text-[2.8rem] lg:text-[3.2rem]"
           />
-          <p className="mt-1 max-w-lg text-muted-foreground">
+          <p className="mt-1 max-w-lg text-sm text-muted-foreground">
             Powerful features designed to make splitting as painless as possible.
           </p>
         </div>
@@ -173,7 +176,7 @@ export default function LandingPage() {
                   key={feature.title}
                   className={`min-h-[13rem] list-none ${feature.area}`}
                 >
-                  <div className="relative h-full rounded-2xl border p-2 md:rounded-3xl md:p-3">
+                  <div className="relative h-full rounded-2xl border border-border/70 p-2 md:rounded-3xl md:p-3 bg-card/40">
                     <GlowingEffect
                       spread={40}
                       glow={true}
@@ -181,16 +184,16 @@ export default function LandingPage() {
                       proximity={64}
                       inactiveZone={0.01}
                     />
-                    <div className="border-0.75 relative flex h-full flex-col justify-between gap-6 overflow-hidden rounded-xl bg-card/60 p-6 dark:shadow-[0px_0px_27px_0px_#2D2D2D]">
+                    <div className="relative flex h-full flex-col justify-between gap-6 overflow-hidden rounded-xl bg-card/80 p-6 shadow-2xs">
                       <div className="relative flex flex-1 flex-col justify-between gap-3 text-left">
-                        <div className="w-fit rounded-lg border border-gray-600 p-2">
-                          <Icon className="h-5 w-5 text-primary" />
+                        <div className="w-fit rounded-lg border border-border/80 bg-primary/10 p-2 text-primary">
+                          <Icon className="size-5" />
                         </div>
-                        <div className="space-y-2">
-                          <h3 className="-tracking-4 pt-0.5 font-sans text-xl font-semibold text-balance md:text-2xl">
+                        <div className="space-y-1.5">
+                          <h3 className="font-sans text-xl font-bold tracking-tight text-foreground text-balance md:text-2xl">
                             {feature.title}
                           </h3>
-                          <p className="font-sans text-sm text-muted-foreground md:text-base">
+                          <p className="font-sans text-xs sm:text-sm text-muted-foreground leading-relaxed">
                             {feature.description}
                           </p>
                         </div>
@@ -206,22 +209,25 @@ export default function LandingPage() {
 
       {/* CTA Section — ShineBorder */}
       <section className="mx-auto max-w-6xl px-4 py-16">
-        <div className="relative flex flex-col items-center gap-5 overflow-hidden rounded-2xl bg-card/60 py-14 text-center">
+        <div className="relative flex flex-col items-center gap-5 overflow-hidden rounded-2xl border border-border/70 bg-card/60 p-8 sm:py-14 text-center shadow-lg">
           <ShineBorder
             shineColor={["#9E7AFF", "#FE8BBB", "#60a5fa"]}
             borderWidth={1.5}
             duration={10}
           />
-          <h2 className="text-2xl font-semibold tracking-tight sm:text-3xl">
+          <h2 className="text-2xl font-bold tracking-tight sm:text-3xl text-foreground">
             Ready to get started?
           </h2>
-          <p className="max-w-md text-muted-foreground">
-            Create a group, add your first expense, and let EquiShare handle the
-            rest.
+          <p className="max-w-md text-xs sm:text-sm text-muted-foreground leading-relaxed">
+            Create a group, add your first expense, and let EquiShare handle the rest.
           </p>
-          <Button size="lg" onClick={() => router.push("/signin")}>
+          <Button
+            size="lg"
+            onClick={() => router.push("/signin")}
+            className="h-11 px-6 font-semibold active:scale-[0.97] transition-transform duration-150"
+          >
             Get started — it&apos;s free
-            <ArrowRight className="ml-2 h-4 w-4" />
+            <ArrowRight className="ml-2 size-4" />
           </Button>
         </div>
       </section>

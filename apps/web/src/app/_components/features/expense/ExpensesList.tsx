@@ -1,14 +1,17 @@
 "use client";
 
 import { useState } from "react";
-import { motion } from "framer-motion";
-import { Receipt, MoreVertical, Loader2, Trash2, Plus } from "lucide-react";
+import { Plus, Receipt, Trash2, MoreVertical } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { Button } from "~/components/ui/button";
 import { Badge } from "~/components/ui/badge";
-import { toast } from "sonner";
-import { api } from "~/trpc/react";
-import type { RouterOutputs } from "~/trpc/shared";
+import { ExpenseForm } from "./ExpenseForm/ExpenseForm";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "~/components/ui/dropdown-menu";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -19,53 +22,33 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "~/components/ui/alert-dialog";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "~/components/ui/dropdown-menu";
-import { ExpenseForm } from "~/app/_components/features/expense/ExpenseForm/ExpenseForm";
-
-type Group = RouterOutputs["group"]["getById"];
+import { api } from "~/trpc/react";
+import { toast } from "sonner";
+import type { Group } from "../group-management/utils";
 
 interface ExpensesListProps {
   group: Group;
-  onExpenseDeleted: () => void;
+  onExpenseDeleted?: () => void;
 }
 
 export function ExpensesList({ group, onExpenseDeleted }: ExpensesListProps) {
   const [expenseToDelete, setExpenseToDelete] = useState<string | null>(null);
-  const [isAddingExpense, setIsAddingExpense] = useState(false);
   const utils = api.useUtils();
-
-  // Define settlement query input for invalidation
-  const settlementQueryInput = { groupId: group.id };
 
   const deleteExpense = api.expense.delete.useMutation({
     onMutate: () => {
-      toast.loading("Deleting expense...", {
-        id: "delete-expense",
-      });
+      toast.loading("Deleting expense...", { id: "delete-expense" });
     },
     onSuccess: async () => {
-      if (!group) return;
-      await utils.group.getById.invalidate();
+      await utils.group.getById.invalidate(group.id);
       await utils.expense.getBalances.invalidate(group.id);
-      await utils.settlement.list.invalidate(settlementQueryInput);
-      toast.success("Expense deleted successfully", {
-        id: "delete-expense",
-        style: {
-          backgroundColor: "#fee2e2",
-          color: "#991b1b",
-          borderColor: "#fecaca",
-        },
-      });
+      await utils.settlement.list.invalidate();
+      toast.success("Expense deleted", { id: "delete-expense" });
+      onExpenseDeleted?.();
       setExpenseToDelete(null);
-      onExpenseDeleted();
     },
-    onError: () => {
-      toast.error("Failed to delete expense", {
+    onError: (error) => {
+      toast.error(`Failed to delete: ${error.message}`, {
         id: "delete-expense",
       });
     },
@@ -77,116 +60,119 @@ export function ExpensesList({ group, onExpenseDeleted }: ExpensesListProps) {
     }
   };
 
-  const handleExpenseCreated = async () => {
-    await utils.group.getById.invalidate();
-    await utils.expense.getBalances.invalidate(group.id);
-    await utils.settlement.list.invalidate(settlementQueryInput);
-    setIsAddingExpense(false);
-  };
-
-  if (!group) return null;
-
   return (
-    <motion.div
-      initial={{ opacity: 0, x: 50 }}
-      animate={{ opacity: 1, x: 0 }}
-      transition={{ delay: 0.4 }}
-    >
-      <Card className="border-border bg-background h-full border">
-        <CardHeader className="pb-4">
-          <div className="flex flex-col items-start justify-between gap-3 md:flex-row md:items-center md:gap-0">
-            <CardTitle className="flex items-center gap-3 text-2xl">
-              <div className="border-border rounded-lg border p-2">
-                <Receipt className="text-foreground h-6 w-6" />
+    <div>
+      <Card className="border-border/70 bg-card h-full rounded-2xl shadow-xs transition-shadow">
+        <CardHeader className="pb-3">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <CardTitle className="flex items-center gap-3 text-xl font-bold tracking-tight">
+              <div className="bg-primary/10 text-primary flex size-8 items-center justify-center rounded-lg">
+                <Receipt className="size-4" />
               </div>
-              <span className="text-gray-900 dark:text-gray-100">Expenses</span>
+              <div className="flex items-center gap-2">
+                <span>Expenses</span>
+                <Badge
+                  variant="secondary"
+                  className="rounded-full px-2 py-0.5 text-xs font-semibold"
+                >
+                  {group.expenses.length}
+                </Badge>
+              </div>
             </CardTitle>
-            <div>
+
+            <div className="flex items-center gap-2">
               <ExpenseForm
                 groupId={group.id}
                 people={group.people}
-                onSuccess={handleExpenseCreated}
                 trigger={
-                  <Button size="sm" variant="outline">
-                    <Plus className="mr-2 h-4 w-4" />
-                    Add Expense
+                  <Button
+                    size="sm"
+                    className="h-9 px-3.5 font-medium active:scale-[0.97] transition-transform duration-150"
+                  >
+                    <Plus className="size-4 mr-1.5" />
+                    <span>Add Expense</span>
                   </Button>
                 }
               />
             </div>
           </div>
         </CardHeader>
-        <CardContent className="max-h-[calc(100vh-24rem)] overflow-y-auto">
-          <div className="space-y-4">
+
+        <CardContent className="max-h-[440px] overflow-y-auto px-6 pt-1.5 pb-3">
+          <div className="space-y-3 pt-1">
             {group.expenses.length === 0 ? (
-              <div className="py-12 text-center text-gray-500 dark:text-gray-400">
-                <Receipt className="mx-auto mb-4 h-12 w-12 text-gray-300 dark:text-gray-600" />
-                <p className="text-lg">No expenses yet</p>
+              <div className="rounded-xl border border-dashed border-border/70 py-12 text-center">
+                <Receipt className="mx-auto mb-3 size-10 text-muted-foreground/40" />
+                <p className="text-foreground font-semibold text-base">No expenses recorded</p>
+                <p className="text-muted-foreground text-xs mt-1">
+                  Add an expense to start calculating balances and settlements.
+                </p>
               </div>
             ) : (
-              group.expenses.map((expense: any, index: number) => {
-                const amount =
-                  typeof expense.amount === "number" ? expense.amount : 0;
-                const settledAmount =
-                  typeof expense.settledAmount === "number"
-                    ? expense.settledAmount
-                    : 0;
-                const settledPercent =
-                  amount > 0 ? Math.round((settledAmount / amount) * 100) : 0;
+              group.expenses.map((expense: any) => {
+                const amount = typeof expense.amount === "number" ? expense.amount : 0;
+                const formattedAmount = amount.toLocaleString("en-IN", {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                });
 
                 return (
-                  <motion.div
+                  <div
                     key={expense.id}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: index * 0.1 }}
-                    className="group border-border bg-background hover:border-foreground/20 relative overflow-hidden rounded-xl border p-5 transition-colors duration-200"
+                    className="group border-border/60 bg-background/50 hover:bg-card hover:border-border hover:-translate-y-0.5 hover:shadow-sm rounded-xl border p-4 transition-[transform,box-shadow,border-color,background-color] duration-150 ease-out shadow-2xs relative"
                   >
-                    <div className="relative flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                      <div className="space-y-2">
-                        <div className="flex flex-wrap items-center gap-2">
-                          <h3 className="text-foreground text-lg font-semibold">
-                            {expense.description}
-                          </h3>
-                        </div>
-                        <div className="flex flex-wrap items-center gap-2">
+                    <div className="flex items-start justify-between gap-4">
+                      {/* Left: Description & metadata */}
+                      <div className="space-y-1.5 min-w-0 flex-1">
+                        <h3 className="text-foreground text-base font-semibold tracking-tight truncate">
+                          {expense.description}
+                        </h3>
+                        <div className="flex flex-wrap items-center gap-1.5">
                           <Badge
                             variant="outline"
-                            className="border-blue-200 bg-blue-50 text-blue-700 dark:border-blue-800 dark:bg-blue-900/50 dark:text-blue-400"
+                            className="border-primary/20 bg-primary/10 text-primary text-[11px] font-medium"
                           >
                             Paid by {expense.paidBy.name}
                           </Badge>
+                          <span className="text-muted-foreground/60 text-xs">•</span>
+                          <span className="text-muted-foreground text-xs font-medium">
+                            Split {expense.shares.length} {expense.shares.length === 1 ? "way" : "ways"}
+                          </span>
                         </div>
                       </div>
-                      <div className="space-y-1 pr-12 text-right sm:pr-10">
-                        <p className="text-foreground text-2xl font-semibold">
-                          ₹{expense.amount.toFixed(2)}
-                        </p>
-                        <div className="text-muted-foreground flex items-center gap-1 text-sm">
-                          <span>Split {expense.shares.length} ways</span>
+
+                      {/* Right: Amount & actions */}
+                      <div className="flex items-center gap-3 shrink-0">
+                        <div className="text-right">
+                          <p className="text-foreground text-lg sm:text-xl font-bold tracking-tight tabular-nums">
+                            ₹{formattedAmount}
+                          </p>
                         </div>
+
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="size-8 rounded-lg text-muted-foreground hover:text-foreground active:scale-[0.96] transition-transform duration-150"
+                              aria-label="Expense options"
+                            >
+                              <MoreVertical className="size-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end" className="w-36">
+                            <DropdownMenuItem
+                              onClick={() => setExpenseToDelete(expense.id)}
+                              className="text-destructive focus:bg-destructive/10 focus:text-destructive cursor-pointer"
+                            >
+                              <Trash2 className="mr-2 size-4" />
+                              Delete
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
                       </div>
                     </div>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="bg-background/90 absolute top-3 right-3 h-9 w-9 rounded-full border border-border opacity-100 shadow-sm transition-colors group-focus-within:opacity-100 group-hover:opacity-100 sm:top-2 sm:right-2 sm:border-transparent sm:bg-transparent sm:shadow-none sm:opacity-0"
-                        >
-                          <MoreVertical className="h-4 w-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuItem
-                          onClick={() => setExpenseToDelete(expense.id)}
-                        >
-                          <Trash2 className="mr-2 h-4 w-4" />
-                          Delete
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </motion.div>
+                  </div>
                 );
               })
             )}
@@ -205,23 +191,22 @@ export function ExpensesList({ group, onExpenseDeleted }: ExpensesListProps) {
       >
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+            <AlertDialogTitle>Delete Expense</AlertDialogTitle>
             <AlertDialogDescription>
-              This action cannot be undone. This will permanently delete the
-              expense.
+              Are you sure you want to delete this expense? This action cannot be undone and will recalculate all group balances.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogCancel className="active:scale-[0.97]">Cancel</AlertDialogCancel>
             <AlertDialogAction
               onClick={handleDelete}
-              className="bg-red-600 hover:bg-red-700 focus:ring-red-600 dark:bg-red-700 dark:text-white dark:hover:bg-red-800 dark:focus:ring-red-700"
+              className="bg-destructive text-white hover:bg-destructive/90 active:scale-[0.97]"
             >
               Delete
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-    </motion.div>
+    </div>
   );
 }

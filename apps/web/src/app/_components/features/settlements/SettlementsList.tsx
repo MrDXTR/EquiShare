@@ -38,12 +38,10 @@ export function SettlementsList({
   const [showDetailsDialog, setShowDetailsDialog] = useState(false);
   const utils = api.useUtils();
 
-  // Query all settlements (the API doesn't filter by settled status anymore)
   const { data: allSettlements, isLoading } = api.settlement.list.useQuery({
     groupId,
   });
 
-  // Filter the settlements client-side based on showSettled state
   const settlements = showSettled
     ? allSettlements
     : allSettlements?.filter((s: any) => !s.settled);
@@ -60,8 +58,8 @@ export function SettlementsList({
       await utils.expense.getBalances.invalidate(groupId);
       setSettlingId(null);
     },
-    onError: () => {
-      toast.error("Failed to settle transaction", { id: "settle-transaction" });
+    onError: (err) => {
+      toast.error(`Failed to settle transaction: ${err.message}`, { id: "settle-transaction" });
       setSettlingId(null);
     },
   });
@@ -76,8 +74,8 @@ export function SettlementsList({
       await utils.group.getById.invalidate(groupId);
       await utils.expense.getBalances.invalidate(groupId);
     },
-    onError: () => {
-      toast.error("Failed to settle all transactions", { id: "settle-all" });
+    onError: (err) => {
+      toast.error(`Failed to settle all: ${err.message}`, { id: "settle-all" });
     },
   });
 
@@ -99,35 +97,35 @@ export function SettlementsList({
 
   return (
     <div>
-      <Card className="border-border bg-background h-full border">
-        <CardHeader className="pb-4">
-          <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-            <CardTitle className="flex flex-wrap items-center gap-3 text-2xl">
-              <div className="border-border rounded-lg border p-2">
-                <ArrowRight className="text-foreground h-6 w-6" />
+      <Card className="border-border/70 bg-card h-full rounded-2xl shadow-xs transition-shadow">
+        <CardHeader className="pb-3">
+          <div className="flex flex-col gap-3.5 md:flex-row md:items-center md:justify-between">
+            <CardTitle className="flex flex-wrap items-center gap-3 text-xl font-bold tracking-tight">
+              <div className="bg-primary/10 text-primary flex size-8 items-center justify-center rounded-lg">
+                <ArrowRight className="size-4" />
               </div>
-              <span className="text-gray-900 dark:text-gray-100">
-                Settlements
-              </span>
+              <span>Settlements</span>
             </CardTitle>
-            <div className="flex flex-wrap items-center gap-2">
-              <div className="flex items-center gap-2">
+
+            <div className="flex flex-wrap items-center gap-2.5">
+              <div className="flex items-center gap-2 rounded-lg border border-border/70 bg-background/60 px-2.5 py-1.5 shadow-2xs">
                 <Switch
                   id="show-settled"
                   checked={showSettled}
                   onCheckedChange={handleToggleSettled}
+                  className="scale-90"
                 />
-                <Label htmlFor="show-settled" className="text-sm font-medium">
+                <Label htmlFor="show-settled" className="text-xs font-medium cursor-pointer select-none">
                   {showSettled ? (
-                    <div className="flex items-center gap-1">
-                      <Eye className="h-3.5 w-3.5" />
-                      <span>Show Settled</span>
-                    </div>
+                    <span className="flex items-center gap-1 text-foreground">
+                      <Eye className="size-3.5" />
+                      <span>Showing Settled</span>
+                    </span>
                   ) : (
-                    <div className="flex items-center gap-1">
-                      <EyeOff className="h-3.5 w-3.5" />
+                    <span className="flex items-center gap-1 text-muted-foreground">
+                      <EyeOff className="size-3.5" />
                       <span>Hide Settled</span>
-                    </div>
+                    </span>
                   )}
                 </Label>
               </div>
@@ -139,10 +137,10 @@ export function SettlementsList({
                   variant="outline"
                   size="sm"
                   onClick={() => setShowDetailsDialog(true)}
-                  className="gap-1.5"
+                  className="h-9 gap-1.5 font-medium border-border/80 active:scale-[0.97] transition-transform duration-150"
                 >
-                  <TableProperties className="h-3.5 w-3.5" />
-                  More Details
+                  <TableProperties className="size-3.5 text-muted-foreground" />
+                  <span>Breakdown</span>
                 </Button>
               )}
 
@@ -157,67 +155,86 @@ export function SettlementsList({
             </div>
           </div>
         </CardHeader>
-        <CardContent>
+
+        <CardContent className="max-h-[440px] overflow-y-auto px-6 pt-1.5 pb-3">
           {isLoading ? (
-            <div className="space-y-3">
+            <div className="space-y-2.5 pt-1">
               {[...Array(3)].map((_, i) => (
-                <div key={i} className="space-y-2">
-                  <Skeleton className="h-12 w-full dark:bg-gray-700" />
-                </div>
+                <Skeleton key={i} className="h-14 w-full rounded-xl" />
               ))}
             </div>
           ) : noRows ? (
-            <div className="py-12 text-center">
-              <div className="mb-4 inline-flex h-20 w-20 items-center justify-center rounded-full border border-emerald-500/60 bg-emerald-500/10">
-                <CheckCircle2 className="h-10 w-10 text-emerald-600 dark:text-emerald-400" />
+            <div className="py-12 text-center rounded-xl border border-dashed border-border/70">
+              <div className="mb-3 inline-flex size-14 items-center justify-center rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
+                <CheckCircle2 className="size-8" />
               </div>
-              <h3 className="text-foreground mb-2 text-2xl font-bold">
+              <h3 className="text-foreground text-lg font-bold tracking-tight">
                 All Settled Up!
               </h3>
-              <p className="text-muted-foreground">
-                Everyone&apos;s debts are cleared
+              <p className="text-muted-foreground text-xs mt-1">
+                All participant debts are currently settled.
               </p>
             </div>
           ) : settlements && settlements.length > 0 ? (
-            <div className="space-y-3">
+            <div className="space-y-2.5 pt-1">
               {settlements.map((settlement: any) => {
                 const isSettled = settlement.settled;
                 const isSettleHovered = hoveredSettleId === settlement.id;
                 const highlightRow =
                   isSettled || isSettleHovered || isSettleAllHovered;
 
+                const amount = typeof settlement.amount === "number" ? settlement.amount : 0;
+                const formattedAmount = amount.toLocaleString("en-IN", {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                });
+
                 return (
                   <div
                     key={settlement.id}
-                    className={`bg-background relative top-0 overflow-hidden rounded-xl border p-4 shadow-none transition-[top,box-shadow,border-color,background-color] duration-200 hover:-top-0.5 ${
+                    className={`relative overflow-hidden rounded-xl border p-3.5 transition-[transform,box-shadow,border-color,background-color] duration-150 ease-out hover:-translate-y-0.5 shadow-2xs ${
                       highlightRow
-                        ? "border-green-500 bg-green-500/[0.03] shadow-lg shadow-green-500/20"
-                        : "border-border hover:border-yellow-500 hover:shadow-lg hover:shadow-yellow-500/20"
+                        ? "border-emerald-500/40 bg-emerald-500/[0.04] shadow-sm shadow-emerald-500/10"
+                        : "border-border/60 bg-background/50 hover:bg-card hover:border-border hover:shadow-xs"
                     }`}
                   >
-                    <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+                    <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                      {/* Left: Transfer participants */}
                       <div className="flex flex-wrap items-center gap-2">
-                        <Badge className="border-border text-foreground bg-transparent font-semibold">
+                        <Badge
+                          variant="outline"
+                          className="border-border/80 bg-background/80 text-foreground font-semibold text-xs px-2.5 py-1"
+                        >
                           {settlement.from.name}
                         </Badge>
-                        <ArrowRight className="text-muted-foreground h-4 w-4" />
-                        <Badge className="border-border text-foreground bg-transparent font-semibold">
+                        <span className="text-xs text-muted-foreground flex items-center gap-1">
+                          pays
+                          <ArrowRight className="size-3 text-muted-foreground" />
+                        </span>
+                        <Badge
+                          variant="outline"
+                          className="border-border/80 bg-background/80 text-foreground font-semibold text-xs px-2.5 py-1"
+                        >
                           {settlement.to.name}
                         </Badge>
+
                         {isSettled && (
                           <Badge
                             variant="outline"
-                            className="ml-2 border-green-300 bg-green-50 font-semibold text-green-800 dark:border-green-700 dark:bg-green-900/30 dark:text-green-300"
+                            className="ml-1 border-emerald-500/30 bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 font-semibold text-[11px]"
                           >
-                            <CheckCircle2 className="mr-1 h-3 w-3" />
+                            <CheckCircle2 className="mr-1 size-3" />
                             Settled
                           </Badge>
                         )}
                       </div>
-                      <div className="flex items-center gap-3">
-                        <span className="text-foreground text-2xl font-semibold">
-                          ₹{settlement.amount.toFixed(2)}
+
+                      {/* Right: Amount & Settle action */}
+                      <div className="flex items-center justify-between sm:justify-end gap-3.5">
+                        <span className="text-foreground text-xl font-bold tracking-tight tabular-nums">
+                          ₹{formattedAmount}
                         </span>
+
                         {!isSettled && (
                           <Button
                             size="sm"
@@ -232,16 +249,16 @@ export function SettlementsList({
                             onFocus={() => setHoveredSettleId(settlement.id)}
                             onBlur={() => setHoveredSettleId(null)}
                             disabled={settlingId === settlement.id}
-                            className={`min-w-[96px] transition-all duration-200 ${
+                            className={`min-w-[90px] h-9 text-xs font-semibold active:scale-[0.96] transition-transform duration-150 ${
                               isSettleHovered
-                                ? "border-green-500 bg-green-50 text-green-700 shadow-[0_0_0_1px_rgba(34,197,94,0.18)] dark:bg-green-950/40 dark:text-green-300"
-                                : "hover:border-green-400 hover:text-green-700 dark:hover:text-green-300"
+                                ? "border-emerald-500 bg-emerald-50 text-emerald-700 shadow-2xs dark:bg-emerald-950/40 dark:text-emerald-300"
+                                : "hover:border-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300"
                             }`}
                           >
                             {settlingId === settlement.id ? (
-                              <Loader2 className="h-4 w-4 animate-spin" />
+                              <Loader2 className="size-3.5 animate-spin" />
                             ) : (
-                              <CheckCircle2 className="h-4 w-4" />
+                              <CheckCircle2 className="size-3.5 mr-1" />
                             )}
                             <span>Settle</span>
                           </Button>
@@ -253,7 +270,7 @@ export function SettlementsList({
               })}
             </div>
           ) : (
-            <div className="text-muted-foreground py-8 text-center">
+            <div className="text-muted-foreground py-8 text-center text-sm">
               <p>No settlements found</p>
             </div>
           )}
@@ -263,15 +280,14 @@ export function SettlementsList({
       {/* Net Settlement Details Dialog */}
       {group && (
         <Dialog open={showDetailsDialog} onOpenChange={setShowDetailsDialog}>
-          <DialogContent className="flex max-h-[85vh] max-w-[80vw] flex-col gap-0 overflow-hidden p-0 sm:max-w-4xl">
-            <DialogHeader className="border-border shrink-0 border-b p-4 sm:p-6">
-              <DialogTitle className="flex items-center gap-2">
-                <TableProperties className="h-5 w-5 shrink-0" />
+          <DialogContent className="flex max-h-[88vh] max-w-[95vw] sm:max-w-4xl flex-col gap-0 overflow-hidden rounded-2xl border border-border/80 bg-card p-0 shadow-2xl">
+            <DialogHeader className="border-b border-border/70 px-6 py-4">
+              <DialogTitle className="flex items-center gap-2 text-lg font-bold tracking-tight">
+                <TableProperties className="size-4.5 text-primary" />
                 Net Settlement Breakdown
               </DialogTitle>
-              <p className="text-muted-foreground text-sm">
-                Each person&apos;s share per expense, total owed, amount paid,
-                and net balance.
+              <p className="text-muted-foreground text-xs">
+                Each participant&apos;s share per expense, total owed, amount paid, and net balance.
               </p>
             </DialogHeader>
             <div className="min-h-0 flex-1 overflow-auto p-4 sm:p-6">

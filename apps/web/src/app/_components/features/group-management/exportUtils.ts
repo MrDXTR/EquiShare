@@ -1,11 +1,6 @@
 import type { Group } from "./utils";
 import { computeNetSettlementData } from "../settlements/NetSettlementTable";
 
-interface Person {
-  name: string | null;
-  id: string;
-}
-
 interface Settlement {
   from: { name: string | null };
   to: { name: string | null };
@@ -14,7 +9,7 @@ interface Settlement {
 }
 
 export function formatExpensesForExport(group: Group) {
-  const header = ["Date", "Description", "Amount", "Paid By", "Participants"];
+  const header = ["Date", "Description", "Amount (INR)", "Paid By", "Participants"];
   const rows = group.expenses.map((expense) => {
     const paidBy = expense.paidBy.name || "";
 
@@ -27,12 +22,12 @@ export function formatExpensesForExport(group: Group) {
       participants = expense.shares.map((p) => p.person?.name || "").join(", ");
     }
 
-    let formattedDate = new Date().toLocaleDateString();
+    let formattedDate = new Date().toLocaleDateString("en-IN");
     if ("createdAt" in expense && expense.createdAt) {
       try {
         formattedDate = new Date(
           expense.createdAt as string | number | Date,
-        ).toLocaleDateString();
+        ).toLocaleDateString("en-IN");
       } catch (e) {
         console.error("Error parsing date:", e);
       }
@@ -67,7 +62,7 @@ export function formatPeopleForExport(group: Group) {
 }
 
 export function formatSettlementsForExport(settlements: Settlement[]) {
-  const header = ["From", "To", "Amount", "Status"];
+  const header = ["From", "To", "Amount (INR)", "Status"];
 
   const rows = settlements.map((settlement) => [
     settlement.from.name || "",
@@ -86,7 +81,7 @@ export function convertToCSV(data: any[][]) {
         .map((cell) => {
           if (
             typeof cell === "string" &&
-            (cell.includes(",") || cell.includes('"'))
+            (cell.includes(",") || cell.includes('"') || cell.includes("\n"))
           ) {
             return `"${cell.replace(/"/g, '""')}"`;
           }
@@ -106,7 +101,8 @@ export function generateAllGroupData(
   const settlementsData = formatSettlementsForExport(settlements);
 
   const allData = [
-    ["Group: " + group.name],
+    ["EquiShare - Group Report: " + group.name],
+    ["Export Date: " + new Date().toLocaleDateString("en-IN")],
     [""],
     ["EXPENSES"],
     ...expenses,
@@ -144,10 +140,68 @@ export async function generatePDF(
   const { jsPDF } = await import("jspdf");
   const { default: autoTable } = await import("jspdf-autotable");
 
-  const doc = new jsPDF();
+  const doc = new jsPDF({
+    orientation: "portrait",
+    unit: "mm",
+    format: "a4",
+  });
 
+  const pageWidth = doc.internal.pageSize.getWidth();
+  const pageHeight = doc.internal.pageSize.getHeight();
+  const margin = 14;
+
+  // Header Banner styling
+  doc.setFillColor(15, 23, 42); // slate-900
+  doc.rect(0, 0, pageWidth, 28, "F");
+
+  // EquiShare Branding in Header
+  doc.setTextColor(255, 255, 255);
+  doc.setFontSize(16);
+  doc.setFont("helvetica", "bold");
+  doc.text("EquiShare", margin, 12);
+
+  doc.setFontSize(9);
+  doc.setFont("helvetica", "normal");
+  doc.setTextColor(148, 163, 184); // slate-400
+  doc.text("Expense & Settlement Summary Report", margin, 18);
+
+  // Export Date on top right
+  const exportDate = `Generated on ${new Date().toLocaleDateString("en-IN", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  })}`;
+  doc.setFontSize(8.5);
+  doc.text(exportDate, pageWidth - margin, 15, { align: "right" });
+
+  // Group Title
+  let currentY = 38;
+  doc.setTextColor(15, 23, 42);
   doc.setFontSize(18);
-  doc.text(title, 14, 22);
+  doc.setFont("helvetica", "bold");
+  doc.text(title, margin, currentY);
+
+  // Group Stats Subtitle
+  if (group) {
+    currentY += 6;
+    const totalExpenses = group.expenses.reduce((sum, e) => sum + e.amount, 0);
+    const memberCount = group.people.length;
+    const expenseCount = group.expenses.length;
+
+    doc.setFontSize(9);
+    doc.setFont("helvetica", "normal");
+    doc.setTextColor(100, 116, 139); // slate-500
+    doc.text(
+      `Total Spend: Rs. ${totalExpenses.toLocaleString("en-IN", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      })}  •  ${memberCount} Participants  •  ${expenseCount} Expenses`,
+      margin,
+      currentY,
+    );
+  }
+
+  currentY += 10;
 
   const parseCsvRow = (row: string): string[] => {
     const result: string[] = [];
@@ -171,38 +225,74 @@ export async function generatePDF(
 
   const rows = csvData.split("\n").map((row) => parseCsvRow(row));
 
-  let currentY = 30;
-  let currentSection = "";
   let tableData: string[][] = [];
   let tableHeader: string[] = [];
+
+  const renderSectionTable = (sectionTitle: string) => {
+    if (tableData.length === 0 || tableHeader.length === 0) return;
+
+    if (currentY > pageHeight - 40) {
+      doc.addPage();
+      currentY = 20;
+    }
+
+    // Section title with accent tag
+    doc.setFontSize(11);
+    doc.setFont("helvetica", "bold");
+    doc.setTextColor(30, 41, 59); // slate-800
+    doc.text(sectionTitle, margin, currentY);
+    currentY += 4;
+
+    autoTable(doc, {
+      head: [tableHeader],
+      body: tableData,
+      startY: currentY,
+      theme: "grid",
+      styles: {
+        fontSize: 8.5,
+        cellPadding: 2.5,
+        lineColor: [226, 232, 240], // slate-200
+        lineWidth: 0.2,
+        textColor: [30, 41, 59],
+      },
+      headStyles: {
+        fillColor: [15, 23, 42], // slate-900
+        textColor: [255, 255, 255],
+        fontStyle: "bold",
+        fontSize: 8.5,
+      },
+      alternateRowStyles: {
+        fillColor: [248, 250, 252], // slate-50
+      },
+      margin: { left: margin, right: margin },
+    });
+
+    const lastY = (doc as any).lastAutoTable?.finalY;
+    currentY = (lastY || currentY) + 10;
+
+    tableData = [];
+    tableHeader = [];
+  };
+
+  let pendingSectionName = "";
 
   rows.forEach((row) => {
     if (
       row.length === 1 &&
       (row[0] === "EXPENSES" || row[0] === "PEOPLE" || row[0] === "SETTLEMENTS")
     ) {
-      if (tableData.length > 0) {
-        autoTable(doc, {
-          head: [tableHeader],
-          body: tableData,
-          startY: currentY,
-          theme: "striped",
-          headStyles: { fillColor: [100, 100, 255] },
-        });
-
-        const lastY = (doc as any).lastAutoTable?.finalY;
-        currentY = lastY ? lastY + 10 : currentY + 10;
+      if (pendingSectionName && tableData.length > 0) {
+        renderSectionTable(pendingSectionName);
       }
-
-      doc.setFontSize(14);
-      doc.text(row[0], 14, currentY);
-      currentY += 8;
-      currentSection = row[0];
+      pendingSectionName = row[0];
       tableData = [];
       tableHeader = [];
-    } else if (row.length === 1 && row[0] === "") {
-    } else if (row.length === 1 && row[0]?.startsWith("Group: ")) {
-    } else if (row.length > 0) {
+    } else if (
+      row.length === 1 &&
+      (row[0] === "" || row[0]?.startsWith("Group: ") || row[0]?.startsWith("EquiShare") || row[0]?.startsWith("Export Date:"))
+    ) {
+      // Skip meta rows
+    } else if (row.length > 0 && row.some((cell) => cell.trim() !== "")) {
       if (tableHeader.length === 0) {
         tableHeader = row;
       } else {
@@ -211,57 +301,49 @@ export async function generatePDF(
     }
   });
 
-  if (tableData.length > 0) {
-    autoTable(doc, {
-      head: [tableHeader],
-      body: tableData,
-      startY: currentY,
-      theme: "striped",
-      headStyles: { fillColor: [100, 100, 255] },
-    });
-    const lastY2 = (doc as any).lastAutoTable?.finalY;
-    currentY = lastY2 ? lastY2 + 10 : currentY + 10;
+  if (pendingSectionName && tableData.length > 0) {
+    renderSectionTable(pendingSectionName);
   }
 
-  // Add Net Settlement Breakdown if group data is provided
+  // Net Settlement Breakdown Table
   if (group && group.expenses.length > 0) {
-    const { rows, expenses } = computeNetSettlementData(group);
+    const { rows: netRows, expenses: netExpenses } = computeNetSettlementData(group);
 
-    // Check if we need a new page
-    if (currentY > 200) {
+    if (currentY > pageHeight - 50) {
       doc.addPage();
       currentY = 20;
     }
 
-    doc.setFontSize(14);
-    doc.text("NET SETTLEMENT BREAKDOWN", 14, currentY);
-    currentY += 8;
+    doc.setFontSize(11);
+    doc.setFont("helvetica", "bold");
+    doc.setTextColor(30, 41, 59);
+    doc.text("NET SETTLEMENT BREAKDOWN", margin, currentY);
+    currentY += 4;
 
-    // Build table headers: Person + each expense description + Total Owes + Paid + Net
     const netTableHead = [
       "Person",
-      ...expenses.map((e) =>
-        e.description.length > 12
-          ? e.description.slice(0, 12) + "..."
+      ...netExpenses.map((e) =>
+        e.description.length > 14
+          ? e.description.slice(0, 14) + "..."
           : e.description,
       ),
       "Total Owes",
       "Paid",
-      "Net",
+      "Net Balance",
     ];
 
-    const netTableBody = rows.map((row) => [
+    const netTableBody = netRows.map((row) => [
       row.personName,
-      ...expenses.map((e) => {
+      ...netExpenses.map((e) => {
         const amt = row.expenseShares[e.id] ?? 0;
-        return amt > 0 ? `Rs.${amt.toFixed(0)}` : "Rs.0";
+        return amt > 0 ? `Rs. ${amt.toLocaleString("en-IN", { maximumFractionDigits: 0 })}` : "Rs. 0";
       }),
-      row.totalOwes > 0 ? `Rs.${row.totalOwes.toFixed(0)}` : "Rs.0",
-      row.paid > 0 ? `Rs.${row.paid.toFixed(0)}` : "Rs.0",
+      `Rs. ${row.totalOwes.toLocaleString("en-IN", { maximumFractionDigits: 0 })}`,
+      `Rs. ${row.paid.toLocaleString("en-IN", { maximumFractionDigits: 0 })}`,
       row.net > 0
-        ? `Receives Rs.${row.net.toFixed(0)}`
+        ? `+ Rs. ${row.net.toLocaleString("en-IN", { maximumFractionDigits: 0 })}`
         : row.net < 0
-          ? `Owes Rs.${Math.abs(row.net).toFixed(0)}`
+          ? `- Rs. ${Math.abs(row.net).toLocaleString("en-IN", { maximumFractionDigits: 0 })}`
           : "Settled",
     ]);
 
@@ -269,13 +351,44 @@ export async function generatePDF(
       head: [netTableHead],
       body: netTableBody,
       startY: currentY,
-      theme: "striped",
-      headStyles: { fillColor: [67, 56, 202] },
+      theme: "grid",
+      styles: {
+        fontSize: 8,
+        cellPadding: 2.2,
+        lineColor: [226, 232, 240],
+        lineWidth: 0.2,
+        textColor: [30, 41, 59],
+      },
+      headStyles: {
+        fillColor: [30, 41, 59], // slate-800
+        textColor: [255, 255, 255],
+        fontStyle: "bold",
+        fontSize: 8,
+      },
+      alternateRowStyles: {
+        fillColor: [248, 250, 252],
+      },
       columnStyles: {
         0: { fontStyle: "bold" },
         [netTableHead.length - 1]: { fontStyle: "bold" },
       },
+      margin: { left: margin, right: margin },
     });
+  }
+
+  // Add Page Numbers and Footer to all pages
+  const totalPages = (doc as any).internal.getNumberOfPages();
+  for (let i = 1; i <= totalPages; i++) {
+    doc.setPage(i);
+    doc.setFontSize(8);
+    doc.setFont("helvetica", "normal");
+    doc.setTextColor(148, 163, 184); // slate-400
+    doc.text(
+      `EquiShare • Page ${i} of ${totalPages}`,
+      pageWidth / 2,
+      pageHeight - 8,
+      { align: "center" },
+    );
   }
 
   return doc.output("blob");

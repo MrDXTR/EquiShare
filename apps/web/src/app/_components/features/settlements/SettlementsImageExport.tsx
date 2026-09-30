@@ -98,17 +98,18 @@ export function SettlementsImageExport({
   return (
     <Button
       variant="outline"
-      size="icon"
+      size="sm"
       onClick={handleExportImage}
       disabled={isExporting}
-      className="md:size-sm h-8 w-8 rounded-full border-indigo-200 bg-indigo-50 p-1 text-indigo-700 hover:bg-indigo-100 md:h-8 md:w-auto md:rounded-md md:p-2 dark:border-indigo-800 dark:bg-indigo-900/30 dark:text-indigo-400 dark:hover:bg-indigo-800/50"
+      className="h-9 px-2.5 sm:px-3 text-xs font-medium border-border/80 bg-background/80 hover:bg-accent active:scale-[0.96] transition-transform duration-150 gap-1.5"
+      aria-label="Export settlement image"
     >
       {isExporting ? (
-        <Loader2 className="h-4 w-4 animate-spin" />
+        <Loader2 className="size-3.5 animate-spin" />
       ) : (
-        <Download className="h-4 w-4" />
+        <Download className="size-3.5" />
       )}
-      <span className="ml-1 hidden md:inline">Export Image</span>
+      <span className="hidden sm:inline">Export Image</span>
     </Button>
   );
 }

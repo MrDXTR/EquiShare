@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Download, FileSpreadsheet, File, Loader2 } from "lucide-react";
+import { Download, FileSpreadsheet, FileText, Loader2 } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -75,40 +75,43 @@ export function GroupDataExport({ group }: GroupDataExportProps) {
         <Button
           variant="outline"
           size="icon"
-          className="h-8 w-8 rounded-full border-blue-200 bg-blue-50 text-blue-700 hover:bg-blue-100 dark:border-blue-800 dark:bg-blue-900/30 dark:text-blue-400 dark:hover:bg-blue-800/50"
+          className="size-9 rounded-lg border-border/80 bg-background/80 text-muted-foreground hover:text-foreground active:scale-[0.96] transition-[transform,border-color,background-color] duration-150"
+          aria-label="Export options"
         >
-          <Download className="h-4 w-4" />
+          <Download className="size-4" />
         </Button>
       </DropdownMenuTrigger>
 
-      <DropdownMenuContent align="end" className="w-48">
-        <DropdownMenuLabel>Export Group Data</DropdownMenuLabel>
-        <DropdownMenuSeparator />
+      <DropdownMenuContent align="end" className="w-52 rounded-xl border-border/80 p-1.5">
+        <DropdownMenuLabel className="text-xs font-semibold uppercase tracking-wider text-muted-foreground px-2 py-1.5">
+          Export Group Data
+        </DropdownMenuLabel>
+        <DropdownMenuSeparator className="bg-border/60" />
 
         <DropdownMenuItem
           onClick={() => handleExport("csv")}
           disabled={isExporting !== null}
-          className="cursor-pointer"
+          className="cursor-pointer rounded-lg py-2 text-xs font-medium"
         >
           {isExporting === "csv" ? (
-            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            <Loader2 className="mr-2 size-4 animate-spin" />
           ) : (
-            <FileSpreadsheet className="mr-2 h-4 w-4" />
+            <FileSpreadsheet className="mr-2 size-4 text-emerald-600 dark:text-emerald-400" />
           )}
-          <span>Download CSV</span>
+          <span>Download as CSV</span>
         </DropdownMenuItem>
 
         <DropdownMenuItem
           onClick={() => handleExport("pdf")}
           disabled={isExporting !== null}
-          className="cursor-pointer"
+          className="cursor-pointer rounded-lg py-2 text-xs font-medium"
         >
           {isExporting === "pdf" ? (
-            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            <Loader2 className="mr-2 size-4 animate-spin" />
           ) : (
-            <File className="mr-2 h-4 w-4" />
+            <FileText className="mr-2 size-4 text-primary" />
           )}
-          <span>Download PDF</span>
+          <span>Download as PDF</span>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

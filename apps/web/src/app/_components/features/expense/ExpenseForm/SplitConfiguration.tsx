@@ -1,4 +1,3 @@
-import { motion } from "framer-motion";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
@@ -7,9 +6,7 @@ import {
   AlertTriangle,
   Calculator,
   Check,
-  DollarSign,
   Equal,
-  IndianRupee,
   Percent,
   RotateCcw,
 } from "lucide-react";
@@ -38,16 +35,19 @@ const splitModeOptions = [
     value: "EQUAL",
     label: "Equal",
     icon: Equal,
+    desc: "Divide evenly",
   },
   {
     value: "PERCENT",
     label: "Percent",
     icon: Percent,
+    desc: "By percentage",
   },
   {
     value: "EXACT",
     label: "Exact",
-    icon: DollarSign,
+    icon: () => <span className="font-bold text-sm">₹</span>,
+    desc: "Custom amounts",
   },
 ] as const;
 
@@ -99,7 +99,6 @@ export function SplitConfiguration({
     updateFormState({ shareValues: newShareValues, formErrors: null });
   };
 
-  // Calculate current totals
   const { percentTotal, exactTotal } = calculateCurrentTotals(
     shareValues,
     selectedPersonIds,
@@ -107,53 +106,57 @@ export function SplitConfiguration({
   );
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       {/* Split Mode Selection */}
-      <div className="space-y-3">
-        <Label className="flex items-center gap-2">
-          <Calculator className="text-muted-foreground h-4 w-4" />
+      <div className="space-y-2">
+        <Label className="flex items-center gap-1.5 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+          <Calculator className="size-3.5 text-primary" />
           Split Method
         </Label>
 
-        <div className="grid grid-cols-3 gap-3">
+        <div className="grid grid-cols-3 gap-2.5">
           {splitModeOptions.map((option) => {
             const Icon = option.icon;
             const isSelected = splitMode === option.value;
 
             return (
-              <motion.button
+              <button
                 key={option.value}
                 type="button"
-                whileTap={{ scale: 0.95 }}
                 onClick={() => handleSplitModeUpdate(option.value as SplitMode)}
-                className={`relative rounded-lg border-2 p-4 transition-all duration-200 ${
+                className={`relative flex flex-col items-center justify-center gap-1.5 rounded-xl border p-3 text-center transition-[transform,border-color,background-color] duration-150 active:scale-[0.97] cursor-pointer select-none ${
                   isSelected
-                    ? "border-foreground/30 bg-muted/30"
-                    : "border-border hover:border-foreground/20"
-                } `}
+                    ? "border-primary bg-primary/10 shadow-2xs"
+                    : "border-border/70 bg-card/60 hover:bg-card hover:border-border"
+                }`}
               >
-                <div className="flex flex-col items-center gap-2">
-                  <div
-                    className={`flex h-10 w-10 items-center justify-center rounded-lg ${
-                      isSelected
-                        ? "border-foreground bg-foreground text-background border"
-                        : "border-border bg-background text-muted-foreground border"
-                    } `}
-                  >
-                    <Icon className="h-5 w-5" />
-                  </div>
+                <div
+                  className={`flex size-8 items-center justify-center rounded-lg transition-colors ${
+                    isSelected
+                      ? "bg-primary text-primary-foreground"
+                      : "bg-muted text-muted-foreground"
+                  }`}
+                >
+                  <Icon className="size-4" />
+                </div>
+                <div>
                   <span
-                    className={`text-sm font-medium ${isSelected ? "text-foreground" : ""}`}
+                    className={`block text-xs font-bold ${
+                      isSelected ? "text-primary" : "text-foreground"
+                    }`}
                   >
                     {option.label}
                   </span>
+                  <span className="hidden sm:block text-[10px] text-muted-foreground">
+                    {option.desc}
+                  </span>
                 </div>
                 {isSelected && (
-                  <div className="border-border bg-background absolute top-2 right-2 flex h-5 w-5 items-center justify-center rounded-full border">
-                    <Check className="text-foreground h-3 w-3" />
+                  <div className="absolute top-1.5 right-1.5 flex size-4 items-center justify-center rounded-full bg-primary text-primary-foreground">
+                    <Check className="size-2.5 stroke-[2.5]" />
                   </div>
                 )}
-              </motion.button>
+              </button>
             );
           })}
         </div>
@@ -161,27 +164,27 @@ export function SplitConfiguration({
 
       {/* Error Display */}
       {formErrors && (
-        <div className="border-border bg-muted/30 text-foreground flex items-center gap-2 rounded-lg border p-3">
-          <AlertTriangle className="h-4 w-4" />
-          <span className="text-sm">{formErrors}</span>
+        <div className="flex items-center gap-2 rounded-xl border border-destructive/30 bg-destructive/10 p-3 text-xs text-destructive">
+          <AlertTriangle className="size-4 shrink-0" />
+          <span className="font-medium">{formErrors}</span>
         </div>
       )}
 
-      {/* Split Configuration */}
+      {/* Split Details */}
       {splitMode === "EQUAL" ? (
-        <div className="border-border bg-muted/20 rounded-lg border p-4 text-center">
-          <div className="text-foreground mb-1 text-2xl font-semibold">
-            ₹{(parsedAmount / selectedPersonIds.length).toFixed(2)}
+        <div className="rounded-xl border border-border/70 bg-muted/30 p-4 text-center">
+          <div className="text-foreground text-2xl font-bold tracking-tight tabular-nums mb-1">
+            ₹{selectedPersonIds.length > 0 ? (parsedAmount / selectedPersonIds.length).toFixed(2) : "0.00"}
           </div>
-          <div className="text-muted-foreground text-sm">
-            per person ({selectedPersonIds.length} people)
+          <div className="text-muted-foreground text-xs">
+            per participant ({selectedPersonIds.length} {selectedPersonIds.length === 1 ? "person" : "people"})
           </div>
         </div>
       ) : (
-        <div className="space-y-4">
+        <div className="space-y-3">
           {/* Total Display & Auto Balance */}
-          <div className="border-border bg-muted/20 flex items-center justify-between rounded-lg border p-3">
-            <div className="text-foreground text-sm font-medium">
+          <div className="flex items-center justify-between rounded-xl border border-border/70 bg-muted/30 px-3.5 py-2.5">
+            <div className="text-xs font-semibold tabular-nums text-foreground">
               {splitMode === "PERCENT"
                 ? `${percentTotal.toFixed(1)}% / 100%`
                 : `₹${exactTotal.toFixed(2)} / ₹${parsedAmount.toFixed(2)}`}
@@ -191,15 +194,15 @@ export function SplitConfiguration({
               variant="outline"
               size="sm"
               onClick={handleAutoBalance}
-              className="h-8 px-3 text-xs"
+              className="h-7 px-2.5 text-xs active:scale-[0.96] transition-transform duration-150"
             >
-              <RotateCcw className="mr-1 h-3 w-3" />
+              <RotateCcw className="mr-1 size-3" />
               Auto Balance
             </Button>
           </div>
 
           {/* Individual Share Controls */}
-          <div className="max-h-[calc(40vh-20px)] space-y-3 overflow-y-auto pr-1">
+          <div className="max-h-[36vh] space-y-2 overflow-y-auto pr-1">
             {selectedPersonIds.map((personId) => {
               const person = people.find((p) => p.id === personId);
               if (!person) return null;
@@ -210,16 +213,18 @@ export function SplitConfiguration({
               return (
                 <div
                   key={personId}
-                  className="border-border bg-muted/20 rounded-lg border p-3"
+                  className="rounded-xl border border-border/60 bg-card/60 p-3"
                 >
                   <div className="mb-2 flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      <div className="border-border text-foreground flex h-8 w-8 items-center justify-center rounded-full border text-xs font-bold">
+                      <div className="bg-primary/10 text-primary flex size-7 items-center justify-center rounded-lg text-xs font-semibold">
                         {getPersonInitials(person.name)}
                       </div>
-                      <span className="font-medium">{person.name}</span>
+                      <span className="text-sm font-medium text-foreground">
+                        {person.name}
+                      </span>
                     </div>
-                    <span className="text-foreground font-semibold">
+                    <span className="text-sm font-bold tabular-nums text-foreground">
                       {splitMode === "PERCENT"
                         ? `${currentValue.toFixed(1)}%`
                         : `₹${currentValue.toFixed(2)}`}
@@ -238,7 +243,9 @@ export function SplitConfiguration({
                     />
                   ) : (
                     <div className="relative">
-                      <IndianRupee className="absolute top-1/2 left-2 h-3 w-3 -translate-y-1/2 transform text-gray-400" />
+                      <span className="pointer-events-none absolute top-1/2 left-2.5 -translate-y-1/2 text-muted-foreground text-xs font-semibold">
+                        ₹
+                      </span>
                       <Input
                         type="number"
                         step="0.01"
@@ -251,7 +258,7 @@ export function SplitConfiguration({
                             parseFloat(e.target.value) || 0,
                           )
                         }
-                        className="h-8 pl-8 text-sm"
+                        className="h-8.5 pl-6 font-mono text-xs tabular-nums rounded-lg border-border/80 bg-background/80"
                         placeholder="0.00"
                       />
                     </div>

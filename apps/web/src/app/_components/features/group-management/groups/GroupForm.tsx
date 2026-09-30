@@ -8,7 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
 import { Separator } from "~/components/ui/separator";
-import { Plus, X } from "lucide-react";
+import { Plus, X, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
 interface GroupFormProps {
@@ -74,125 +74,120 @@ export function GroupForm({ onClose, onSuccess }: GroupFormProps) {
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20, scale: 0.95 }}
-      animate={{ opacity: 1, y: 0, scale: 1 }}
-      exit={{ opacity: 0, y: -20, scale: 0.95 }}
+      initial={{ opacity: 0, scale: 0.98 }}
+      animate={{ opacity: 1, scale: 1 }}
+      exit={{ opacity: 0, scale: 0.98 }}
+      transition={{ duration: 0.18, ease: [0.23, 1, 0.32, 1] }}
       className="relative"
     >
-      <Card className="border-0 bg-white/90 shadow-2xl shadow-blue-100/50 backdrop-blur-sm">
+      <Card className="rounded-2xl border border-border/80 bg-card shadow-2xl">
         <CardHeader className="pb-4">
           <div className="flex items-center justify-between">
-            <CardTitle className="flex items-center gap-3 text-2xl">
-              <div className="rounded-lg bg-green-600 p-2">
-                <Plus className="h-6 w-6 text-white" />
+            <CardTitle className="flex items-center gap-3 text-xl font-bold tracking-tight">
+              <div className="bg-primary/10 text-primary flex size-8 items-center justify-center rounded-lg">
+                <Plus className="size-4" />
               </div>
-              <span className="text-gray-900 dark:text-gray-100">
-                Create New Group
-              </span>
+              <span className="text-foreground">Create New Group</span>
             </CardTitle>
             <Button
               variant="ghost"
-              size="sm"
+              size="icon"
               onClick={onClose}
-              className="rounded-full text-gray-500 hover:bg-gray-100 hover:text-gray-700"
+              className="size-8 rounded-lg text-muted-foreground hover:text-foreground active:scale-[0.96]"
             >
-              <X className="h-5 w-5" />
+              <X className="size-4" />
             </Button>
           </div>
         </CardHeader>
-        <CardContent className="space-y-6">
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="space-y-2">
+
+        <CardContent className="space-y-5">
+          <form onSubmit={handleSubmit} className="space-y-5">
+            <div className="space-y-1.5">
               <Label
                 htmlFor="groupName"
-                className="text-sm font-semibold text-gray-700"
+                className="text-xs font-semibold uppercase tracking-wider text-muted-foreground"
               >
-                Group Name *
+                Group Name <span className="text-destructive">*</span>
               </Label>
               <Input
                 id="groupName"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                placeholder="e.g., Trip to Goa, Roommate Expenses, Office Lunch"
-                className="h-12 border-gray-200 transition-all duration-200 focus:border-blue-500 focus:ring-blue-500/20"
+                placeholder="e.g. Trip to Goa, Roommate Expenses, Office Lunch"
+                className="h-10.5 rounded-lg border-border/80 bg-background/80"
                 autoFocus
                 required
               />
-              <p className="text-sm text-gray-500">
-                Choose a descriptive name for your group
+              <p className="text-xs text-muted-foreground">
+                Give your group an identifiable name.
               </p>
             </div>
 
             <div className="space-y-2">
-              <Label className="text-sm font-semibold text-gray-700">
-                People *
+              <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                Initial Participants <span className="text-destructive">*</span>
               </Label>
-              {people.map((person, index) => (
-                <motion.div
-                  key={index}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -20 }}
-                  className="flex gap-2"
-                >
-                  <Input
-                    value={person}
-                    onChange={(e) => updatePerson(index, e.target.value)}
-                    placeholder={`Person ${index + 1}`}
-                    className="h-12 border-gray-200 transition-all duration-200 focus:border-blue-500 focus:ring-blue-500/20"
-                    required
-                  />
-                  {people.length > 1 && (
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => removePerson(index)}
-                      className="rounded-full text-gray-500 hover:bg-gray-100 hover:text-gray-700"
-                    >
-                      <X className="h-4 w-4" />
-                    </Button>
-                  )}
-                </motion.div>
-              ))}
+              <div className="space-y-2 max-h-56 overflow-y-auto pr-1">
+                {people.map((person, index) => (
+                  <div key={index} className="flex items-center gap-2">
+                    <Input
+                      value={person}
+                      onChange={(e) => updatePerson(index, e.target.value)}
+                      placeholder={`Participant ${index + 1}`}
+                      className="h-10 rounded-lg border-border/80 bg-background/80"
+                      required
+                    />
+                    {people.length > 1 && (
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => removePerson(index)}
+                        className="size-10 shrink-0 rounded-lg text-muted-foreground hover:bg-destructive/10 hover:text-destructive active:scale-[0.96]"
+                      >
+                        <X className="size-4" />
+                      </Button>
+                    )}
+                  </div>
+                ))}
+              </div>
+
               <Button
                 type="button"
                 variant="outline"
+                size="sm"
                 onClick={addPerson}
-                className="w-full border-gray-200 hover:bg-gray-50"
+                className="mt-1 h-9 w-full rounded-lg border-dashed border-border/80 active:scale-[0.97] transition-transform duration-150"
               >
-                Add Person
+                <Plus className="mr-1.5 size-4" />
+                Add Another Participant
               </Button>
             </div>
 
-            <Separator />
+            <Separator className="bg-border/60" />
 
-            <div className="flex flex-col justify-end gap-3 sm:flex-row">
+            <div className="flex flex-col-reverse justify-end gap-2.5 sm:flex-row">
               <Button
                 type="button"
                 variant="outline"
                 onClick={onClose}
-                className="order-2 border-gray-300 hover:bg-gray-50 sm:order-1"
+                className="h-10 w-full sm:w-auto active:scale-[0.97] transition-transform duration-150 border-border/80"
               >
                 Cancel
               </Button>
               <Button
                 type="submit"
                 disabled={!isFormValid || createGroup.isPending}
-                className={`order-1 sm:order-2 ${
-                  isFormValid
-                    ? "bg-gradient-to-r from-green-600 to-emerald-600 shadow-lg hover:from-green-700 hover:to-emerald-700 hover:shadow-xl"
-                    : "cursor-not-allowed bg-gray-300"
-                } transition-all duration-300`}
+                className="h-10 w-full sm:w-auto font-medium active:scale-[0.97] transition-transform duration-150"
               >
                 {createGroup.isPending ? (
                   <div className="flex items-center gap-2">
-                    <div className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />
+                    <Loader2 className="size-4 animate-spin" />
                     Creating...
                   </div>
                 ) : (
                   <>
-                    <Plus className="mr-2 h-4 w-4" />
+                    <Plus className="mr-1.5 size-4" />
                     Create Group
                   </>
                 )}
