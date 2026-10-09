@@ -28,7 +28,7 @@ export default function SignInPage() {
 
   return (
     <div className="flex min-h-[calc(100vh-8rem)] items-center justify-center bg-background p-4 transition-colors">
-      <div className="w-full max-w-sm">
+      <div className="w-full max-w-md">
         <MagicCard className="rounded-2xl p-0.5">
           <Card className="rounded-[15px] border-0 bg-card p-6 shadow-xl">
             <CardContent className="space-y-6 p-0">
