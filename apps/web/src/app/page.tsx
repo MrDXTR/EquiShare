@@ -11,8 +11,14 @@ import {
   TrendingUp,
   Users,
 } from "lucide-react";
+import { AnimatedGridPattern } from "~/components/ui/animated-grid-pattern";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
+import { DiaTextReveal } from "~/components/ui/dia-text-reveal";
+import { LayoutTextFlip } from "~/components/ui/layout-text-flip";
+import { MorphingText } from "~/components/ui/morphing-text";
+import { GlowingEffect } from "~/components/ui/glowing-effect";
+import { ShineBorder } from "~/components/ui/shine-border";
 
 export default function LandingPage() {
   const { data: session, status } = useSession();
@@ -70,9 +76,12 @@ export default function LandingPage() {
     <div className="bg-background text-foreground transition-colors">
       {/* Hero Section */}
       <section className="relative overflow-hidden">
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute inset-0 opacity-20 [background-image:linear-gradient(to_right,var(--border)_1px,transparent_1px),linear-gradient(to_bottom,var(--border)_1px,transparent_1px)] [background-size:40px_40px]"
+        <AnimatedGridPattern
+          className="opacity-30"
+          maxOpacity={0.12}
+          numSquares={10}
+          duration={14}
+          repeatDelay={3}
         />
 
         <div className="relative mx-auto flex min-h-[calc(100vh-4rem)] max-w-6xl flex-col items-center justify-center px-4 py-16 text-center">
@@ -86,16 +95,26 @@ export default function LandingPage() {
             </Badge>
 
             <div className="flex flex-col items-center gap-3">
-              <h1 className="text-3xl font-extrabold tracking-tight md:text-5xl">
-                Split expenses fairly
-              </h1>
+              <LayoutTextFlip
+                text="Split expenses"
+                words={["fairly", "instantly", "without awkwardness", "with friends"]}
+                duration={2800}
+                className="text-3xl font-extrabold tracking-tight md:text-5xl"
+              />
               <p className="mx-auto max-w-xl text-base leading-relaxed text-muted-foreground sm:text-lg">
                 EquiShare keeps every shared bill transparent and fair — from
                 weekend getaways to monthly household costs.
               </p>
+              {/* DiaTextReveal in its own fixed-height line — no reflow */}
               <div className="flex items-center justify-center gap-1.5 text-base text-muted-foreground sm:text-lg">
                 <span>Perfect for</span>
-                <span className="font-semibold text-foreground">trips, roommates, teams, and daily bills</span>
+                <DiaTextReveal
+                  text={["trips", "roommates", "team events", "daily bills"]}
+                  repeat
+                  repeatDelay={1.4}
+                  duration={1.1}
+                  className="font-semibold text-foreground"
+                />
               </div>
             </div>
 
@@ -138,9 +157,10 @@ export default function LandingPage() {
           <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
             Everything you need for
           </p>
-          <h2 className="mx-auto text-3xl font-bold tracking-tight text-foreground md:text-5xl">
-            From trips to everyday bills
-          </h2>
+          <MorphingText
+            texts={["Trips", "Shared apartments", "Team events", "Everyday bills"]}
+            className="mx-auto h-14 max-w-3xl text-[2.2rem] md:h-18 md:text-[2.8rem] lg:text-[3.2rem]"
+          />
           <p className="mt-1 max-w-lg text-sm text-muted-foreground">
             Powerful features designed to make splitting as painless as possible.
           </p>
@@ -157,6 +177,13 @@ export default function LandingPage() {
                   className={`min-h-[13rem] list-none ${feature.area}`}
                 >
                   <div className="relative h-full rounded-2xl border border-border/70 p-2 md:rounded-3xl md:p-3 bg-card/40">
+                    <GlowingEffect
+                      spread={40}
+                      glow={true}
+                      disabled={false}
+                      proximity={64}
+                      inactiveZone={0.01}
+                    />
                     <div className="relative flex h-full flex-col justify-between gap-6 overflow-hidden rounded-xl bg-card/80 p-6 shadow-2xs">
                       <div className="relative flex flex-1 flex-col justify-between gap-3 text-left">
                         <div className="w-fit rounded-lg border border-border/80 bg-primary/10 p-2 text-primary">
@@ -180,8 +207,14 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* CTA Section — ShineBorder */}
       <section className="mx-auto max-w-6xl px-4 py-16">
         <div className="relative flex flex-col items-center gap-5 overflow-hidden rounded-2xl border border-border/70 bg-card/60 p-8 sm:py-14 text-center shadow-lg">
+          <ShineBorder
+            shineColor={["#9E7AFF", "#FE8BBB", "#60a5fa"]}
+            borderWidth={1.5}
+            duration={10}
+          />
           <h2 className="text-2xl font-bold tracking-tight sm:text-3xl text-foreground">
             Ready to get started?
           </h2>

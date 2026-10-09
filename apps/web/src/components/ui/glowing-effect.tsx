@@ -2,7 +2,6 @@
 
 import { memo, useCallback, useEffect, useRef } from "react";
 import { cn } from "~/lib/utils";
-import { animate } from "motion/react";
 
 interface GlowingEffectProps {
   blur?: number;
@@ -25,7 +24,6 @@ const GlowingEffect = memo(
     variant = "default",
     glow = false,
     className,
-    movementDuration = 2,
     borderWidth = 1,
     disabled = true,
   }: GlowingEffectProps) => {
@@ -76,30 +74,23 @@ const GlowingEffect = memo(
 
           if (!isActive) return;
 
-          const currentAngle =
-            parseFloat(element.style.getPropertyValue("--start")) || 0;
           const targetAngle =
             (180 * Math.atan2(mouseY - centerY, mouseX - centerX)) /
               Math.PI +
             90;
-
-          const angleDiff = ((targetAngle - currentAngle + 180) % 360) - 180;
-          const newAngle = currentAngle + angleDiff;
-
-          animate(currentAngle, newAngle, {
-            duration: movementDuration,
-            ease: [0.16, 1, 0.3, 1],
-            onUpdate: (value) => {
-              element.style.setProperty("--start", String(value));
-            },
-          });
+          // Set the angle once per animation frame. Starting a new Motion
+          // animation for every pointer event creates many competing timelines.
+          element.style.setProperty("--start", String(targetAngle));
         });
       },
-      [inactiveZone, proximity, movementDuration]
+      [inactiveZone, proximity]
     );
 
     useEffect(() => {
       if (disabled) return;
+
+      // Pointer-following glow has no useful interaction on touch screens.
+      if (window.matchMedia("(pointer: coarse)").matches) return;
 
       const handleScroll = () => handleMove();
       const handlePointerMove = (e: PointerEvent) => handleMove(e);

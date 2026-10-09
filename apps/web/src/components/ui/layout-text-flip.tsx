@@ -40,14 +40,12 @@ export const LayoutTextFlip = ({
         <AnimatePresence mode="popLayout">
           <motion.span
             key={currentIndex}
-            initial={{ y: -40, filter: "blur(10px)" }}
-            animate={{
-              y: 0,
-              filter: "blur(0px)",
-            }}
-            exit={{ y: 50, filter: "blur(10px)", opacity: 0 }}
+            initial={{ y: -12, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: 12, opacity: 0 }}
             transition={{
-              duration: 0.5,
+              duration: 0.3,
+              ease: "easeOut",
             }}
             className={cn("inline-block whitespace-nowrap")}
           >
