@@ -18,6 +18,7 @@ import {
   DialogTitle,
 } from "~/components/ui/dialog";
 import { NetSettlementTable } from "./NetSettlementTable";
+import { ScrollFadeArea } from "~/components/ui/scroll-fade-area";
 import type { Group } from "../group-management/utils";
 
 interface SettlementsListProps {
@@ -96,7 +97,7 @@ export function SettlementsList({
   const noRows = (settlements?.length ?? 0) === 0;
 
   return (
-    <div>
+    <>
       <Card className="border-border/70 bg-card h-full rounded-2xl shadow-xs transition-shadow">
         <CardHeader className="pb-3">
           <div className="flex flex-col gap-3.5 md:flex-row md:items-center md:justify-between">
@@ -105,10 +106,15 @@ export function SettlementsList({
                 <ArrowRight className="size-4" />
               </div>
               <span>Settlements</span>
+              {group?.name && (
+                <span className="settlement-export-group-name hidden text-sm font-normal text-muted-foreground">
+                  • {group.name}
+                </span>
+              )}
             </CardTitle>
 
-            <div className="flex flex-wrap items-center gap-2.5">
-              <div className="flex items-center gap-2 rounded-lg border border-border/70 bg-background/60 px-2.5 py-1.5 shadow-2xs">
+            <div data-export-hide="true" className="flex flex-wrap items-center gap-2.5">
+              <div className="flex h-9 items-center gap-2 rounded-lg border border-border/70 bg-background/60 px-3 shadow-2xs">
                 <Switch
                   id="show-settled"
                   checked={showSettled}
@@ -117,12 +123,12 @@ export function SettlementsList({
                 />
                 <Label htmlFor="show-settled" className="text-xs font-medium cursor-pointer select-none">
                   {showSettled ? (
-                    <span className="flex items-center gap-1 text-foreground">
+                    <span className="flex items-center gap-1.5 text-foreground">
                       <Eye className="size-3.5" />
                       <span>Showing Settled</span>
                     </span>
                   ) : (
-                    <span className="flex items-center gap-1 text-muted-foreground">
+                    <span className="flex items-center gap-1.5 text-muted-foreground">
                       <EyeOff className="size-3.5" />
                       <span>Hide Settled</span>
                     </span>
@@ -137,7 +143,7 @@ export function SettlementsList({
                   variant="outline"
                   size="sm"
                   onClick={() => setShowDetailsDialog(true)}
-                  className="h-9 gap-1.5 font-medium border-border/80 active:scale-[0.97] transition-transform duration-150"
+                  className="h-9 min-w-[118px] px-3.5 rounded-lg text-xs font-medium border-border/80 bg-background/80 hover:bg-accent active:scale-[0.96] transition-transform duration-150 gap-1.5 justify-center"
                 >
                   <TableProperties className="size-3.5 text-muted-foreground" />
                   <span>Breakdown</span>
@@ -156,124 +162,130 @@ export function SettlementsList({
           </div>
         </CardHeader>
 
-        <CardContent className="max-h-[440px] overflow-y-auto px-6 pt-1.5 pb-3">
-          {isLoading ? (
-            <div className="space-y-2.5 pt-1">
-              {[...Array(3)].map((_, i) => (
-                <Skeleton key={i} className="h-14 w-full rounded-xl" />
-              ))}
-            </div>
-          ) : noRows ? (
-            <div className="py-12 text-center rounded-xl border border-dashed border-border/70">
-              <div className="mb-3 inline-flex size-14 items-center justify-center rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
-                <CheckCircle2 className="size-8" />
+        <CardContent className="p-0">
+          <ScrollFadeArea
+            fadeHeight={32}
+            scrollClassName="max-h-[440px] px-6 pt-1.5 pb-3"
+          >
+            {isLoading ? (
+              <div className="space-y-2.5 pt-1">
+                {[...Array(3)].map((_, i) => (
+                  <Skeleton key={i} className="h-14 w-full rounded-xl" />
+                ))}
               </div>
-              <h3 className="text-foreground text-lg font-bold tracking-tight">
-                All Settled Up!
-              </h3>
-              <p className="text-muted-foreground text-xs mt-1">
-                All participant debts are currently settled.
-              </p>
-            </div>
-          ) : settlements && settlements.length > 0 ? (
-            <div className="space-y-2.5 pt-1">
-              {settlements.map((settlement: any) => {
-                const isSettled = settlement.settled;
-                const isSettleHovered = hoveredSettleId === settlement.id;
-                const highlightRow =
-                  isSettled || isSettleHovered || isSettleAllHovered;
+            ) : noRows ? (
+              <div className="py-12 text-center rounded-xl border border-dashed border-border/70">
+                <div className="mb-3 inline-flex size-14 items-center justify-center rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
+                  <CheckCircle2 className="size-8" />
+                </div>
+                <h3 className="text-foreground text-lg font-bold tracking-tight">
+                  All Settled Up!
+                </h3>
+                <p className="text-muted-foreground text-xs mt-1">
+                  All participant debts are currently settled.
+                </p>
+              </div>
+            ) : settlements && settlements.length > 0 ? (
+              <div className="space-y-2.5 pt-1">
+                {settlements.map((settlement: any) => {
+                  const isSettled = settlement.settled;
+                  const isSettleHovered = hoveredSettleId === settlement.id;
+                  const highlightRow =
+                    isSettled || isSettleHovered || isSettleAllHovered;
 
-                const amount = typeof settlement.amount === "number" ? settlement.amount : 0;
-                const formattedAmount = amount.toLocaleString("en-IN", {
-                  minimumFractionDigits: 2,
-                  maximumFractionDigits: 2,
-                });
+                  const amount = typeof settlement.amount === "number" ? settlement.amount : 0;
+                  const formattedAmount = amount.toLocaleString("en-IN", {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  });
 
-                return (
-                  <div
-                    key={settlement.id}
-                    className={`relative overflow-hidden rounded-xl border p-3.5 transition-[transform,box-shadow,border-color,background-color] duration-150 ease-out hover:-translate-y-0.5 shadow-2xs ${
-                      highlightRow
-                        ? "border-emerald-500/40 bg-emerald-500/[0.04] shadow-sm shadow-emerald-500/10"
-                        : "border-border/60 bg-background/50 hover:bg-card hover:border-border hover:shadow-xs"
-                    }`}
-                  >
-                    <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                      {/* Left: Transfer participants */}
-                      <div className="flex flex-wrap items-center gap-2">
-                        <Badge
-                          variant="outline"
-                          className="border-border/80 bg-background/80 text-foreground font-semibold text-xs px-2.5 py-1"
-                        >
-                          {settlement.from.name}
-                        </Badge>
-                        <span className="text-xs text-muted-foreground flex items-center gap-1">
-                          pays
-                          <ArrowRight className="size-3 text-muted-foreground" />
-                        </span>
-                        <Badge
-                          variant="outline"
-                          className="border-border/80 bg-background/80 text-foreground font-semibold text-xs px-2.5 py-1"
-                        >
-                          {settlement.to.name}
-                        </Badge>
-
-                        {isSettled && (
+                  return (
+                    <div
+                      key={settlement.id}
+                      className={`relative overflow-hidden rounded-xl border p-3.5 transition-[transform,box-shadow,border-color,background-color] duration-150 ease-out hover:-translate-y-0.5 shadow-2xs ${
+                        highlightRow
+                          ? "border-emerald-500/40 bg-emerald-500/[0.04] shadow-sm shadow-emerald-500/10"
+                          : "border-border/60 bg-background/50 hover:bg-card hover:border-border hover:shadow-xs"
+                      }`}
+                    >
+                      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                        {/* Left: Transfer participants */}
+                        <div className="flex flex-wrap items-center gap-2">
                           <Badge
                             variant="outline"
-                            className="ml-1 border-emerald-500/30 bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 font-semibold text-[11px]"
+                            className="border-border/80 bg-background/80 text-foreground font-semibold text-xs px-2.5 py-1"
                           >
-                            <CheckCircle2 className="mr-1 size-3" />
-                            Settled
+                            {settlement.from.name}
                           </Badge>
-                        )}
-                      </div>
-
-                      {/* Right: Amount & Settle action */}
-                      <div className="flex items-center justify-between sm:justify-end gap-3.5">
-                        <span className="text-foreground text-xl font-bold tracking-tight tabular-nums">
-                          ₹{formattedAmount}
-                        </span>
-
-                        {!isSettled && (
-                          <Button
-                            size="sm"
+                          <span className="text-xs text-muted-foreground flex items-center gap-1">
+                            pays
+                            <ArrowRight className="size-3 text-muted-foreground" />
+                          </span>
+                          <Badge
                             variant="outline"
-                            onClick={() =>
-                              handleSettleTransaction(settlement.id)
-                            }
-                            onMouseEnter={() =>
-                              setHoveredSettleId(settlement.id)
-                            }
-                            onMouseLeave={() => setHoveredSettleId(null)}
-                            onFocus={() => setHoveredSettleId(settlement.id)}
-                            onBlur={() => setHoveredSettleId(null)}
-                            disabled={settlingId === settlement.id}
-                            className={`min-w-[90px] h-9 text-xs font-semibold active:scale-[0.96] transition-transform duration-150 ${
-                              isSettleHovered
-                                ? "border-emerald-500 bg-emerald-50 text-emerald-700 shadow-2xs dark:bg-emerald-950/40 dark:text-emerald-300"
-                                : "hover:border-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300"
-                            }`}
+                            className="border-border/80 bg-background/80 text-foreground font-semibold text-xs px-2.5 py-1"
                           >
-                            {settlingId === settlement.id ? (
-                              <Loader2 className="size-3.5 animate-spin" />
-                            ) : (
-                              <CheckCircle2 className="size-3.5 mr-1" />
-                            )}
-                            <span>Settle</span>
-                          </Button>
-                        )}
+                            {settlement.to.name}
+                          </Badge>
+
+                          {isSettled && (
+                            <Badge
+                              variant="outline"
+                              className="ml-1 border-emerald-500/30 bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 font-semibold text-[11px]"
+                            >
+                              <CheckCircle2 className="mr-1 size-3" />
+                              Settled
+                            </Badge>
+                          )}
+                        </div>
+
+                        {/* Right: Amount & Settle action */}
+                        <div className="flex items-center justify-between sm:justify-end gap-3.5">
+                          <span className="text-foreground text-xl font-bold tracking-tight tabular-nums">
+                            ₹{formattedAmount}
+                          </span>
+
+                          {!isSettled && (
+                            <Button
+                              data-export-hide="true"
+                              size="sm"
+                              variant="outline"
+                              onClick={() =>
+                                handleSettleTransaction(settlement.id)
+                              }
+                              onMouseEnter={() =>
+                                setHoveredSettleId(settlement.id)
+                              }
+                              onMouseLeave={() => setHoveredSettleId(null)}
+                              onFocus={() => setHoveredSettleId(settlement.id)}
+                              onBlur={() => setHoveredSettleId(null)}
+                              disabled={settlingId === settlement.id}
+                              className={`min-w-[90px] h-9 text-xs font-semibold active:scale-[0.96] transition-transform duration-150 ${
+                                isSettleHovered
+                                  ? "border-emerald-500 bg-emerald-50 text-emerald-700 shadow-2xs dark:bg-emerald-950/40 dark:text-emerald-300"
+                                  : "hover:border-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300"
+                              }`}
+                            >
+                              {settlingId === settlement.id ? (
+                                <Loader2 className="size-3.5 animate-spin" />
+                              ) : (
+                                <CheckCircle2 className="size-3.5 mr-1" />
+                              )}
+                              <span>Settle</span>
+                            </Button>
+                          )}
+                        </div>
                       </div>
                     </div>
-                  </div>
-                );
-              })}
-            </div>
-          ) : (
-            <div className="text-muted-foreground py-8 text-center text-sm">
-              <p>No settlements found</p>
-            </div>
-          )}
+                  );
+                })}
+              </div>
+            ) : (
+              <div className="text-muted-foreground py-8 text-center text-sm">
+                <p>No settlements found</p>
+              </div>
+            )}
+          </ScrollFadeArea>
         </CardContent>
       </Card>
 
@@ -296,6 +308,6 @@ export function SettlementsList({
           </DialogContent>
         </Dialog>
       )}
-    </div>
+    </>
   );
 }

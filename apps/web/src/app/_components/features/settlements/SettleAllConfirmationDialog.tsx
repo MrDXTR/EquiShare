@@ -43,7 +43,7 @@ export function SettleAllConfirmationDialog({
           size="sm"
           variant="outline"
           disabled={isPending || activeSettlementsCount === 0}
-          className="h-9 gap-1.5 font-semibold text-xs border-emerald-500/40 bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 hover:bg-emerald-500/20 hover:border-emerald-500/60 active:scale-[0.96] transition-[transform,background-color,border-color] duration-150"
+          className="h-9 min-w-[118px] px-3.5 rounded-lg text-xs font-medium border-emerald-500/40 bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 hover:bg-emerald-500/20 hover:border-emerald-500/60 active:scale-[0.96] transition-[transform,background-color,border-color] duration-150 gap-1.5 justify-center"
           onMouseEnter={() => onHoverChange?.(true)}
           onMouseLeave={() => onHoverChange?.(false)}
           onFocus={() => onHoverChange?.(true)}

@@ -17,6 +17,7 @@ import {
   AlertDialogTitle,
 } from "~/components/ui/alert-dialog";
 import { Badge } from "~/components/ui/badge";
+import { ScrollFadeArea } from "~/components/ui/scroll-fade-area";
 import { api } from "~/trpc/react";
 import { toast } from "sonner";
 import type { Group } from "./utils";
@@ -28,68 +29,70 @@ interface PeopleManagementProps {
 export function PeopleManagement({ group }: PeopleManagementProps) {
   const [newPersonName, setNewPersonName] = useState("");
   const [personToDelete, setPersonToDelete] = useState<string | null>(null);
-  const [isDeletingPerson, setIsDeletingPerson] = useState(false);
+
   const utils = api.useUtils();
 
   const addPerson = api.group.addPerson.useMutation({
-    onMutate: () => {
-      toast.loading("Adding person...", { id: "add-person" });
-    },
-    onSuccess: async () => {
-      await utils.group.getById.invalidate(group.id);
-      await utils.expense.getBalances.invalidate(group.id);
-      setNewPersonName("");
-      toast.success("Person added successfully", { id: "add-person" });
-    },
-    onError: (error) => {
-      toast.error(`Failed to add person: ${error.message}`, {
-        id: "add-person",
-      });
-    },
-  });
-
-  const deletePerson = api.group.deletePerson.useMutation({
-    onMutate: () => {
-      toast.loading("Removing person...", { id: "delete-person" });
-    },
     onSuccess: async () => {
       await utils.group.getById.invalidate(group.id);
       await utils.expense.getBalances.invalidate(group.id);
       await utils.settlement.list.invalidate();
-      toast.success("Person removed successfully", { id: "delete-person" });
-      setPersonToDelete(null);
+      setNewPersonName("");
+      toast.success("Person added successfully");
     },
     onError: (error) => {
-      toast.error(`Failed to remove person: ${error.message}`, {
-        id: "delete-person",
-      });
+      toast.error(error.message);
+    },
+  });
+
+  const deletePerson = api.group.deletePerson.useMutation({
+    onSuccess: async () => {
+      await utils.group.getById.invalidate(group.id);
+      await utils.expense.getBalances.invalidate(group.id);
+      await utils.settlement.list.invalidate();
+      setPersonToDelete(null);
+      toast.success("Person removed successfully");
+    },
+    onError: (error) => {
+      toast.error(error.message);
     },
   });
 
   const handleAddPerson = (e: React.FormEvent) => {
     e.preventDefault();
-    if (newPersonName.trim()) {
-      addPerson.mutate({
-        name: newPersonName.trim(),
+    if (!newPersonName.trim()) {
+      toast.error("Please enter a name");
+      return;
+    }
+
+    // Check for duplicate name (case insensitive)
+    const nameExists = group.people.some(
+      (person) =>
+        person.name.trim().toLowerCase() ===
+        newPersonName.trim().toLowerCase(),
+    );
+
+    if (nameExists) {
+      toast.error("A person with this name already exists");
+      return;
+    }
+
+    addPerson.mutate({
+      groupId: group.id,
+      name: newPersonName.trim(),
+    });
+  };
+
+  const handleDeletePerson = () => {
+    if (personToDelete) {
+      deletePerson.mutate({
+        personId: personToDelete,
         groupId: group.id,
       });
     }
   };
 
-  const handleDeletePerson = async () => {
-    if (personToDelete) {
-      setIsDeletingPerson(true);
-      try {
-        await deletePerson.mutateAsync({
-          groupId: group.id,
-          personId: personToDelete,
-        });
-      } finally {
-        setIsDeletingPerson(false);
-        setPersonToDelete(null);
-      }
-    }
-  };
+  const isDeletingPerson = deletePerson.isPending;
 
   return (
     <div>
@@ -147,7 +150,10 @@ export function PeopleManagement({ group }: PeopleManagementProps) {
                 No participants yet. Add people to start splitting expenses.
               </div>
             ) : (
-              <div className="space-y-2 max-h-[350px] overflow-y-auto pr-1">
+              <ScrollFadeArea
+                fadeHeight={28}
+                scrollClassName="max-h-[350px] space-y-2 pr-1"
+              >
                 {group.people.map((person) => (
                   <div
                     key={person.id}
@@ -172,7 +178,7 @@ export function PeopleManagement({ group }: PeopleManagementProps) {
                     </Button>
                   </div>
                 ))}
-              </div>
+              </ScrollFadeArea>
             )}
           </div>
         </CardContent>
@@ -187,32 +193,35 @@ export function PeopleManagement({ group }: PeopleManagementProps) {
           }
         }}
       >
-        <AlertDialogContent>
+        <AlertDialogContent className="rounded-2xl border border-border/80 bg-card p-6 shadow-2xl">
           <AlertDialogHeader>
-            <AlertDialogTitle>Remove Person</AlertDialogTitle>
-            <AlertDialogDescription>
-              Are you sure? This will permanently delete this person and their associated expense shares.
+            <AlertDialogTitle className="text-xl font-bold tracking-tight text-foreground">
+              Remove Person
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-sm text-muted-foreground">
+              Are you sure you want to remove this person from the group? This
+              cannot be undone if they are part of any expenses.
             </AlertDialogDescription>
           </AlertDialogHeader>
-          <AlertDialogFooter>
+          <AlertDialogFooter className="mt-4 flex gap-2">
             <AlertDialogCancel
               disabled={isDeletingPerson}
-              className="active:scale-[0.97]"
+              className="active:scale-[0.97] transition-transform duration-150 border-border/80"
             >
               Cancel
             </AlertDialogCancel>
             <AlertDialogAction
               onClick={handleDeletePerson}
               disabled={isDeletingPerson}
-              className="bg-destructive text-white hover:bg-destructive/90 active:scale-[0.97]"
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90 active:scale-[0.97] transition-transform duration-150 font-medium"
             >
               {isDeletingPerson ? (
-                <div className="flex items-center gap-2">
-                  <Loader2 className="size-4 animate-spin" />
-                  Deleting...
-                </div>
+                <>
+                  <Loader2 className="mr-1.5 size-4 animate-spin" />
+                  <span>Removing...</span>
+                </>
               ) : (
-                "Delete"
+                <span>Remove</span>
               )}
             </AlertDialogAction>
           </AlertDialogFooter>
